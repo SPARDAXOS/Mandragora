@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Mandragora {
@@ -11,6 +9,9 @@ namespace Mandragora {
 
         public static bool Validate(Object target, string message, ValidationType type) {
             if (!target) {
+                if (message == null)
+                    return false;
+
                 if (type == ValidationType.DEBUG)
                     Debug.Log(message);
                 else if (type == ValidationType.WARNING)

@@ -44,3 +44,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9efe53c569cc4ce4ca2d5ad9ed3ee185, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  entitiesBundle: {fileID: 11400000, guid: 69c106c49dca700438c4b3bf22384b69, type: 2}
+  levelsBundle: {fileID: 11400000, guid: 26945b0305d55654e96aad91e8ae5997, type: 2}
+  player1ControlScheme: {fileID: 11400000, guid: c8571a4dc279c79409265de61e23c8ba, type: 2}
+  player2ControlScheme: {fileID: 11400000, guid: ab22c9cb5ecda9c449b57b56b7c03d51, type: 2}
+  player3ControlScheme: {fileID: 11400000, guid: 40a3446187ee4e44e8a9ba24f73dfad7, type: 2}
+  player4ControlScheme: {fileID: 11400000, guid: 54c052e816989614fbcf1b46bb99e364, type: 2}
+  currentGameState: 0

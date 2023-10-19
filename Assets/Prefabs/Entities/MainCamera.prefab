@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4704215841683333091}
   - component: {fileID: 6075319717511482246}
   - component: {fileID: 4550311458004441065}
+  - component: {fileID: 1891836560861259214}
   m_Layer: 0
   m_Name: MainCamera
   m_TagString: Untagged
@@ -26,13 +27,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9123308379923989643}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: 0.38268343, y: 0, z: 0, w: 0.92387956}
+  m_LocalPosition: {x: 0, y: 20, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 45, y: 0, z: 0}
 --- !u!20 &6075319717511482246
 Camera:
   m_ObjectHideFlags: 0
@@ -92,3 +93,23 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9123308379923989643}
   m_Enabled: 1
+--- !u!114 &1891836560861259214
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9123308379923989643}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e66f7e576e289274ab03b3d6253da27b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  restingCameraDistance: 3.07
+  maxTargetAngle: 8.1
+  zoomToFitFactor: 0.091
+  lerpSpeed: 4.5
+  cameraShake:
+    amplitude: 0
+    speed: 0
+    isShaking: 0

@@ -2,7 +2,6 @@ using UnityEngine;
 
 namespace Mandragora {
     public class Utility {
-
         public enum ValidationType {
             DEBUG, WARNING, ERROR
         }

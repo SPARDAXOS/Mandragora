@@ -33,8 +33,6 @@ public class GameInstance : MonoBehaviour {
     [SerializeField] private ResourcesBundle levelsBundle;
     [SerializeField] private PlayerControlScheme player1ControlScheme;
     [SerializeField] private PlayerControlScheme player2ControlScheme;
-    [SerializeField] private PlayerControlScheme player3ControlScheme;
-    [SerializeField] private PlayerControlScheme player4ControlScheme;
 
 
     public GameState currentGameState = GameState.NONE;
@@ -51,8 +49,6 @@ public class GameInstance : MonoBehaviour {
 
     private GameObject player1 = null;
     private GameObject player2 = null;
-    private GameObject player3 = null;
-    private GameObject player4 = null;
 
     private GameObject mainMenu = null;
     private GameObject eventSystem = null;
@@ -60,14 +56,12 @@ public class GameInstance : MonoBehaviour {
 
     private Player player1Script = null;
     private Player player2Script = null;
-    private Player player3Script = null;
-    private Player player4Script = null;
+    private CameraMovement cameraScript = null;
     private MainMenu mainMenuScript = null;
  
 
 
     void Update() {
-        DeleteMe();
         switch (currentGameState) {
             case GameState.NONE: 
                 break;
@@ -144,22 +138,6 @@ public class GameInstance : MonoBehaviour {
             player2Script.SetControlScheme(player2ControlScheme);
             player2Script.SetColor(Color.red);
             player2.SetActive(false);
-
-            player3 = Instantiate(entitiesResources["Player"]);
-            player3.name = "Player_3";
-            player3Script = player3.GetComponent<Player>();
-            player3Script.Initialize();
-            player3Script.SetControlScheme(player3ControlScheme);
-            player3Script.SetColor(Color.yellow);
-            player3.SetActive(false);
-
-            player4 = Instantiate(entitiesResources["Player"]);
-            player4.name = "Player_4";
-            player4Script = player4.GetComponent<Player>();
-            player4Script.Initialize();
-            player4Script.SetControlScheme(player4ControlScheme);
-            player4Script.SetColor(Color.green);
-            player4.SetActive(false);
         }
 
 
@@ -167,16 +145,16 @@ public class GameInstance : MonoBehaviour {
             Abort("Failed to find MainCamera resource");
         else {
             mainCamera = Instantiate(entitiesResources["MainCamera"]);
-            //TEMP
-            mainCamera.transform.position = new Vector3(0.0f, 4.5f, -7.0f);
-            mainCamera.transform.rotation = Quaternion.Euler(35.0f, 0.0f, 0.0f);
+            cameraScript = mainCamera.GetComponent<CameraMovement>();
+            cameraScript.Initialize();
+            cameraScript.AddTarget(player1);
+            cameraScript.AddTarget(player2);
         }
 
         if (!entitiesResources["EventSystem"])
             Abort("Failed to find EventSystem resource");
-        else {
+        else
             eventSystem = Instantiate(entitiesResources["EventSystem"]);
-        }
 
 
 
@@ -194,29 +172,11 @@ public class GameInstance : MonoBehaviour {
     private void UpdatePlayingState() {
         player1Script.Tick();
         player2Script.Tick();
-        player3Script.Tick();
-        player4Script.Tick();
+        cameraScript.Tick();
     }
     private void UpdateFixedPlayingState() {
         player1Script.FixedTick();
         player2Script.FixedTick();
-        player3Script.FixedTick();
-        player4Script.FixedTick();
-    }
-
-
-    //TEMP
-    private void DeleteMe() {
-        if (Input.GetKeyDown(KeyCode.Q)) {
-            if (!player3.activeInHierarchy) {
-                player3.SetActive(true);
-                return;
-            }
-            if (!player4.activeInHierarchy) {
-                player4.SetActive(true);
-                return;
-            }
-        }
     }
 
 
@@ -274,12 +234,8 @@ public class GameInstance : MonoBehaviour {
 
         player1.SetActive(false);
         player2.SetActive(false);
-        player3.SetActive(false);
-        player4.SetActive(false);
         player1Script.DisableInput();
         player2Script.DisableInput();
-        player3Script.DisableInput();
-        player4Script.DisableInput();
     }
     private void SetupLoseMenuState() {
         SetCursorState(true);
@@ -288,12 +244,8 @@ public class GameInstance : MonoBehaviour {
         //DRY
         player1.SetActive(false);
         player2.SetActive(false);
-        player3.SetActive(false);
-        player4.SetActive(false);
         player1Script.DisableInput();
         player2Script.DisableInput();
-        player3Script.DisableInput();
-        player4Script.DisableInput();
     }
     private void SetupPlayingState() {
         SetCursorState(true);
@@ -302,17 +254,11 @@ public class GameInstance : MonoBehaviour {
         //DRY
         player1.transform.position = level1Script.GetPlayer1SpawnPosition();
         player2.transform.position = level1Script.GetPlayer2SpawnPosition();
-        player3.transform.position = level1Script.GetPlayer3SpawnPosition();
-        player4.transform.position = level1Script.GetPlayer4SpawnPosition();
 
         player1.SetActive(true);
         player2.SetActive(true);
-        player3.SetActive(false);
-        player4.SetActive(false);
         player1Script.EnableInput();
         player2Script.EnableInput();
-        player3Script.EnableInput();
-        player4Script.EnableInput();
         currentGameState = GameState.PLAYING;
     }
 

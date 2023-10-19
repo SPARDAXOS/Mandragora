@@ -105,9 +105,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e66f7e576e289274ab03b3d6253da27b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  restingCameraDistance: 3.07
-  maxTargetAngle: 8.1
-  zoomToFitFactor: 0.091
+  restingCameraDistance: 4.15
+  maxTargetAngle: 6.57
+  zoomToFitFactor: 0.158
   lerpSpeed: 4.5
   cameraShake:
     amplitude: 0

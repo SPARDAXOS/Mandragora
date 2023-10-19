@@ -108,7 +108,7 @@ MonoBehaviour:
   restingCameraDistance: 7
   maxTargetAngle: 40
   zoomToFitFactor: 0.5
-  lerpSpeed: 4.6
+  lerpSpeed: 4.5
   cameraShake:
     amplitude: 0
     speed: 0

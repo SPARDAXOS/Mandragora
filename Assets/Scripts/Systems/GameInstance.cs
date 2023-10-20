@@ -48,18 +48,23 @@ public class GameInstance : MonoBehaviour {
     private GameObject player1 = null;
     private GameObject player2 = null;
 
-    private GameObject mainMenu = null;
     private GameObject eventSystem = null;
     private GameObject mainCamera = null;
+    private GameObject soundManager = null;
+    private GameObject mainMenu = null;
 
     private Player player1Script = null;
     private Player player2Script = null;
     private CameraMovement cameraScript = null;
+    private SoundManager soundManagerScript = null;
     private MainMenu mainMenuScript = null;
  
 
 
     void Update() {
+        //Updated regardless
+        if (soundManagerScript)
+            soundManagerScript.Tick();
         switch (currentGameState) {
             case GameState.NONE: 
                 break;
@@ -118,6 +123,14 @@ public class GameInstance : MonoBehaviour {
             mainMenu.SetActive(false);
         }
 
+
+        if (!entitiesResources["SoundManager"])
+            Abort("Failed to find SoundManager resource");
+        else {
+            soundManager = Instantiate(entitiesResources["SoundManager"]);
+            soundManagerScript = soundManager.GetComponent<SoundManager>();
+            soundManagerScript.Initialize();
+        }
         if (!entitiesResources["Player"])
             Abort("Failed to find Player resource");
         else {

@@ -4,11 +4,16 @@ using UnityEngine;
 
 
 [CreateAssetMenu(fileName = "PlayerStats", menuName = "Data/PlayerStats", order = 1)]
-public class PlayerStats : ScriptableObject {
 
-    [Range(1.0f, 10.0f)] public float turnRate = 120.0f;
-    [Range(1.0f, 999.0f)] public float maxSpeed = 260.0f;
-    [Range(1.0f, 999.0f)] public float accelerationRate = 20.0f;
-    [Range(1.0f, 999.0f)] public float decelerationRate = 10.0f;
+public class PlayerStats : ScriptableObject
+{
+    [Header("Movement")]
+    [Range(1.0f, 1000.0f)] public float maxSpeed = 1.0f;
+    [Range(1.0f, 12.0f)] public float turnRate = 1.0f;
+    
+    [Header("Acceleration")]
+    [Range(1.0f, 1000.0f)] public float accelerationRate = 2.0f;
+    [Range(1.0f, 1000.0f)] public float decelerationRate = 1.0f;
+   
 
-}
+}    

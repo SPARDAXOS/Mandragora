@@ -62,9 +62,10 @@ public class GameInstance : MonoBehaviour {
 
 
     void Update() {
-        //Updated regardless
+        //Updated regardless?
         if (soundManagerScript)
             soundManagerScript.Tick();
+
         switch (currentGameState) {
             case GameState.NONE: 
                 break;
@@ -90,10 +91,11 @@ public class GameInstance : MonoBehaviour {
         CreateEntities();
         SetGameState(GameState.MAIN_MENU);
     }
-    public static void Abort(string message) {
+    public static void Abort(string message = null) {
 #if UNITY_EDITOR
         EditorApplication.isPlaying = false;
-        Debug.LogError(message);
+        if (message == null)
+            Debug.LogError(message);
 #else
         Application.Quit();
 #endif
@@ -137,16 +139,14 @@ public class GameInstance : MonoBehaviour {
             player1 = Instantiate(entitiesResources["Player"]);
             player1.name = "Player_1";
             player1Script = player1.GetComponent<Player>();
-            player1Script.Initialize();
-            player1Script.SetControlScheme(player1ControlScheme);
+            player1Script.Initialize(player1ControlScheme, soundManagerScript);
             player1Script.SetColor(Color.blue);
             player1.SetActive(false);
 
             player2 = Instantiate(entitiesResources["Player"]);
             player2.name = "Player_2";
             player2Script = player2.GetComponent<Player>();
-            player2Script.Initialize();
-            player2Script.SetControlScheme(player2ControlScheme);
+            player2Script.Initialize(player2ControlScheme, soundManagerScript);
             player2Script.SetColor(Color.red);
             player2.SetActive(false);
         }
@@ -219,6 +219,7 @@ public class GameInstance : MonoBehaviour {
         SetCursorState(true);
         HideAllMenus();
 
+        soundManagerScript.PlayTrack("TestTrack1", true);
         mainMenu.SetActive(true);
     }
     private void SetupSettingsMenuState() {
@@ -262,6 +263,7 @@ public class GameInstance : MonoBehaviour {
         player2.SetActive(true);
         player1Script.EnableInput();
         player2Script.EnableInput();
+        soundManagerScript.PlayTrack("TestTrack2", true);
         currentGameState = GameState.PLAYING;
     }
 

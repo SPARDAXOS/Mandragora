@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c81aaa2c7a9996499f0969935326e90, type: 3}
+  m_Name: SFXBundle
+  m_EditorClassIdentifier: 
+  entries:
+  - key: SFXTest1
+    clip: {fileID: 8300000, guid: e900124a69a860441a8828969447cb18, type: 3}
+    volume: 1.6
+    maxPitch: 0.35
+    minPitch: 1.57
+  - key: SFXTest2
+    clip: {fileID: 8300000, guid: 853b132a97721e442943067ad6c544c0, type: 3}
+    volume: 1.66
+    maxPitch: 1.41
+    minPitch: 0.57

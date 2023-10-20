@@ -17,12 +17,10 @@ namespace Initialization {
 }
 
 public class GameInstance : MonoBehaviour {
-
     public enum GameState {
         NONE = 0,
         MAIN_MENU,
         SETTINGS_MENU,
-        GAMEMODE_MENU,
         CUSTOMIZATION_MENU,
         WIN_MENU,
         LOSE_MENU,
@@ -101,13 +99,13 @@ public class GameInstance : MonoBehaviour {
         if (!Utility.Validate(levelsBundle, null, Utility.ValidationType.ERROR))
             Abort("No levels bundle was not set!");
 
-        entitiesResources = new Dictionary<string, GameObject>(entitiesBundle.resources.Length);
-        levelsResources = new Dictionary<string, GameObject>(levelsBundle.resources.Length);
+        entitiesResources = new Dictionary<string, GameObject>(entitiesBundle.entries.Length);
+        levelsResources = new Dictionary<string, GameObject>(levelsBundle.entries.Length);
 
-        foreach (var entry in entitiesBundle.resources)
+        foreach (var entry in entitiesBundle.entries)
             entitiesResources.Add(entry.name, entry.resource);
 
-        foreach (var entry in levelsBundle.resources)
+        foreach (var entry in levelsBundle.entries)
             levelsResources.Add(entry.name, entry.resource);
     }
     private void CreateEntities() {
@@ -190,9 +188,6 @@ public class GameInstance : MonoBehaviour {
             case GameState.SETTINGS_MENU:
                 SetupSettingsMenuState();
                 break;
-            case GameState.GAMEMODE_MENU:
-                SetupGameModeMenuState();
-                break;
             case GameState.CUSTOMIZATION_MENU:
                 SetupCustomizationMenuState();
                 break;
@@ -214,11 +209,6 @@ public class GameInstance : MonoBehaviour {
         mainMenu.SetActive(true);
     }
     private void SetupSettingsMenuState() {
-        SetCursorState(true);
-        HideAllMenus();
-
-    }
-    private void SetupGameModeMenuState() {
         SetCursorState(true);
         HideAllMenus();
 

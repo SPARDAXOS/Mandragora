@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 877ac50eebccc6f468b030727e3f0cc8, type: 3}
   m_Name: EntitiesBundle
   m_EditorClassIdentifier: 
-  resources:
+  entries:
   - name: Player
     resource: {fileID: 7480552023201383878, guid: eb15a56865b55f84895f174e4bde0c8a, type: 3}
-  - name: MainMenu
-    resource: {fileID: 6456218508632502803, guid: 57285f566902622488587e492f5e8c05, type: 3}
-  - name: EventSystem
-    resource: {fileID: 6595343267326584282, guid: 45c4030c803345249a5c631cf3c735de, type: 3}
   - name: MainCamera
     resource: {fileID: 9123308379923989643, guid: b9cc5c1f6e5b3fc43b7ed928c8879d9a, type: 3}
+  - name: EventSystem
+    resource: {fileID: 6595343267326584282, guid: 45c4030c803345249a5c631cf3c735de, type: 3}
+  - name: MainMenu
+    resource: {fileID: 6456218508632502803, guid: 57285f566902622488587e492f5e8c05, type: 3}

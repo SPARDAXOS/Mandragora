@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 877ac50eebccc6f468b030727e3f0cc8, type: 3}
   m_Name: LevelsBundle
   m_EditorClassIdentifier: 
-  resources:
+  entries:
   - name: Level1
     resource: {fileID: 8300445841244982701, guid: 0f2685311de2cfc45966e3f556ba170f, type: 3}

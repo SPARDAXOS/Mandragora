@@ -26,6 +26,9 @@
 # Visual Studio cache directory
 .vs/
 
+# Ryder stuff
+.idea/
+
 # Gradle cache directory
 .gradle/
 

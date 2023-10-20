@@ -9,7 +9,7 @@ public class Player : MonoBehaviour {
     private bool initialized = false;
     private bool isMoving = false;
 
-    private float currentSpeed = 0.0f;
+    public float currentSpeed = 0.0f;
     private Vector3 direction;
     private Vector3 velocity;
 

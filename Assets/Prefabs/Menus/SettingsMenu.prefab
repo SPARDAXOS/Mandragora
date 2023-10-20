@@ -121,9 +121,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 11500000, guid: 732e59709e4c68b40b5abcf88c69c3c7, type: 3}
+      - m_Target: {fileID: 6264290467216499452}
         m_TargetAssemblyTypeName: UIMenus, Assembly-CSharp
-        m_MethodName: 
+        m_MethodName: ReturnFromSettings
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

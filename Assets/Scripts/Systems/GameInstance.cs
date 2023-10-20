@@ -170,7 +170,7 @@ public class GameInstance : MonoBehaviour {
     private void UpdatePlayingState() {
         player1Script.Tick();
         player2Script.Tick();
-        cameraScript.Tick();
+        cameraScript.FixedTick();
     }
     private void UpdateFixedPlayingState() {
         player1Script.FixedTick();

@@ -149,7 +149,8 @@ MonoBehaviour:
   stats:
     maxSpeed: 5
     accelerationTime: 0.1
-    decelerationTIme: 0.1
+    decelerationTime: 0.1
     turnRate: 180
     shyness: 0
+    viewRange: 4
     satisfaction: 0

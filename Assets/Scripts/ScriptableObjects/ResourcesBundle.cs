@@ -11,7 +11,5 @@ public struct EntityEntry {
 
 [CreateAssetMenu(fileName = "ResourcesBundle", menuName = "Data/ResourcesBundle", order = 2)]
 public class ResourcesBundle : ScriptableObject {
-
-    public EntityEntry[] resources;
-
+    public EntityEntry[] entries;
 }

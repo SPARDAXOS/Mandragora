@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 9135386428048894539}
   - component: {fileID: 8286512445207717520}
   - component: {fileID: 485047807280192455}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Creature
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -152,5 +152,5 @@ MonoBehaviour:
     decelerationTime: 0.1
     turnRate: 180
     shyness: 0
-    viewRange: 4
+    viewRange: 5
     satisfaction: 0

@@ -28,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 9123308379923989643}
   serializedVersion: 2
   m_LocalRotation: {x: 0.38268343, y: 0, z: 0, w: 0.92387956}
-  m_LocalPosition: {x: 0, y: 20, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -106,10 +106,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   restingCameraDistance: 7
-  maxTargetAngle: 40
+  maxAngleBetweenTargets: 45
   zoomToFitFactor: 0.5
   lerpSpeed: 4.5
   cameraShake:
-    amplitude: 0
-    speed: 0
+    amplitude: 2
+    frequency: 2
     isShaking: 0

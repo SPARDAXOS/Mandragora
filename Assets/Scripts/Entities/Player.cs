@@ -15,14 +15,20 @@ public class Player : MonoBehaviour {
 
     private PlayerControlScheme activeControlScheme = null;
 
+    private SoundManager soundManager = null;
+
     private Rigidbody rigidbodyComp = null;
     private MeshRenderer meshRendererComp = null;
     private Material mainMaterial;
 
-    public void Initialize() {
+    public void Initialize(PlayerControlScheme controlScheme, SoundManager soundManager) {
         if (initialized)
             return;
 
+        activeControlScheme = controlScheme;
+        this.soundManager = soundManager;
+
+        BindInputCallbacks();
         SetupReferences();
         initialized = true;
     }
@@ -36,6 +42,12 @@ public class Player : MonoBehaviour {
         if (!rigidbodyComp)
             GameInstance.Abort("Failed to get Rigidbody component on " + gameObject.name);
     }
+    private void BindInputCallbacks() {
+        activeControlScheme.interact.performed += InteractInputCallback;
+    }
+
+
+
     public void Tick() {
         if (!initialized)
             return;
@@ -50,15 +62,15 @@ public class Player : MonoBehaviour {
         UpdateMovement();
         UpdateRotation();
     }
+    private void OnDestroy() {
+        //UNBIND Callbacks from inputactions.
+    }
 
     public void SetColor(Color color) {
         if (!initialized)
             return;
 
         mainMaterial.color = color;
-    }
-    public void SetControlScheme(PlayerControlScheme scheme) {
-        activeControlScheme = scheme;
     }
     public void EnableInput() {
         if (!activeControlScheme)
@@ -114,5 +126,10 @@ public class Player : MonoBehaviour {
 
 
 
+    private void InteractInputCallback(UnityEngine.InputSystem.InputAction.CallbackContext obj) {
+        //Raycast to check for pickups!
 
+        //For testing
+        soundManager.PlaySFX("SFXTest1", transform.position);
+    }
 }

@@ -21,7 +21,6 @@ public struct CreatureStats
     [Range(0, 1f)]
     public float satisfaction;
 }
-
 public enum CreatureState
 {
     GROUNDED,
@@ -60,7 +59,7 @@ public class Creature : MonoBehaviour
 
     public void Initialize()
     {
-        if(initialized) 
+        if (initialized) 
             return;
 
         rigidbodyComp = GetComponent<Rigidbody>();
@@ -95,7 +94,6 @@ public class Creature : MonoBehaviour
                 speed = stats.maxSpeed;
         }
     }
-
     private void Decelerate()
     {
         if (speed > 0f)
@@ -110,13 +108,11 @@ public class Creature : MonoBehaviour
     {
         direction = Vector3.RotateTowards(transform.forward, targetDirection, stats.turnRate * Time.fixedDeltaTime * Mathf.Deg2Rad, 0.0f);
     }
-
     private void UpdateMovement()
     {
         velocity = transform.forward * speed;
         rigidbodyComp.velocity = velocity;
     }
-
     private void UpdateRotation()
     {
         transform.forward = direction;

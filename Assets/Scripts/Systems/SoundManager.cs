@@ -80,12 +80,6 @@ public class SoundManager : MonoBehaviour {
         soundUnitResource = Resources.Load<GameObject>("SoundUnit");
         Utility.Validate(soundUnitResource, "Failed to load SoundUnit resource.", Utility.ValidationType.WARNING);
     }
-    private void UpdateTrackVolume() {
-        if (!trackAudioSource.isPlaying)
-            return;
-
-        trackAudioSource.volume = masterVolume * trackVolume * currentTrackEntryVolume;
-    }
 
 
     public bool PlaySFX(string key, Vector3 position) {
@@ -211,6 +205,7 @@ public class SoundManager : MonoBehaviour {
         }
 
         var gameObject = Instantiate(soundUnitResource);
+        gameObject.transform.parent = transform;
         var script = gameObject.GetComponent<SoundUnit>();
         script.Initialize();
         soundUnits.Add(script);
@@ -257,5 +252,11 @@ public class SoundManager : MonoBehaviour {
             if (fadeTargetTrack != null)
                 StarFadeIn((SoundEntry)fadeTargetTrack);
         }
+    }
+    private void UpdateTrackVolume() {
+        if (!trackAudioSource.isPlaying)
+            return;
+
+        trackAudioSource.volume = masterVolume * trackVolume * currentTrackEntryVolume;
     }
 }

@@ -1,5 +1,8 @@
 using System;
+using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem.HID;
+using static UnityEngine.UI.Image;
 
 [Serializable]
 public struct CreatureStats
@@ -16,6 +19,9 @@ public struct CreatureStats
     [Range(0, 1f)]
     public float shyness;
     public float viewRange;
+    public float maxRestDuration;
+    [Range(0, 1f)]
+    public float restProbability;
 
     [Header("Variables")]
     [Range(0, 1f)]
@@ -23,7 +29,8 @@ public struct CreatureStats
 }
 public enum CreatureState
 {
-    GROUNDED,
+    RUN,
+    REST,
     HELD,
     INACTIVE
 }
@@ -31,7 +38,7 @@ public enum CreatureState
 [RequireComponent(typeof(Rigidbody))]
 public class Creature : MonoBehaviour
 {
-    private bool initialized;
+    private bool initialized = false;
 
     private Rigidbody rigidbodyComp = null;
 
@@ -40,6 +47,7 @@ public class Creature : MonoBehaviour
     private float accelerationIncrement;
     private float decelerationIncrement;
 
+    private Vector3 targetPosition;
     private Vector3 direction = Vector3.forward;
     private Vector3 targetDirection = Vector3.forward;
 
@@ -62,27 +70,130 @@ public class Creature : MonoBehaviour
         if (initialized) 
             return;
 
+        state = CreatureState.RUN;
+
         rigidbodyComp = GetComponent<Rigidbody>();
-        accelerationIncrement = Time.deltaTime * stats.maxSpeed / stats.accelerationTime;
-        decelerationIncrement = Time.deltaTime * stats.maxSpeed / stats.decelerationTime;
+        accelerationIncrement = Time.fixedDeltaTime * stats.maxSpeed / stats.accelerationTime;
+        decelerationIncrement = Time.fixedDeltaTime * stats.maxSpeed / stats.decelerationTime;
+
         direction = RandomDirection();
-        targetDirection = RandomDirection();
+        FindNewValidTarget();
 
         initialized = true;
     }
 
     public void FixedTick()
     {
-        Accelerate();
+        UpdateStates();
+    }
+
+    private void UpdateStates()
+    {
+        switch(state)
+        {
+            case CreatureState.RUN:
+                RunBehavior();
+                break;
+            case CreatureState.REST:
+                RestBehavior();
+                break;
+        }
+    }
+
+    private void RunBehavior()
+    {
         UpdateDirection();
         UpdateRotation();
         UpdateMovement();
+        ChooseInput();
+        ChooseTarget();
+    }
+
+    float restTimeElapsed = 0;
+    float restDuration = 0;
+    private void RestBehavior()
+    {
+        UpdateDirection();
+        UpdateRotation();
+        UpdateMovement();
+        Decelerate();
+
+        if(restTimeElapsed == 0)
+        {
+            restDuration = UnityEngine.Random.value * stats.maxRestDuration + stats.decelerationTime;
+            FindNewValidTarget();
+        }
+
+        else if(restTimeElapsed > restDuration)
+        {
+            state = CreatureState.RUN;
+            restTimeElapsed = 0;
+            return;
+        }
+
+        restTimeElapsed += Time.fixedDeltaTime;
     }
 
     private Vector3 RandomDirection()
     {
         Vector2 random2D = (UnityEngine.Random.insideUnitCircle).normalized;
         return new Vector3(random2D.x, 0, random2D.y);
+    }
+
+    void ChooseTarget()
+    {
+        bool pathObstructed = CastToTarget(targetPosition, false);
+
+        float breakDist = speed * stats.decelerationTime;
+        bool isClose = (targetPosition - transform.position).sqrMagnitude < breakDist * breakDist;
+
+        if (isClose && UnityEngine.Random.value < stats.restProbability)
+        {
+            ChangeState(CreatureState.REST);
+            return;
+        }
+
+        if (pathObstructed)
+            FindNewValidTarget();
+    }
+
+    void FindNewValidTarget()
+    {
+        int retryLimit = 50;
+        int retryIndex = 0;
+
+        while (retryIndex < retryLimit)
+        {
+            retryIndex++;
+            Vector3 candidateTarget = CandidateTarget();
+            if (!CastToTarget(candidateTarget, true))
+                break;
+        }
+    }
+
+    bool CastToTarget(Vector3 target, bool assignTarget)
+    {
+        Vector3 origin = transform.position;
+        Vector3 direction = target - transform.position;
+        bool output = Physics.SphereCast(new Ray(origin, direction), 0.25f, stats.viewRange, ~LayerMask.NameToLayer("Ignore Raycast"));
+        if (!output && assignTarget) targetPosition = target;
+        return output;
+    }
+
+    Vector3 CandidateTarget()
+    {
+        Vector3 candidate = stats.viewRange * UnityEngine.Random.insideUnitCircle;
+        candidate = new Vector3(candidate.x, 0, candidate.y);
+        return candidate + transform.position.y * Vector3.up;
+    }
+
+    private void ChooseInput()
+    {
+        float dirDot = Vector3.Dot(direction, targetDirection);
+        if(dirDot > -0.5f)
+            Accelerate();
+        else 
+            Decelerate();
     }
 
     private void Accelerate()
@@ -104,17 +215,40 @@ public class Creature : MonoBehaviour
         }
     }
 
+
     private void UpdateDirection()
     {
-        direction = Vector3.RotateTowards(transform.forward, targetDirection, stats.turnRate * Time.fixedDeltaTime * Mathf.Deg2Rad, 0.0f);
+        targetDirection = (targetPosition - transform.position).normalized;
+
+        direction = Vector3.RotateTowards(direction, targetDirection, stats.turnRate * Time.fixedDeltaTime * Mathf.Deg2Rad, 0.0f);
+        direction.y = 0;
+        direction = direction.normalized;
     }
     private void UpdateMovement()
     {
-        velocity = transform.forward * speed;
+        velocity = speed * direction;
         rigidbodyComp.velocity = velocity;
     }
     private void UpdateRotation()
     {
         transform.forward = direction;
+    }
+
+    public void ChangeState(CreatureState state)
+    {
+        this.state = state;
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, stats.viewRange);
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(targetPosition, 0.5f);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        direction *= -1;
     }
 }

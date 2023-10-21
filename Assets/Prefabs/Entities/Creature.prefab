@@ -147,10 +147,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stats:
-    maxSpeed: 5
-    accelerationTime: 0.1
-    decelerationTime: 0.1
+    maxSpeed: 4
+    accelerationTime: 0.5
+    decelerationTime: 1
     turnRate: 180
     shyness: 0
-    viewRange: 5
+    viewRange: 4
+    maxRestDuration: 2
+    restProbability: 0.05
     satisfaction: 0

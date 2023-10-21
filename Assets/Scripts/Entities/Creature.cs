@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem.HID;
 using static UnityEngine.UI.Image;
@@ -18,6 +19,9 @@ public struct CreatureStats
     [Range(0, 1f)]
     public float shyness;
     public float viewRange;
+    public float maxRestDuration;
+    [Range(0, 1f)]
+    public float restProbability;
 
     [Header("Variables")]
     [Range(0, 1f)]
@@ -26,8 +30,8 @@ public struct CreatureStats
 
 public enum CreatureState
 {
-    RUNNING,
-    WAITING,
+    RUN,
+    REST,
     HELD,
     INACTIVE
 }
@@ -35,7 +39,7 @@ public enum CreatureState
 [RequireComponent(typeof(Rigidbody))]
 public class Creature : MonoBehaviour
 {
-    private bool initialized;
+    private bool initialized = false;
 
     private Rigidbody rigidbodyComp = null;
 
@@ -50,8 +54,6 @@ public class Creature : MonoBehaviour
 
     private float speed;
     private Vector3 velocity = Vector3.zero;
-
-    [SerializeField] LayerMask ignoreLayer;
 
 
     void Start()
@@ -69,22 +71,68 @@ public class Creature : MonoBehaviour
         if(initialized) 
             return;
 
+        state = CreatureState.RUN;
+
         rigidbodyComp = GetComponent<Rigidbody>();
-        accelerationIncrement = Time.deltaTime * stats.maxSpeed / stats.accelerationTime;
-        decelerationIncrement = Time.deltaTime * stats.maxSpeed / stats.decelerationTime;
+        accelerationIncrement = Time.fixedDeltaTime * stats.maxSpeed / stats.accelerationTime;
+        decelerationIncrement = Time.fixedDeltaTime * stats.maxSpeed / stats.decelerationTime;
+
         direction = RandomDirection();
-        targetDirection = RandomDirection();
+        FindNewValidTarget();
 
         initialized = true;
     }
 
     public void FixedTick()
     {
-        FindValidTarget();
+        UpdateStates();
+    }
+
+    private void UpdateStates()
+    {
+        switch(state)
+        {
+            case CreatureState.RUN:
+                RunBehavior();
+                break;
+            case CreatureState.REST:
+                RestBehavior();
+                break;
+        }
+    }
+
+    private void RunBehavior()
+    {
         UpdateDirection();
-        ChooseInput();
         UpdateRotation();
         UpdateMovement();
+        ChooseInput();
+        ChooseTarget();
+    }
+
+    float restTimeElapsed = 0;
+    float restDuration = 0;
+    private void RestBehavior()
+    {
+        UpdateDirection();
+        UpdateRotation();
+        UpdateMovement();
+        Decelerate();
+
+        if(restTimeElapsed == 0)
+        {
+            restDuration = UnityEngine.Random.value * stats.maxRestDuration + stats.decelerationTime;
+            FindNewValidTarget();
+        }
+
+        else if(restTimeElapsed > restDuration)
+        {
+            state = CreatureState.RUN;
+            restTimeElapsed = 0;
+            return;
+        }
+
+        restTimeElapsed += Time.fixedDeltaTime;
     }
 
     private Vector3 RandomDirection()
@@ -93,34 +141,43 @@ public class Creature : MonoBehaviour
         return new Vector3(random2D.x, 0, random2D.y);
     }
 
-    void FindValidTarget()
+    void ChooseTarget()
     {
-        bool proximityCondition = (targetPosition - transform.position).sqrMagnitude > 1;
-        bool clearPathCondition = !CastToTarget(ref targetPosition);
+        bool pathObstructed = CastToTarget(targetPosition, false);
 
-        if (proximityCondition || (proximityCondition && clearPathCondition))
+        float breakDist = speed * stats.decelerationTime;
+        bool isClose = (targetPosition - transform.position).sqrMagnitude < breakDist * breakDist;
+
+        if (isClose && UnityEngine.Random.value < stats.restProbability)
+        {
+            ChangeState(CreatureState.REST);
             return;
+        }
 
+        if (pathObstructed)
+            FindNewValidTarget();
+    }
+
+    void FindNewValidTarget()
+    {
         int retryLimit = 50;
         int retryIndex = 0;
 
         while (retryIndex < retryLimit)
         {
             retryIndex++;
-
-            if (!CastToTarget(ref targetPosition))
+            Vector3 candidateTarget = CandidateTarget();
+            if (!CastToTarget(candidateTarget, true))
                 break;
         }
-        Debug.Log(retryIndex);
     }
 
-    bool CastToTarget(ref Vector3 target)
+    bool CastToTarget(Vector3 target, bool assignTarget)
     {
-        Vector3 candidateTarget = CandidateTarget();
         Vector3 origin = transform.position;
-        Vector3 direction = candidateTarget - transform.position;
-        bool output = Physics.Raycast(origin, direction, stats.viewRange, ~ignoreLayer);
-        if (output) target = candidateTarget;
+        Vector3 direction = target - transform.position;
+        bool output = Physics.SphereCast(new Ray(origin, direction), 0.25f, stats.viewRange, ~LayerMask.NameToLayer("Ignore Raycast"));
+        if (!output && assignTarget) targetPosition = target;
         return output;
     }
 
@@ -134,9 +191,10 @@ public class Creature : MonoBehaviour
     private void ChooseInput()
     {
         float dirDot = Vector3.Dot(direction, targetDirection);
-        if(dirDot > 0.5f)
+        if(dirDot > -0.5f)
             Accelerate();
-        else Decelerate();
+        else 
+            Decelerate();
     }
 
     private void Accelerate()
@@ -159,17 +217,19 @@ public class Creature : MonoBehaviour
         }
     }
 
+
     private void UpdateDirection()
     {
         targetDirection = (targetPosition - transform.position).normalized;
-        direction = Vector3.RotateTowards(transform.forward, targetDirection, stats.turnRate * Time.fixedDeltaTime * Mathf.Deg2Rad, 0.0f);
+
+        direction = Vector3.RotateTowards(direction, targetDirection, stats.turnRate * Time.fixedDeltaTime * Mathf.Deg2Rad, 0.0f);
         direction.y = 0;
-        Vector3.Normalize(direction);
+        direction = direction.normalized;
     }
 
     private void UpdateMovement()
     {
-        velocity = transform.forward * speed;
+        velocity = speed * direction;
         rigidbodyComp.velocity = velocity;
     }
 
@@ -189,5 +249,10 @@ public class Creature : MonoBehaviour
         Gizmos.DrawWireSphere(transform.position, stats.viewRange);
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(targetPosition, 0.5f);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        direction *= -1;
     }
 }

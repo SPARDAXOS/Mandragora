@@ -1,3 +1,4 @@
+using Mandragora;
 using UnityEngine;
 
 
@@ -8,6 +9,8 @@ public class Player : MonoBehaviour {
 
     private bool initialized = false;
     private bool isMoving = false;
+    private bool isInteractingTrigger = false;
+    private bool isInteractingHeld= false;
 
     public float currentSpeed = 0.0f;
     private Vector3 direction;
@@ -16,6 +19,10 @@ public class Player : MonoBehaviour {
     private PlayerControlScheme activeControlScheme = null;
 
     private SoundManager soundManager = null;
+
+
+    private ParticleSystem runDustPS = null;
+    private TaskStation taskStationInRange = null;
 
     private Rigidbody rigidbodyComp = null;
     private MeshRenderer meshRendererComp = null;
@@ -28,7 +35,6 @@ public class Player : MonoBehaviour {
         activeControlScheme = controlScheme;
         this.soundManager = soundManager;
 
-        BindInputCallbacks();
         SetupReferences();
         initialized = true;
     }
@@ -38,12 +44,14 @@ public class Player : MonoBehaviour {
             GameInstance.Abort("Failed to get MeshRenderer component on " + gameObject.name);
         mainMaterial = meshRendererComp.materials[0];
 
+
+        runDustPS = transform.Find("RunDustPS").GetComponent<ParticleSystem>();
+        Utility.Validate(runDustPS, "Failed to find RunDustPS.", Utility.ValidationType.WARNING);
+
+
         rigidbodyComp = GetComponent<Rigidbody>();
         if (!rigidbodyComp)
             GameInstance.Abort("Failed to get Rigidbody component on " + gameObject.name);
-    }
-    private void BindInputCallbacks() {
-        activeControlScheme.interact.performed += InteractInputCallback;
     }
 
 
@@ -62,9 +70,7 @@ public class Player : MonoBehaviour {
         UpdateMovement();
         UpdateRotation();
     }
-    private void OnDestroy() {
-        //UNBIND Callbacks from inputactions.
-    }
+
 
     public void SetColor(Color color) {
         if (!initialized)
@@ -73,24 +79,40 @@ public class Player : MonoBehaviour {
         mainMaterial.color = color;
     }
     public void EnableInput() {
-        if (!activeControlScheme)
-            return;
 
         activeControlScheme.movement.Enable();
         activeControlScheme.interact.Enable();
     }
     public void DisableInput() {
-        if (!activeControlScheme)
-            return;
 
         activeControlScheme.movement.Disable();
         activeControlScheme.interact.Disable();
     }
+    public void EnableMovement() {
+        activeControlScheme.movement.Enable();
+    }
+    public void DisableMovement() {
+        activeControlScheme.movement.Disable();
+    }
+
+
     private void CheckInput() {
         if (!activeControlScheme)
             return;
 
+        isInteractingTrigger = activeControlScheme.interact.triggered;
+        isInteractingHeld = activeControlScheme.interact.IsPressed();
         isMoving = activeControlScheme.movement.IsPressed();
+
+        //Testing
+        if (isInteractingTrigger)
+            soundManager.PlaySFX("SFXTest1", transform.position);
+
+        //Break into update func
+        if (isMoving && !runDustPS.isPlaying)
+            runDustPS.Play();
+        else if (!isMoving && runDustPS.isPlaying)
+            runDustPS.Stop();
 
         if (isMoving) {
             Vector2 input = activeControlScheme.movement.ReadValue<Vector2>();
@@ -126,10 +148,12 @@ public class Player : MonoBehaviour {
 
 
 
-    private void InteractInputCallback(UnityEngine.InputSystem.InputAction.CallbackContext obj) {
-        //Raycast to check for pickups!
 
-        //For testing
-        soundManager.PlaySFX("SFXTest1", transform.position);
+
+    public bool IsInteractingTrigger() {
+        return isInteractingTrigger;
+    }
+    public bool IsInteractingHeld() {
+        return isInteractingHeld;
     }
 }

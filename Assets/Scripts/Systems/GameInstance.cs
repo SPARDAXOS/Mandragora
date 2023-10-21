@@ -42,8 +42,8 @@ public class GameInstance : MonoBehaviour {
 
 
 
-    private GameObject level1;
-    private Level level1Script;
+    private GameObject currentLevel;
+    private Level currentLevelScript;
 
     private GameObject player1 = null;
     private GameObject player2 = null;
@@ -173,9 +173,9 @@ public class GameInstance : MonoBehaviour {
         if (!levelsResources["Level1"])
             Abort("Failed to find Level1 resource");
         else {
-            level1 = Instantiate(levelsResources["Level1"]);
-            level1Script = level1.GetComponent<Level>();
-            level1Script.Initialize();
+            currentLevel = Instantiate(levelsResources["Level1"]);
+            currentLevelScript = currentLevel.GetComponent<Level>();
+            currentLevelScript.Initialize(this);
         }
     }
 
@@ -183,11 +183,12 @@ public class GameInstance : MonoBehaviour {
     private void UpdatePlayingState() {
         player1Script.Tick();
         player2Script.Tick();
-        cameraScript.FixedTick();
+        currentLevelScript.Tick();
     }
     private void UpdateFixedPlayingState() {
         player1Script.FixedTick();
         player2Script.FixedTick();
+        cameraScript.FixedTick();
     }
 
 
@@ -256,8 +257,8 @@ public class GameInstance : MonoBehaviour {
         HideAllMenus();
 
         //DRY
-        player1.transform.position = level1Script.GetPlayer1SpawnPosition();
-        player2.transform.position = level1Script.GetPlayer2SpawnPosition();
+        player1.transform.position = currentLevelScript.GetPlayer1SpawnPosition();
+        player2.transform.position = currentLevelScript.GetPlayer2SpawnPosition();
 
         player1.SetActive(true);
         player2.SetActive(true);
@@ -277,5 +278,10 @@ public class GameInstance : MonoBehaviour {
     private void HideAllMenus() {
         //Add all menus here
         mainMenu.SetActive(false);
+    }
+
+
+    public CameraMovement GetCameraScript() {
+        return cameraScript;
     }
 }

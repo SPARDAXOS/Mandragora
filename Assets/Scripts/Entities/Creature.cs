@@ -1,8 +1,5 @@
 using System;
-using System.Collections;
 using UnityEngine;
-using UnityEngine.InputSystem.HID;
-using static UnityEngine.UI.Image;
 
 [Serializable]
 public struct CreatureStats
@@ -26,6 +23,9 @@ public struct CreatureStats
     [Header("Variables")]
     [Range(0, 1f)]
     public float satisfaction;
+    bool hungry;
+    bool dirty;
+
 }
 
 public enum CreatureState
@@ -54,7 +54,6 @@ public class Creature : MonoBehaviour
 
     private float speed;
     private Vector3 velocity = Vector3.zero;
-
 
     void Start()
     {

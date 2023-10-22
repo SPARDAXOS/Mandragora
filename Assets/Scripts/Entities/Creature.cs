@@ -27,7 +27,6 @@ public struct CreatureStats
     bool dirty;
 
 }
-
 public enum CreatureState
 {
     RUN,
@@ -67,7 +66,7 @@ public class Creature : MonoBehaviour
 
     public void Initialize()
     {
-        if(initialized) 
+        if (initialized) 
             return;
 
         state = CreatureState.RUN;
@@ -205,7 +204,6 @@ public class Creature : MonoBehaviour
                 speed = stats.maxSpeed;
         }
     }
-
     private void Decelerate()
     {
         if (speed > 0f)
@@ -225,13 +223,11 @@ public class Creature : MonoBehaviour
         direction.y = 0;
         direction = direction.normalized;
     }
-
     private void UpdateMovement()
     {
         velocity = speed * direction;
         rigidbodyComp.velocity = velocity;
     }
-
     private void UpdateRotation()
     {
         transform.forward = direction;

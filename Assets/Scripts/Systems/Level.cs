@@ -6,16 +6,23 @@ using UnityEngine.AI;
 
 public class Level : MonoBehaviour {
 
+    [Header("CreatureState")]
     [SerializeField] private GameObject CreaturePrefab;
-    [SerializeField] private uint creaturesCount = 7;
+    [Range(1, 24)][SerializeField] private uint creaturesCount = 7;
 
+    [Header("Spawner")]
+    [Range(1, 15)] [SerializeField] private uint spawnPointCalculationRetries = 10;
+    [Range(0.0f, 10.0f)][SerializeField] private float spawnHeightOffset = 7.0f;
 
     private bool initialize = false;
 
+    float leftNavMeshEdge  = 0.0f;
+    float rightNavMeshEdge = 0.0f;
+    float upperNavMeshEdge = 0.0f;
+    float lowerNavMeshEdge = 0.0f;
+
     private GameInstance gameInstance = null;
 
-
-    private GameObject floorPlane = null;
 
     private NavMeshSurface navMesh = null;
 
@@ -25,7 +32,9 @@ public class Level : MonoBehaviour {
     private List<Creature> creatures = new List<Creature>();
     private TaskStation[] taskStations;
 
-    public Bounds test = new Bounds();
+    public Bounds navMeshBounds = new Bounds();
+
+
     public void Initialize(GameInstance instance) {
         if (initialize)
             return;
@@ -41,10 +50,6 @@ public class Level : MonoBehaviour {
 
         foreach (var entry in taskStations)
             entry.Tick();
-
-        test = navMesh.navMeshData.sourceBounds;
-        Debug.Log(test.size);
-        
     }
     private void SetupReferences() {
 
@@ -52,7 +57,11 @@ public class Level : MonoBehaviour {
         Utility.Validate(navMeshTransform, "Failed to get reference to NavMesh - " + gameObject.name, Utility.ValidationType.ERROR);
         navMesh = navMeshTransform.GetComponent<NavMeshSurface>();
         Utility.Validate(navMesh, "Failed to get component NavMeshSurface in NavMesh - " + gameObject.name, Utility.ValidationType.ERROR);
-        
+        navMeshBounds = navMesh.navMeshData.sourceBounds;
+        leftNavMeshEdge = transform.position.x - (navMeshBounds.size.x / 2);
+        rightNavMeshEdge = transform.position.x + (navMeshBounds.size.x / 2);
+        upperNavMeshEdge = transform.position.z + (navMeshBounds.size.z / 2);
+        lowerNavMeshEdge = transform.position.z - (navMeshBounds.size.z / 2);
 
         var player1SpawnPositionTransform = transform.Find("Player1SpawnPoint");
         var player2SpawnPositionTransform = transform.Find("Player2SpawnPoint");
@@ -87,34 +96,24 @@ public class Level : MonoBehaviour {
 
 
 
-    private bool RandomPoint(Vector3 center, float range, out Vector3 result) {
 
-        //Get random point on the floor plane of this level
-
-
-        for (int i = 0; i < 30; i++) {
-            Vector3 randomPoint = center + Random.insideUnitSphere * range;
-            NavMeshHit hit;
-            if (NavMesh.SamplePosition(randomPoint, out hit, 1.0f, NavMesh.AllAreas)) {
-                result = hit.position;
-                return true;
-            }
+    private Vector3 GetRandomPointOnNavMesh() {
+        NavMeshHit hit;
+        for (uint i = 0; i < spawnPointCalculationRetries; i++) {
+            float randomX = Random.Range(leftNavMeshEdge, rightNavMeshEdge);
+            float randomZ = Random.Range(lowerNavMeshEdge, upperNavMeshEdge);
+            Vector3 randomPoint = new Vector3(randomX, navMeshBounds.center.y, randomZ);
+            if (NavMesh.SamplePosition(randomPoint, out hit, 1.0f, NavMesh.AllAreas))
+                return hit.position;
         }
-        result = Vector3.zero;
-        return false;
+        return Vector3.zero;
     }
-
-
     private void RandomizeCreatureSpawns() {
-        NavMeshTriangulation data = NavMesh.CalculateTriangulation();
-
         foreach(var creature in creatures) {
-            int index = Random.Range(0, data.vertices.Length);
-            NavMeshHit hitResults;
-            if (NavMesh.SamplePosition(data.vertices[index], out hitResults, 2.0f, 0)) {
-                creature.transform.position = hitResults.position;
-                Debug.Log(hitResults.position);
-            }
+            //If Active
+            Vector3 spawnPosition = GetRandomPointOnNavMesh();
+            spawnPosition.y += spawnHeightOffset;
+            creature.transform.position = spawnPosition;
         }
     }
 

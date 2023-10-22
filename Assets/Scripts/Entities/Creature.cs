@@ -85,13 +85,20 @@ public class Creature : MonoBehaviour
     public void FixedTick()
     {
         UpdateStates();
+        UpdateParticles();
+    }
 
+    void UpdateParticles()
+    {
         if (stats.dirty && !stinkPS.isPlaying)
             stinkPS.Play();
-        else if(!stats.dirty)
+        else if (!stats.dirty)
             stinkPS.Stop();
 
-        Debug.Log(stinkPS.isPlaying);
+        if (stats.hungry && !cryPS.isPlaying)
+            cryPS.Play();
+        else if (!stats.hungry)
+            cryPS.Stop();
     }
 
     void SetupReferences()

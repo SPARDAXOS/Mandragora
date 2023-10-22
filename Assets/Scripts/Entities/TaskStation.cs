@@ -47,7 +47,7 @@ public class TaskStation : MonoBehaviour {
     private KeyCode currentTargetQTE = KeyCode.None;
     private uint currentQTECount = 0;
 
-    public bool QTEBarTrigger = false;
+    private bool QTEBarTrigger = false;
 
 
 

@@ -24,7 +24,8 @@ public class GameInstance : MonoBehaviour {
         CUSTOMIZATION_MENU,
         WIN_MENU,
         LOSE_MENU,
-        PLAYING
+        PLAYING,
+        PAUSE_MENU
     }
 
     [SerializeField] private ResourcesBundle entitiesBundle;
@@ -38,7 +39,7 @@ public class GameInstance : MonoBehaviour {
     private Dictionary<string, GameObject> levelsResources;
 
 
-
+    private bool gameStarted = false;
 
 
 
@@ -52,6 +53,7 @@ public class GameInstance : MonoBehaviour {
     private GameObject mainCamera = null;
     private GameObject soundManager = null;
     private GameObject mainMenu = null;
+    private GameObject pauseMenu = null;
 
     private Player player1Script = null;
     private Player player2Script = null;
@@ -214,6 +216,9 @@ public class GameInstance : MonoBehaviour {
             case GameState.PLAYING:
                 SetupPlayingState();
                 break;
+            case GameState.PAUSE_MENU:
+                Debug.LogWarning("You cant use SetGameState to pause the game. Use PauseGame() instead!");
+                break;
         }
     }
     private void SetupMainMenuState() {
@@ -265,8 +270,31 @@ public class GameInstance : MonoBehaviour {
         player1Script.EnableInput();
         player2Script.EnableInput();
         soundManagerScript.PlayTrack("TestTrack2", true);
+        gameStarted = true;
         currentGameState = GameState.PLAYING;
     }
+
+
+    public void PauseGame() {
+        HideAllMenus();
+        SetCursorState(true);
+
+        pauseMenu.SetActive(true);
+        Time.timeScale = 0.0f;
+    }
+    public void UnpauseGame() {
+        HideAllMenus();
+        SetCursorState(false);
+
+        pauseMenu.SetActive(false);
+        Time.timeScale = 1.0f;
+    }
+
+
+    public bool IsGameStarted() {
+        return gameStarted;
+    }
+
 
     private void SetCursorState(bool state) {
         Cursor.visible = state;
@@ -278,6 +306,7 @@ public class GameInstance : MonoBehaviour {
     private void HideAllMenus() {
         //Add all menus here
         mainMenu.SetActive(false);
+        //pauseMenu.SetActive(false);
     }
 
 

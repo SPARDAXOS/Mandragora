@@ -23,8 +23,8 @@ public struct CreatureStats
     [Header("Variables")]
     [Range(0, 1f)]
     public float satisfaction;
-    bool hungry;
-    bool dirty;
+    public bool hungry;
+    public bool dirty;
 
 }
 public enum CreatureState
@@ -38,21 +38,22 @@ public enum CreatureState
 [RequireComponent(typeof(Rigidbody))]
 public class Creature : MonoBehaviour
 {
-    private bool initialized = false;
-
-    private Rigidbody rigidbodyComp = null;
-
-    private CreatureState state;
     [SerializeField] private CreatureStats stats;
+
+    private bool initialized = false;
+    private CreatureState state;
     private float accelerationIncrement;
     private float decelerationIncrement;
 
     private Vector3 targetPosition;
     private Vector3 direction = Vector3.forward;
     private Vector3 targetDirection = Vector3.forward;
-
     private float speed;
     private Vector3 velocity = Vector3.zero;
+
+    private Rigidbody rigidbodyComp = null;
+    private ParticleSystem stinkPS = null;
+    private ParticleSystem cryPS = null;
 
     void Start()
     {
@@ -69,9 +70,10 @@ public class Creature : MonoBehaviour
         if (initialized) 
             return;
 
+        SetupReferences();
+
         state = CreatureState.RUN;
 
-        rigidbodyComp = GetComponent<Rigidbody>();
         accelerationIncrement = Time.fixedDeltaTime * stats.maxSpeed / stats.accelerationTime;
         decelerationIncrement = Time.fixedDeltaTime * stats.maxSpeed / stats.decelerationTime;
 
@@ -80,10 +82,23 @@ public class Creature : MonoBehaviour
 
         initialized = true;
     }
-
     public void FixedTick()
     {
         UpdateStates();
+
+        if (stats.dirty && !stinkPS.isPlaying)
+            stinkPS.Play();
+        else if(!stats.dirty)
+            stinkPS.Stop();
+
+        Debug.Log(stinkPS.isPlaying);
+    }
+
+    void SetupReferences()
+    {
+        rigidbodyComp = GetComponent<Rigidbody>();
+        stinkPS = transform.Find("StinkPS").GetComponent<ParticleSystem>();
+        cryPS = transform.Find("CryPS").GetComponent<ParticleSystem>();
     }
 
     private void UpdateStates()
@@ -112,21 +127,19 @@ public class Creature : MonoBehaviour
     float restDuration = 0;
     private void RestBehavior()
     {
-        UpdateDirection();
-        UpdateRotation();
         UpdateMovement();
         Decelerate();
 
         if(restTimeElapsed == 0)
         {
             restDuration = UnityEngine.Random.value * stats.maxRestDuration + stats.decelerationTime;
-            FindNewValidTarget();
         }
 
         else if(restTimeElapsed > restDuration)
         {
             state = CreatureState.RUN;
             restTimeElapsed = 0;
+            FindNewValidTarget();
             return;
         }
 
@@ -145,8 +158,9 @@ public class Creature : MonoBehaviour
 
         float breakDist = speed * stats.decelerationTime;
         bool isClose = (targetPosition - transform.position).sqrMagnitude < breakDist * breakDist;
+        bool willRest = UnityEngine.Random.value <= stats.restProbability;
 
-        if (isClose && UnityEngine.Random.value < stats.restProbability)
+        if (isClose && willRest)
         {
             ChangeState(CreatureState.REST);
             return;
@@ -182,7 +196,7 @@ public class Creature : MonoBehaviour
     Vector3 CandidateTarget()
     {
         Vector3 candidate = stats.viewRange * UnityEngine.Random.insideUnitCircle;
-        candidate = new Vector3(candidate.x, 0, candidate.y);
+        candidate = candidate.x0y();
         return candidate + transform.position.y * Vector3.up;
     }
 
@@ -248,6 +262,6 @@ public class Creature : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        direction *= -1;
+        direction *= -0.5f;
     }
 }

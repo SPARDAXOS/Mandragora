@@ -16,7 +16,7 @@ public class UIWinMenu : MonoBehaviour
     }
     public void Credits()
     {
-        //gameInstance.SetGameState(GameInstance.GameState.CREDITS_MENU);
+        gameInstance.SetGameState(GameInstance.GameState.CREDITS_MENU);
     }
 
     public void MainMenu()

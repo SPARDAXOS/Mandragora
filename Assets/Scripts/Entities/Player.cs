@@ -93,14 +93,14 @@ public class Player : MonoBehaviour {
 
     private void Accelerate() {
         if (currentSpeed < stats.maxSpeed) {
-            currentSpeed += stats.accelerationRate * Time.deltaTime;
+            currentSpeed += stats.accelerationspeed * Time.deltaTime;
             if (currentSpeed >= stats.maxSpeed)
                 currentSpeed = stats.maxSpeed;
         }
     }
     private void Decelerate() {
         if (currentSpeed > 0.0f) {
-            currentSpeed -= stats.decelerationRate * Time.deltaTime;
+            currentSpeed -= stats.decelerationspeed * Time.deltaTime;
             if (currentSpeed < 0.0f)
                 currentSpeed = 0.0f;
         }

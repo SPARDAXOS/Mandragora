@@ -147,7 +147,7 @@ GameObject:
   - component: {fileID: 6465287097155257156}
   - component: {fileID: 6903688703348761847}
   m_Layer: 5
-  m_Name: Lose Menu
+  m_Name: LoseMenu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

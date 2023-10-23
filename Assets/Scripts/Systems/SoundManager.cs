@@ -162,6 +162,29 @@ public class SoundManager : MonoBehaviour {
     }
 
 
+
+    public float GetMasterVolume() {
+        return masterVolume;
+    }
+    public float GetTrackVolume() { 
+        return trackVolume; 
+    }
+    public float GetSFXVolume() {
+        return sfxVolume;
+    }
+
+
+    public void SetMasterVolume(float volume) {
+        masterVolume = volume;
+    }
+    public void SetTrackVolume(float volume) {
+        trackVolume = volume;
+    }
+    public void SetSFXVolume(float volume) {
+        sfxVolume = volume;
+    }
+
+
     private Nullable<SoundEntry> FindClip(string key, ClipType type) {
         if (key == null)
             return null;

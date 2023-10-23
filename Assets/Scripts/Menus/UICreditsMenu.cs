@@ -1,13 +1,10 @@
 using UnityEngine;
 
-public class UICreditsMenu : MonoBehaviour
-{
+public class UICreditsMenu : MonoBehaviour {
     private bool initialize = false;
     private GameInstance gameInstance = null;
 
-
-    public void Initialize(GameInstance reference)
-    {
+    public void Initialize(GameInstance reference) {
         if (initialize)
             return;
 
@@ -15,8 +12,7 @@ public class UICreditsMenu : MonoBehaviour
         initialize = true;
     }
 
-    public void MainMenu()
-    {
+    public void ReturnButton() {
         gameInstance.SetGameState(GameInstance.GameState.MAIN_MENU);
     }
 }

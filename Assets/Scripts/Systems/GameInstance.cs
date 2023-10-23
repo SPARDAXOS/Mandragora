@@ -205,14 +205,14 @@ public class GameInstance : MonoBehaviour {
             player1 = Instantiate(entitiesResources["Player"]);
             player1.name = "Player_1";
             player1Script = player1.GetComponent<Player>();
-            player1Script.Initialize(player1ControlScheme, soundManagerScript);
+            player1Script.Initialize(player1ControlScheme, this, soundManagerScript);
             player1Script.SetColor(Color.blue);
             player1.SetActive(false);
 
             player2 = Instantiate(entitiesResources["Player"]);
             player2.name = "Player_2";
             player2Script = player2.GetComponent<Player>();
-            player2Script.Initialize(player2ControlScheme, soundManagerScript);
+            player2Script.Initialize(player2ControlScheme, this, soundManagerScript);
             player2Script.SetColor(Color.red);
             player2.SetActive(false);
         }
@@ -255,6 +255,7 @@ public class GameInstance : MonoBehaviour {
         player1Script.FixedTick();
         player2Script.FixedTick();
         cameraScript.FixedTick();
+        currentLevelScript.FixedTick();
     }
 
 
@@ -349,8 +350,8 @@ public class GameInstance : MonoBehaviour {
         player1Script.EnableInput();
         player2Script.EnableInput();
         soundManagerScript.PlayTrack("TestTrack2", true);
-        gameStarted = true;
         currentGameState = GameState.PLAYING;
+        StartGame();
     }
 
 
@@ -378,7 +379,7 @@ public class GameInstance : MonoBehaviour {
     }
     private void StartGame() {
         gameStarted = true;
-        //Activate all creatures, vfx and moving stuff in map! do this in SetupPlayingState()
+        currentLevelScript.StartLevel();
     }
     public bool IsGameStarted() {
         return gameStarted;

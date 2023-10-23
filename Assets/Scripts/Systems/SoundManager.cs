@@ -23,7 +23,7 @@ public class SoundManager : MonoBehaviour {
     [Space(5)]
     [Header("Volume")]
     [Range(0.0f, 1.0f)][SerializeField] private float masterVolume = 1.0f;
-    [Range(0.0f, 1.0f)][SerializeField] private float trackVolume = 1.0f;
+    [Range(0.0f, 1.0f)][SerializeField] private float musicVolume = 1.0f;
     [Range(0.0f, 1.0f)][SerializeField] private float sfxVolume = 1.0f;
 
 
@@ -33,6 +33,9 @@ public class SoundManager : MonoBehaviour {
 
     private float currentTrackVolume = 0.0f;
     private float currentTrackEntryVolume = 0.0f;
+
+    private string currentPlayingTrackKey = null;
+
     private bool fadingIn = false;
     private bool fadingOut = false;
     private SoundEntry? fadeTargetTrack;
@@ -109,6 +112,9 @@ public class SoundManager : MonoBehaviour {
             return false;
         }
 
+        if (currentPlayingTrackKey == key)
+            return false;
+
         SoundEntry? TargetSoundEntry = FindClip(key, ClipType.TRACK);
         if (TargetSoundEntry == null) {
             Debug.Log("Unable to find track clip \"" + key + "\" to play!");
@@ -166,8 +172,8 @@ public class SoundManager : MonoBehaviour {
     public float GetMasterVolume() {
         return masterVolume;
     }
-    public float GetTrackVolume() { 
-        return trackVolume; 
+    public float GetMusicVolume() { 
+        return musicVolume; 
     }
     public float GetSFXVolume() {
         return sfxVolume;
@@ -177,8 +183,8 @@ public class SoundManager : MonoBehaviour {
     public void SetMasterVolume(float volume) {
         masterVolume = volume;
     }
-    public void SetTrackVolume(float volume) {
-        trackVolume = volume;
+    public void SetMusicVolume(float volume) {
+        musicVolume = volume;
     }
     public void SetSFXVolume(float volume) {
         sfxVolume = volume;
@@ -237,8 +243,9 @@ public class SoundManager : MonoBehaviour {
 
 
     private void ApplyTrack(SoundEntry track) {
+        currentPlayingTrackKey = track.key;
         currentTrackEntryVolume = track.volume;
-        trackAudioSource.volume = masterVolume * trackVolume * currentTrackEntryVolume;
+        trackAudioSource.volume = masterVolume * musicVolume * currentTrackEntryVolume;
         trackAudioSource.pitch = UnityEngine.Random.Range(track.minPitch, track.maxPitch);
         trackAudioSource.clip = track.clip;
         trackAudioSource.Play();
@@ -256,7 +263,7 @@ public class SoundManager : MonoBehaviour {
             return;
 
         currentTrackVolume += fadeInSpeed * Time.deltaTime;
-        trackAudioSource.volume = currentTrackVolume * masterVolume * trackVolume; //So sliders affect also fade in and out.
+        trackAudioSource.volume = currentTrackVolume * masterVolume * musicVolume; //So sliders affect also fade in and out.
         if (currentTrackVolume >= currentTrackEntryVolume) {
             currentTrackVolume = currentTrackEntryVolume;
             fadingIn = false;
@@ -267,7 +274,7 @@ public class SoundManager : MonoBehaviour {
             return;
 
         currentTrackVolume -= fadeOutSpeed * Time.deltaTime;
-        trackAudioSource.volume = currentTrackVolume * masterVolume * trackVolume; //So sliders affect also fade in and out.
+        trackAudioSource.volume = currentTrackVolume * masterVolume * musicVolume; //So sliders affect also fade in and out.
         if (currentTrackVolume <= 0.0f) {
             currentTrackVolume = 0.0f;
             trackAudioSource.Stop();
@@ -280,6 +287,6 @@ public class SoundManager : MonoBehaviour {
         if (!trackAudioSource.isPlaying)
             return;
 
-        trackAudioSource.volume = masterVolume * trackVolume * currentTrackEntryVolume;
+        trackAudioSource.volume = masterVolume * musicVolume * currentTrackEntryVolume;
     }
 }

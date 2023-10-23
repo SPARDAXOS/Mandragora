@@ -23,7 +23,6 @@ public class Level : MonoBehaviour {
 
     private GameInstance gameInstance = null;
 
-
     private NavMeshSurface navMesh = null;
 
     private Vector3 player1SpawnPosition = Vector3.zero;
@@ -50,8 +49,12 @@ public class Level : MonoBehaviour {
 
         foreach (var entry in taskStations)
             entry.Tick();
-
-        //Tick creatures
+    }
+    public void FixedTick() {
+        if (gameInstance.IsGameStarted()) {
+            foreach (var entry in creatures)
+                entry.FixedTick();
+        }
     }
     private void SetupReferences() {
 
@@ -91,9 +94,9 @@ public class Level : MonoBehaviour {
             GameObject go = Instantiate(CreaturePrefab);
             Creature script = go.GetComponent<Creature>();
             script.Initialize();
+            script.SetActive(false);
             creatures.Add(script);
         }
-        RandomizeCreatureSpawns();
     }
 
 
@@ -112,7 +115,6 @@ public class Level : MonoBehaviour {
     }
     private void RandomizeCreatureSpawns() {
         foreach(var creature in creatures) {
-            //If Active
             Vector3 spawnPosition = GetRandomPointOnNavMesh();
             spawnPosition.y += spawnHeightOffset;
             creature.transform.position = spawnPosition;
@@ -127,6 +129,11 @@ public class Level : MonoBehaviour {
     }
 
 
+    public void StartLevel() {
+        foreach (var entry in creatures)
+            entry.SetActive(true);
+        RandomizeCreatureSpawns();
+    }
     public void GameOver() {
 
     }

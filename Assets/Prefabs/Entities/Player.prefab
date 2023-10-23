@@ -357,6 +357,7 @@ Transform:
   - {fileID: 7744696152357125317}
   - {fileID: 8819910652024971246}
   - {fileID: 6432580524469744728}
+  - {fileID: 3990462869373603157}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &2654902058708577203
@@ -470,7 +471,43 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stats: {fileID: 11400000, guid: 76702858faa01224c8b42fb84fffb64c, type: 2}
-  currentSpeed: 0
+  pickupCheckBoxSize: 0.5
+  pickupCheckOffset: 0.56
+  pickupMask:
+    serializedVersion: 2
+    m_Bits: 64
+  showPickupTrigger: 1
+--- !u!1 &8927406364580707716
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3990462869373603157}
+  m_Layer: 0
+  m_Name: PickupPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3990462869373603157
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8927406364580707716}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 1.2}
+  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5422696617343906344}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &8887116708034034378
 PrefabInstance:
   m_ObjectHideFlags: 0

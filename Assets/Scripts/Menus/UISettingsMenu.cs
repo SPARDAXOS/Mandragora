@@ -1,17 +1,18 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UISettingsMenu : MonoBehaviour
-{
+public class UISettingsMenu : MonoBehaviour {
+
     private bool initialize = false;
+
     private GameInstance gameInstance = null;
     private SoundManager soundManager = null;
+
     private Slider MasterSlider;
     private Slider SFXSlider;
-    private Slider TrackSlider;
+    private Slider MusicSlider;
 
-    public void Initialize(GameInstance gameInstance, SoundManager soundManager)
-    {
+    public void Initialize(GameInstance gameInstance, SoundManager soundManager) {
         if (initialize)
             return;
 
@@ -20,42 +21,33 @@ public class UISettingsMenu : MonoBehaviour
         SetupReference();
         initialize = true;
     }
-    private void SetupReference()
-    {
+    private void SetupReference() {
         MasterSlider = transform.Find("MasterSlider").GetComponent<Slider>();
         SFXSlider = transform.Find("SFXSlider").GetComponent<Slider>();
-        TrackSlider = transform.Find("TrackSlider").GetComponent<Slider>();
+        MusicSlider = transform.Find("MusicSlider").GetComponent<Slider>();
 
         MasterSlider.value = soundManager.GetMasterVolume();
         SFXSlider.value = soundManager.GetSFXVolume();
-        TrackSlider.value = soundManager.GetTrackVolume();
+        MusicSlider.value = soundManager.GetMusicVolume();
     }
 
-    public void ReturnFromSettings()
-    {   
+    public void ReturnButton() {
         if (gameInstance.IsGameStarted())
-        {
-            gameInstance.SetGameState(GameInstance.GameState.PLAYING);
-        }
+            gameInstance.PauseGame();
         else
-        {
             gameInstance.SetGameState(GameInstance.GameState.MAIN_MENU);
-        }
     }
 
-    public void SetSfxSlider(float value)
-    {
-        soundManager.SetSFXVolume(value);
-
+    public void SetMasterSlider() {
+        if (initialize)
+            soundManager.SetMasterVolume(MasterSlider.value);
     }
-    public void SetMasterSlider(float value)
-    {
-        soundManager.SetMasterVolume(value);
-
+    public void SetSFXSlider() {
+        if (initialize)
+            soundManager.SetSFXVolume(SFXSlider.value);
     }
-    public void SetTrackSlider(float value)
-    {
-        soundManager.SetTrackVolume(value);
-
+    public void SetMusicSlider() {
+        if (initialize)
+            soundManager.SetMusicVolume(MusicSlider.value);
     }
 }

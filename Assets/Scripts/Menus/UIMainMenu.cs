@@ -21,16 +21,12 @@ public class UIMainMenu : MonoBehaviour
     {
         GameInstance.Abort("Game Quit!");
     }
-
     public void Startgame()
     {
         gameInstance.SetGameState(GameInstance.GameState.CUSTOMIZATION_MENU);
     }
-
     public void Settings()
     {
         gameInstance.SetGameState(GameInstance.GameState.SETTINGS_MENU);
     }
-
-   
 }

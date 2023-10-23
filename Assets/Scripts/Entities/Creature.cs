@@ -58,15 +58,15 @@ public class Creature : MonoBehaviour
     private ParticleSystem stinkPS = null;
     private ParticleSystem cryPS = null;
 
-    void Start()
-    {
-        Initialize();
-    }
+    //void Start()
+    //{
+    //    Initialize();
+    //}
 
-    void FixedUpdate()
-    {
-        FixedTick();
-    }
+    //void FixedUpdate()
+    //{
+    //    FixedTick();
+    //}
 
     public void Initialize()
     {

@@ -1,4 +1,5 @@
 using Mandragora;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,7 +13,7 @@ public class TaskStation : MonoBehaviour {
         MASH,
         HOLD,
         QTE,
-        TIMED_CLICK
+        QTE_BAR
     }
 
     [Header("Types")]
@@ -20,29 +21,50 @@ public class TaskStation : MonoBehaviour {
     [SerializeField] private ActionType actionType = ActionType.MASH;
 
     [Space(10)]
-    [Header("Interactions")]
+    [Header("Mash")]
     [Range(1.0f, 10.0f)][SerializeField] private float mashIncreaseRate = 5.0f;
+
+    [Space(10)]
+    [Header("Hold")]
     [Range(0.01f, 1.0f)][SerializeField] private float holdIncreaseRate = 0.5f;
+
+    [Space(10)]
+    [Header("QTE")]
+    [SerializeField] private KeyCode[] possibleQTEKeys;
+    [Range(1, 10)][SerializeField] private uint QTECount = 5;
+
 
 
     private bool initialized = false;
 
     private CameraMovement cameraScript = null;
-    public Player targetPlayer = null;
-    public bool playerInRange = false;
+    private Player targetPlayer = null;
+    private bool playerInRange = false;
 
-    public bool interactionOngoing = false;
+    private bool interactionOngoing = false;
+
+    private string lastInputedKey = null;
+    private KeyCode currentTargetQTE = KeyCode.None;
+    private uint currentQTECount = 0;
+
+    private bool QTEBarTrigger = false;
+
+
+
 
     private GameObject GUI = null;
     private GameObject interactionIndicator = null;
+    private GameObject QTEIndicator = null;
     private GameObject normalBarFrame = null;
+    private GameObject QTEBarFrame = null;
 
     private ParticleSystem sparklePS = null;
     private ParticleSystem bathBubblePS = null;
 
+    private TextMeshProUGUI QTEIndicatorText = null;
+    private Image normalBar = null;
 
-    private UnityEngine.UI.Image normalBar = null;
-
+    private Animation QTEBarAnimationComp = null;
 
 
 
@@ -59,10 +81,11 @@ public class TaskStation : MonoBehaviour {
         if (!initialized)
             return;
 
-        if (interactionOngoing) {
+        if (playerInRange)
             UpdateIndicatorsRotation();
+
+        if (interactionOngoing)
             UpdateInteraction();
-        }
         else if (playerInRange && targetPlayer)
             CheckInput();
     }
@@ -71,25 +94,38 @@ public class TaskStation : MonoBehaviour {
         if (!Utility.Validate(GUI, "Failed to get reference to GUI - " + gameObject.name, Utility.ValidationType.ERROR))
             return;
 
+        //Interaction Indicator
         interactionIndicator = GUI.transform.Find("InteractionIndicator").gameObject;
         Utility.Validate(interactionIndicator, "Failed to get reference to InteractionIndicator - " + gameObject.name, Utility.ValidationType.ERROR);
         interactionIndicator.SetActive(false);
 
-        //Bars
+        //QTE Indicator
+        QTEIndicator = GUI.transform.Find("QTEIndicator").gameObject;
+        Utility.Validate(QTEIndicator, "Failed to get reference to QTEIndicator - " + gameObject.name, Utility.ValidationType.ERROR);
+        QTEIndicatorText = QTEIndicator.GetComponent<TextMeshProUGUI>();
+        Utility.Validate(QTEIndicatorText, "Failed to get component TextMeshProUGUI in QTEIndicatorText - " + gameObject.name, Utility.ValidationType.ERROR);
+        QTEIndicator.SetActive(false);
+
+        //Normal Bar
         normalBarFrame = GUI.transform.Find("NormalBarFrame").gameObject;
         Utility.Validate(normalBarFrame, "Failed to get reference to NormalBarFrame - " + gameObject.name, Utility.ValidationType.ERROR);
         normalBar = normalBarFrame.transform.Find("NormalBarFill").GetComponent<Image>();
         Utility.Validate(normalBar, "Failed to get reference to NormalBarFill - " + gameObject.name, Utility.ValidationType.ERROR);
-
         normalBarFrame.SetActive(false);
 
+        //QTE Bar
+        QTEBarFrame = GUI.transform.Find("QTEBarFrame").gameObject;
+        Utility.Validate(QTEBarFrame, "Failed to get reference to QTEBarFrame - " + gameObject.name, Utility.ValidationType.ERROR);
+        QTEBarAnimationComp = QTEBarFrame.GetComponent<Animation>();
+        Utility.Validate(QTEBarAnimationComp, "Failed to get component Animation in QTEBarAnimationComp - " + gameObject.name, Utility.ValidationType.ERROR);
+        QTEBarFrame.SetActive(false);
 
-        //Particle Systems
+        //Sparkle PS
         var SparklePSTransform = transform.Find("SparklePS");
         Utility.Validate(SparklePSTransform, "Failed to get reference to SparklePS - " + gameObject.name, Utility.ValidationType.ERROR);
         sparklePS = SparklePSTransform.GetComponent<ParticleSystem>();
 
-
+        //BathBubble PS
         var BathBubblePSTransform = transform.Find("BathBubblePS");
         Utility.Validate(BathBubblePSTransform, "Failed to get reference to BathBubblePS - " + gameObject.name, Utility.ValidationType.ERROR);
         bathBubblePS = BathBubblePSTransform.GetComponent<ParticleSystem>();
@@ -103,12 +139,17 @@ public class TaskStation : MonoBehaviour {
             UpdateHoldInteraction();
         else if (actionType == ActionType.QTE)
             UpdateQTEInteraction();
-        else if (actionType == ActionType.TIMED_CLICK)
+        else if (actionType == ActionType.QTE_BAR)
             UpdateTimedClickInteraction();
     }
     private void UpdateIndicatorsRotation() {
-        normalBarFrame.transform.rotation = Quaternion.LookRotation(cameraScript.transform.forward, cameraScript.transform.up);
+        Quaternion RotationTowardsCamera = Quaternion.LookRotation(cameraScript.transform.forward, cameraScript.transform.up);
+        interactionIndicator.transform.rotation = RotationTowardsCamera;
+        normalBarFrame.transform.rotation       = RotationTowardsCamera;
+        QTEIndicator.transform.rotation         = RotationTowardsCamera;
+        QTEBarFrame.transform.rotation          = RotationTowardsCamera;
     }
+
 
 
     private void UpdateMashInteraction() {
@@ -130,14 +171,27 @@ public class TaskStation : MonoBehaviour {
         }
     }
     private void UpdateQTEInteraction() {
-
+        lastInputedKey = Input.inputString;
+        if (lastInputedKey == currentTargetQTE.ToString().ToLower()) {
+            currentQTECount++;
+            normalBar.fillAmount += 1.0f / QTECount;
+            if (currentQTECount == QTECount) {
+                normalBar.fillAmount = 1.0f;
+                currentQTECount = 0;
+                CompleteInteraction();
+            }
+            else
+                UpdateQTE();
+        }
     }
     private void UpdateTimedClickInteraction() {
+        if (QTEBarTrigger && targetPlayer.IsInteractingTrigger())
+            CompleteInteraction();
     }
 
     private void CompleteInteraction() {
         interactionOngoing = false;
-        DisableInteractionBar();
+        DisableInteraction();
         DisableParticleSystem();
         sparklePS.Play();
         //-Gets picked up creature and toggles off TaskType!
@@ -152,7 +206,7 @@ public class TaskStation : MonoBehaviour {
     }
     private void Intearct() {
         interactionOngoing = true;
-        EnableInteractionBar();
+        EnableInteraction();
         EnableParticleSystem();
         targetPlayer.DisableMovement();
         interactionIndicator.SetActive(false);
@@ -165,25 +219,54 @@ public class TaskStation : MonoBehaviour {
 
 
     }
-    private void EnableInteractionBar() {
+    private void EnableInteraction() {
         if (actionType == ActionType.MASH || actionType == ActionType.HOLD) {
             normalBarFrame.SetActive(true);
             normalBar.fillAmount = 0.0f;
         }
-        //else if (actionType == ActionType.QTE)
-        //    UpdateQTEInteraction();
-        //else if (actionType == ActionType.TIMED_CLICK)
-        //    UpdateTimedClickInteraction();
+        else if (actionType == ActionType.QTE) {
+            normalBarFrame.SetActive(true);
+            QTEIndicator.SetActive(true);
+            normalBar.fillAmount = 0.0f;
+            UpdateQTE();
+        }
+        else if (actionType == ActionType.QTE_BAR) {
+            QTEBarFrame.SetActive(true);
+            QTEBarAnimationComp.Play();
+            QTEBarTrigger = false;
+        }
     }
-    private void DisableInteractionBar() {
+    private void DisableInteraction() {
         if (actionType == ActionType.MASH || actionType == ActionType.HOLD)
             normalBarFrame.SetActive(false);
-        
+        else if (actionType == ActionType.QTE) {
+            normalBarFrame.SetActive(false);
+            QTEIndicator.SetActive(false);
+        }
+        else if(actionType == ActionType.QTE_BAR) {
+            QTEBarFrame.SetActive(false);
+            QTEBarAnimationComp.Stop();
+        }
     }
     private void DisableParticleSystem() {
         if (taskType == TaskType.BATHING)
             bathBubblePS.Stop();
 
+    }
+
+
+    private void UpdateQTE() {
+        KeyCode NewQTE = currentTargetQTE;
+        while(NewQTE == currentTargetQTE) {
+            int rand = UnityEngine.Random.Range(0, possibleQTEKeys.Length);
+            NewQTE = possibleQTEKeys[rand];
+        }
+
+        currentTargetQTE = NewQTE;
+        QTEIndicatorText.text = currentTargetQTE.ToString();
+    }
+    public void ToggleQTEBarTrigger() {
+        QTEBarTrigger ^= true;
     }
 
 

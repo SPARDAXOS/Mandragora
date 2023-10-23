@@ -165,7 +165,7 @@ public class GameInstance : MonoBehaviour {
             Abort("Failed to find WinMenu resource");
         else {
             winMenu = Instantiate(entitiesResources["WinMenu"]);
-            winMenuScript = settingsMenu.GetComponent<UIWinMenu>();
+            winMenuScript = winMenu.GetComponent<UIWinMenu>();
             winMenuScript.Initialize(this);
             winMenu.SetActive(false);
         }
@@ -377,6 +377,7 @@ public class GameInstance : MonoBehaviour {
         gameStarted = false;
     }
     private void StartGame() {
+        gameStarted = true;
         //Activate all creatures, vfx and moving stuff in map! do this in SetupPlayingState()
     }
     public bool IsGameStarted() {

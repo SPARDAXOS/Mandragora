@@ -267,7 +267,7 @@ GameObject:
   - component: {fileID: 7183031975170119001}
   - component: {fileID: 6107389560490051591}
   - component: {fileID: 8127475391084312531}
-  - component: {fileID: 1167960382698768717}
+  - component: {fileID: -4418071675015565083}
   m_Layer: 5
   m_Name: WinMenu
   m_TagString: Untagged
@@ -358,7 +358,7 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &1167960382698768717
+--- !u!114 &-4418071675015565083
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -367,7 +367,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 3992107309455478605}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94659c5fc02ddf44b9fa4ff16ab46b6f, type: 3}
+  m_Script: {fileID: 11500000, guid: 4218382e08b6b104aa5f73f2b70fe475, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &5487575907549577413

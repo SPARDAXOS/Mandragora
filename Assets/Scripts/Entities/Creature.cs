@@ -10,6 +10,7 @@ public struct CreatureStats
     public float maxSpeed;
     public float accelerationTime;
     public float decelerationTime;
+    public float gravityScale;
     [Tooltip("Degrees per second.")]
     public float turnRate;
 
@@ -81,6 +82,7 @@ public class Creature : MonoBehaviour
     }
     public void FixedTick()
     {
+        UpdateGravity(); //TEMP
         UpdateStates();
         UpdateParticles();
     }
@@ -225,6 +227,12 @@ public class Creature : MonoBehaviour
             if (speed < 0f)
                 speed = 0f;
         }
+    }
+
+    private void UpdateGravity() {
+        Vector3 currentVelocity = rigidbodyComp.velocity;
+        rigidbodyComp.velocity += new Vector3(0.0f, -stats.gravityScale * Time.fixedDeltaTime, 0.0f);
+        Debug.Log(-stats.gravityScale * Time.fixedDeltaTime);
     }
     private void UpdateDirection()
     {

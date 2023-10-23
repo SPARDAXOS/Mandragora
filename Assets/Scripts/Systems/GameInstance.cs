@@ -255,6 +255,7 @@ public class GameInstance : MonoBehaviour {
         player1Script.FixedTick();
         player2Script.FixedTick();
         cameraScript.FixedTick();
+        currentLevelScript.FixedTick();
     }
 
 
@@ -349,8 +350,8 @@ public class GameInstance : MonoBehaviour {
         player1Script.EnableInput();
         player2Script.EnableInput();
         soundManagerScript.PlayTrack("TestTrack2", true);
-        gameStarted = true;
         currentGameState = GameState.PLAYING;
+        StartGame();
     }
 
 
@@ -378,7 +379,7 @@ public class GameInstance : MonoBehaviour {
     }
     private void StartGame() {
         gameStarted = true;
-        //Activate all creatures, vfx and moving stuff in map! do this in SetupPlayingState()
+        currentLevelScript.StartLevel();
     }
     public bool IsGameStarted() {
         return gameStarted;

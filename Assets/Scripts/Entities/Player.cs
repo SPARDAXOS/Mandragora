@@ -1,15 +1,17 @@
 using Mandragora;
 using UnityEngine;
-
+using UnityEngine.Rendering.VirtualTexturing;
 
 public class Player : MonoBehaviour {
 
-    [SerializeField] PlayerStats stats;
+    [SerializeField] private PlayerStats stats;
+    [SerializeField] private float pickupCheckBoxSize = 1.0f;
+    [SerializeField] private float pickupCheckOffset = 0.5f;
+    [SerializeField] private LayerMask pickupMask;
 
-    //Pablo code for player pick up action
-    public float boxSize = 0.5f;
-    public float maxDistance = 1.0f;
-    public LayerMask detectionLayer;
+    [Header("Debugging")]
+    [SerializeField] private bool showPickupTrigger = true;
+
 
 
     private bool initialized = false;
@@ -17,9 +19,11 @@ public class Player : MonoBehaviour {
     private bool isInteractingTrigger = false;
     private bool isInteractingHeld = false;
 
-    public float currentSpeed = 0.0f;
+    private float currentSpeed = 0.0f;
     private Vector3 direction;
     private Vector3 velocity;
+
+    private GameObject pickupPoint = null;
 
     private PlayerControlScheme activeControlScheme = null;
 
@@ -28,6 +32,8 @@ public class Player : MonoBehaviour {
 
 
     private ParticleSystem runDustPS = null;
+
+    private Creature heldCreature = null;
 
     private Rigidbody rigidbodyComp = null;
     private MeshRenderer meshRendererComp = null;
@@ -50,10 +56,10 @@ public class Player : MonoBehaviour {
             GameInstance.Abort("Failed to get MeshRenderer component on " + gameObject.name);
         mainMaterial = meshRendererComp.materials[0];
 
+        pickupPoint = transform.Find("PickupPoint").gameObject;
 
         runDustPS = transform.Find("RunDustPS").GetComponent<ParticleSystem>();
         Utility.Validate(runDustPS, "Failed to find RunDustPS.", Utility.ValidationType.WARNING);
-
 
         rigidbodyComp = GetComponent<Rigidbody>();
         if (!rigidbodyComp)
@@ -66,6 +72,10 @@ public class Player : MonoBehaviour {
         if (!initialized)
             return;
 
+        if (heldCreature) {
+            heldCreature.transform.position = pickupPoint.transform.position;
+
+        }
         
         CheckInput();
     }
@@ -116,10 +126,14 @@ public class Player : MonoBehaviour {
 
 
         //Testing
-        if (isInteractingTrigger)
-        {
-            Pickup();
-            soundManager.PlaySFX("SFXTest1", transform.position);
+        if (isInteractingTrigger) {
+            if (!heldCreature)
+                Pickup();
+            else if (heldCreature) {
+               
+                heldCreature.PutDown();
+                heldCreature = null;
+            }
         }
 
         if (activeControlScheme.pause.triggered)
@@ -165,49 +179,21 @@ public class Player : MonoBehaviour {
 
 
 
-    private void Pickup()
-    {
-        {
-            if (IsInteractTriggered())
-            {
-                PerformInteraction();
-            }
-        }
+    private void Pickup() {
+        Vector3 boxcastOrigin = transform.position + transform.forward * pickupCheckOffset;
+        Vector3 boxExtent = new Vector3(pickupCheckBoxSize / 2.0f, pickupCheckBoxSize / 2.0f, pickupCheckBoxSize / 2.0f);
 
-        bool IsInteractTriggered()
-        {
-            // Implement logic to check if the interact button is triggered (I selected mouse0 (CLICK)).
-            // Return true when the button is pressed 
-            return Input.GetKeyDown(KeyCode.Mouse0);
-
-            //Debug.Log("Mouse 0 was clicked");
-        }
-
-        void PerformInteraction()
-        {
-            Vector3 boxcastOrigin = transform.position + transform.forward * boxSize;
-            Vector3 boxExtent = new Vector3(boxSize / 2.0f, boxSize / 2.0f, boxSize / 2.0f);
-
-            if (Physics.BoxCast(boxcastOrigin, boxExtent, transform.forward, out RaycastHit hitInfo, transform.rotation, 0.0f, detectionLayer))
-            {
-                // Check if the hit object has a Creature component
-                Creature creature = hitInfo.collider.GetComponent<Creature>();
-
-                if (creature != null)
-                {
-                    // You found a creature
-                    Debug.Log("Found a creature!");
+        var HitResults = Physics.BoxCastAll(boxcastOrigin, boxExtent, transform.forward, transform.rotation, 0.0f, pickupMask.value);
+        if (HitResults != null) {
+            foreach (var entry in HitResults) {
+                var script = entry.collider.GetComponent<Creature>();
+                if (!script) {
+                    Debug.LogError("Attempted to pickup invalid Creature that did not own creature script!");
+                    continue;
                 }
-                else
-                {
-                    // The hit object does not have a Creature component
-                    Debug.Log("No creature detected.");
-                }
-            }
-            else
-            {
-                // BoxCast did NOT hit anything
-                Debug.Log("No objects in front.");
+
+                heldCreature = script;
+                heldCreature.PickUp(this);
             }
         }
     }
@@ -219,11 +205,12 @@ public class Player : MonoBehaviour {
         return isInteractingHeld;
     }
 
-    private void OnDrawGizmos()
-    {
-        Vector3 boxcastOrigin = transform.position + transform.forward * boxSize;
-        Vector3 boxExtent = new Vector3(boxSize / 2.0f, boxSize / 2.0f, boxSize / 2.0f);
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawCube(boxcastOrigin, boxExtent);
+    private void OnDrawGizmos() {
+        if (showPickupTrigger) {
+            Vector3 boxcastOrigin = transform.position + transform.forward * pickupCheckOffset;
+            Vector3 boxSize = new Vector3(pickupCheckBoxSize, pickupCheckBoxSize, pickupCheckBoxSize);
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawCube(boxcastOrigin, boxSize);
+        }
     }
 }

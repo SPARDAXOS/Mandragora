@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 9135386428048894539}
   - component: {fileID: 8286512445207717520}
   - component: {fileID: 485047807280192455}
-  m_Layer: 2
+  m_Layer: 6
   m_Name: Creature
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -66,7 +66,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 4d3861c7f13eca542b69a4c01a4d6662, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -117,7 +117,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6999313860858921807}
   serializedVersion: 4
-  m_Mass: 0.25
+  m_Mass: 1
   m_Drag: 0
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -152,6 +152,7 @@ MonoBehaviour:
     maxSpeed: 2
     accelerationTime: 0.5
     decelerationTime: 1
+    gravityScale: 5
     turnRate: 360
     shyness: 0
     viewRange: 4
@@ -172,6 +173,10 @@ PrefabInstance:
     - target: {fileID: 1602645000612654521, guid: 2925672ae78425b4597f0e8765d4749f, type: 3}
       propertyPath: m_Name
       value: StinkPS
+      objectReference: {fileID: 0}
+    - target: {fileID: 1602645000612654521, guid: 2925672ae78425b4597f0e8765d4749f, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 1602645000612654526, guid: 2925672ae78425b4597f0e8765d4749f, type: 3}
       propertyPath: m_LocalScale.x
@@ -251,6 +256,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Left
       objectReference: {fileID: 0}
+    - target: {fileID: 7238772451212046937, guid: 43bd00e0d29137c46b1191882aea24c5, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 7238772451885342900, guid: 43bd00e0d29137c46b1191882aea24c5, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -295,9 +304,17 @@ PrefabInstance:
       propertyPath: m_Name
       value: CryPS
       objectReference: {fileID: 0}
+    - target: {fileID: 7238772451885342903, guid: 43bd00e0d29137c46b1191882aea24c5, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 7238772452277931479, guid: 43bd00e0d29137c46b1191882aea24c5, type: 3}
       propertyPath: m_Name
       value: Right
+      objectReference: {fileID: 0}
+    - target: {fileID: 7238772452277931479, guid: 43bd00e0d29137c46b1191882aea24c5, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

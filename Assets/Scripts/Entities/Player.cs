@@ -6,6 +6,11 @@ public class Player : MonoBehaviour {
 
     [SerializeField] PlayerStats stats;
 
+    //Pablo code for player pick up action
+    public float boxSize = 0.5f;
+    public float maxDistance = 1.0f;
+    public LayerMask detectionLayer;
+
 
     private bool initialized = false;
     private bool isMoving = false;
@@ -60,7 +65,7 @@ public class Player : MonoBehaviour {
         if (!initialized)
             return;
 
-
+        
         CheckInput();
     }
     public void FixedTick() {
@@ -104,9 +109,14 @@ public class Player : MonoBehaviour {
         isInteractingHeld = activeControlScheme.interact.IsPressed();
         isMoving = activeControlScheme.movement.IsPressed();
 
+
+
         //Testing
         if (isInteractingTrigger)
+        {
+            Pickup();
             soundManager.PlaySFX("SFXTest1", transform.position);
+        }
 
         //Break into update func
         if (isMoving && !runDustPS.isPlaying)
@@ -125,14 +135,14 @@ public class Player : MonoBehaviour {
 
     private void Accelerate() {
         if (currentSpeed < stats.maxSpeed) {
-            currentSpeed += stats.accelerationspeed * Time.deltaTime;
+            currentSpeed += stats.accelerationRate * Time.deltaTime;
             if (currentSpeed >= stats.maxSpeed)
                 currentSpeed = stats.maxSpeed;
         }
     }
     private void Decelerate() {
         if (currentSpeed > 0.0f) {
-            currentSpeed -= stats.decelerationspeed * Time.deltaTime;
+            currentSpeed -= stats.decelerationRate * Time.deltaTime;
             if (currentSpeed < 0.0f)
                 currentSpeed = 0.0f;
         }
@@ -148,12 +158,65 @@ public class Player : MonoBehaviour {
 
 
 
+    private void Pickup()
+    {
+        {
+            if (IsInteractTriggered())
+            {
+                PerformInteraction();
+            }
+        }
 
+        bool IsInteractTriggered()
+        {
+            // Implement logic to check if the interact button is triggered (I selected mouse0 (CLICK)).
+            // Return true when the button is pressed 
+            return Input.GetKeyDown(KeyCode.Mouse0);
+
+            //Debug.Log("Mouse 0 was clicked");
+        }
+
+        void PerformInteraction()
+        {
+            Vector3 boxcastOrigin = transform.position + transform.forward * boxSize;
+            Vector3 boxExtent = new Vector3(boxSize / 2.0f, boxSize / 2.0f, boxSize / 2.0f);
+
+            if (Physics.BoxCast(boxcastOrigin, boxExtent, transform.forward, out RaycastHit hitInfo, transform.rotation, 0.0f, detectionLayer))
+            {
+                // Check if the hit object has a Creature component
+                Creature creature = hitInfo.collider.GetComponent<Creature>();
+
+                if (creature != null)
+                {
+                    // You found a creature
+                    Debug.Log("Found a creature!");
+                }
+                else
+                {
+                    // The hit object does not have a Creature component
+                    Debug.Log("No creature detected.");
+                }
+            }
+            else
+            {
+                // BoxCast did NOT hit anything
+                Debug.Log("No objects in front.");
+            }
+        }
+    }
 
     public bool IsInteractingTrigger() {
         return isInteractingTrigger;
     }
     public bool IsInteractingHeld() {
         return isInteractingHeld;
+    }
+
+    private void OnDrawGizmos()
+    {
+        Vector3 boxcastOrigin = transform.position + transform.forward * boxSize;
+        Vector3 boxExtent = new Vector3(boxSize / 2.0f, boxSize / 2.0f, boxSize / 2.0f);
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawCube(boxcastOrigin, boxExtent);
     }
 }

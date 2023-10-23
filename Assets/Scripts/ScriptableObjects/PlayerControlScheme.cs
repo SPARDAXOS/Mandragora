@@ -6,4 +6,5 @@ public class PlayerControlScheme : ScriptableObject
 {
     public InputAction movement;
     public InputAction interact;
+    public InputAction pause;
 }

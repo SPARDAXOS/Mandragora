@@ -10,7 +10,7 @@ public class Player : MonoBehaviour {
     private bool initialized = false;
     private bool isMoving = false;
     private bool isInteractingTrigger = false;
-    private bool isInteractingHeld= false;
+    private bool isInteractingHeld = false;
 
     public float currentSpeed = 0.0f;
     private Vector3 direction;
@@ -18,21 +18,22 @@ public class Player : MonoBehaviour {
 
     private PlayerControlScheme activeControlScheme = null;
 
+    private GameInstance gameInstance = null;
     private SoundManager soundManager = null;
 
 
     private ParticleSystem runDustPS = null;
-    private TaskStation taskStationInRange = null;
 
     private Rigidbody rigidbodyComp = null;
     private MeshRenderer meshRendererComp = null;
     private Material mainMaterial;
 
-    public void Initialize(PlayerControlScheme controlScheme, SoundManager soundManager) {
+    public void Initialize(PlayerControlScheme controlScheme, GameInstance gameInstance, SoundManager soundManager) {
         if (initialized)
             return;
 
         activeControlScheme = controlScheme;
+        this.gameInstance = gameInstance;
         this.soundManager = soundManager;
 
         SetupReferences();
@@ -82,11 +83,13 @@ public class Player : MonoBehaviour {
 
         activeControlScheme.movement.Enable();
         activeControlScheme.interact.Enable();
+        activeControlScheme.pause.Enable();
     }
     public void DisableInput() {
 
         activeControlScheme.movement.Disable();
         activeControlScheme.interact.Disable();
+        activeControlScheme.pause.Disable();
     }
     public void EnableMovement() {
         activeControlScheme.movement.Enable();
@@ -103,10 +106,14 @@ public class Player : MonoBehaviour {
         isInteractingTrigger = activeControlScheme.interact.triggered;
         isInteractingHeld = activeControlScheme.interact.IsPressed();
         isMoving = activeControlScheme.movement.IsPressed();
+        
 
         //Testing
         if (isInteractingTrigger)
             soundManager.PlaySFX("SFXTest1", transform.position);
+
+        if (activeControlScheme.pause.triggered)
+            gameInstance.PauseGame();
 
         //Break into update func
         if (isMoving && !runDustPS.isPlaying)

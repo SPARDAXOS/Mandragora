@@ -31,9 +31,9 @@ public class UISettingsMenu : MonoBehaviour {
         MusicSlider.value = soundManager.GetMusicVolume();
     }
 
-    public void ReturnButton() {   
+    public void ReturnButton() {
         if (gameInstance.IsGameStarted())
-            gameInstance.SetGameState(GameInstance.GameState.PLAYING);
+            gameInstance.PauseGame();
         else
             gameInstance.SetGameState(GameInstance.GameState.MAIN_MENU);
     }
@@ -49,6 +49,5 @@ public class UISettingsMenu : MonoBehaviour {
     public void SetMusicSlider() {
         if (initialize)
             soundManager.SetMusicVolume(MusicSlider.value);
-
     }
 }

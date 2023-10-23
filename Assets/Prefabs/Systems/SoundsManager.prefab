@@ -47,11 +47,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sfxBundle: {fileID: 11400000, guid: 3d61192b47b35814dae4484149b44ee4, type: 2}
   tracksBundle: {fileID: 11400000, guid: 993a41f9556ade145945f03c9a9c24fe, type: 2}
-  fadeInSpeed: 0.4
+  fadeInSpeed: 0.5
   fadeOutSpeed: 0.4
   canInterruptFade: 0
   masterVolume: 1
-  trackVolume: 1
+  musicVolume: 1
   sfxVolume: 1
 --- !u!82 &-8465688723338295763
 AudioSource:

@@ -6,8 +6,7 @@ public class UIPauseMenu : MonoBehaviour
     private GameInstance gameInstance = null;
 
 
-    public void Initialize(GameInstance reference)
-    {
+    public void Initialize(GameInstance reference) {
         if (initialize)
             return;
 
@@ -15,23 +14,14 @@ public class UIPauseMenu : MonoBehaviour
         initialize = true;
     }
 
-    public void UnPause()
-    {
-        gameInstance.SetGameState(GameInstance.GameState.PLAYING);
+    public void ResumeButton() {
+        gameInstance.UnpauseGame();
     }
-
-    public void Settings()
-    {
+    public void SettingsButton() {
         gameInstance.SetGameState(GameInstance.GameState.SETTINGS_MENU);
     }
-
-    public void QuitGame()
-    {
-        GameInstance.Abort("Game Quit!");
-    }
-
-    public void MainMenu()
-    {
+    public void QuitButton() {
+        //END GAME
         gameInstance.SetGameState(GameInstance.GameState.MAIN_MENU);
     }
 }

@@ -106,8 +106,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   restingCameraDistance: 5
-  maxAngleBetweenTargets: 55
-  zoomToFitFactor: 0.75
+  zOffset: -1
+  maxAngleBetweenTargets: 25
+  zoomToFitFactor: 0.3
   lerpSpeed: 4.5
   cameraShake:
     amplitude: 2

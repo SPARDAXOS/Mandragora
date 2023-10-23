@@ -67,7 +67,7 @@ public class GameInstance : MonoBehaviour {
 
     private Player player1Script = null;
     private Player player2Script = null;
-    private CameraMovement cameraScript = null;
+    private MainCamera cameraScript = null;
     private SoundManager soundManagerScript = null;
     private UIMainMenu mainMenuScript = null;
     private UISettingsMenu settingsMenuScript = null;
@@ -222,7 +222,7 @@ public class GameInstance : MonoBehaviour {
             Abort("Failed to find MainCamera resource");
         else {
             mainCamera = Instantiate(entitiesResources["MainCamera"]);
-            cameraScript = mainCamera.GetComponent<CameraMovement>();
+            cameraScript = mainCamera.GetComponent<MainCamera>();
             cameraScript.Initialize();
             cameraScript.AddTarget(player1);
             cameraScript.AddTarget(player2);
@@ -404,7 +404,7 @@ public class GameInstance : MonoBehaviour {
     }
 
 
-    public CameraMovement GetCameraScript() {
+    public MainCamera GetCameraScript() {
         return cameraScript;
     }
 }

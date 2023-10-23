@@ -37,7 +37,7 @@ public class TaskStation : MonoBehaviour {
 
     private bool initialized = false;
 
-    private CameraMovement cameraScript = null;
+    private MainCamera cameraScript = null;
     private Player targetPlayer = null;
     private bool playerInRange = false;
 
@@ -69,7 +69,7 @@ public class TaskStation : MonoBehaviour {
 
 
 
-    public void Initialize(CameraMovement camera) {
+    public void Initialize(MainCamera camera) {
         if (initialized)
             return;
 

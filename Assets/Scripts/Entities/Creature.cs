@@ -44,6 +44,7 @@ public class Creature : MonoBehaviour
     [SerializeField] private bool drawAIGizmos;
 
     private bool initialized = false;
+    private bool active;
     private CreatureState state;
     private float accelerationIncrement;
     private float decelerationIncrement;
@@ -54,20 +55,12 @@ public class Creature : MonoBehaviour
     private float speed;
     private Vector3 velocity = Vector3.zero;
 
+    float restTimeElapsed = 0;
+    float restDuration = 0;
+
     private Rigidbody rigidbodyComp = null;
     private ParticleSystem stinkPS = null;
     private ParticleSystem cryPS = null;
-
-    //void Start()
-    //{
-    //    Initialize();
-    //}
-
-    //void FixedUpdate()
-    //{
-    //    FixedTick();
-    //}
-
 
     public void Initialize()
     {
@@ -91,7 +84,15 @@ public class Creature : MonoBehaviour
         UpdateStates();
         UpdateParticles();
     }
-
+    public bool GetActive()
+    {
+        return active;
+    }
+    public void SetActive(bool state)
+    {
+        active = state;
+        gameObject.SetActive(active);
+    }
     void UpdateParticles()
     {
         if (stats.dirty && !stinkPS.isPlaying)
@@ -104,14 +105,12 @@ public class Creature : MonoBehaviour
         else if (!stats.hungry)
             cryPS.Stop();
     }
-
     void SetupReferences()
     {
         rigidbodyComp = GetComponent<Rigidbody>();
         stinkPS       = transform.Find("StinkPS").GetComponent<ParticleSystem>();
         cryPS         = transform.Find("CryPS").GetComponent<ParticleSystem>();
     }
-
     private void UpdateStates()
     {
         switch(state)
@@ -124,7 +123,6 @@ public class Creature : MonoBehaviour
                 break;
         }
     }
-
     private void RunBehavior()
     {
         UpdateDirection();
@@ -133,9 +131,6 @@ public class Creature : MonoBehaviour
         ChooseInput();
         ChooseTarget();
     }
-
-    float restTimeElapsed = 0;
-    float restDuration = 0;
     private void RestBehavior()
     {
         UpdateMovement();
@@ -156,13 +151,11 @@ public class Creature : MonoBehaviour
 
         restTimeElapsed += Time.fixedDeltaTime;
     }
-
     private Vector3 RandomDirection()
     {
         Vector2 random2D = (UnityEngine.Random.insideUnitCircle).normalized;
         return new Vector3(random2D.x, 0, random2D.y);
     }
-
     void ChooseTarget()
     {
         bool pathObstructed = CastToTarget(targetPosition, false);
@@ -180,7 +173,6 @@ public class Creature : MonoBehaviour
         if (pathObstructed)
             FindNewValidTarget();
     }
-
     void FindNewValidTarget()
     {
         int retryLimit = 50;
@@ -251,12 +243,10 @@ public class Creature : MonoBehaviour
     {
         transform.forward = direction;
     }
-
     private void ChangeState(CreatureState state)
     {
         this.state = state;
     }
-
     public void PickUp(Player player)
     {
         ChangeState(CreatureState.HELD);
@@ -267,10 +257,10 @@ public class Creature : MonoBehaviour
         ChangeState(CreatureState.RUN);
         GetComponent<Collider>().enabled = true;
     }
-
     private void OnCollisionEnter(Collision collision)
     {
-        direction *= -0.5f;
+        direction *= -1f;
+        speed *= 0.5f;
     }
     private void OnDrawGizmos()
     {

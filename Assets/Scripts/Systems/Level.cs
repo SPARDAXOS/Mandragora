@@ -50,6 +50,8 @@ public class Level : MonoBehaviour {
 
         foreach (var entry in taskStations)
             entry.Tick();
+
+        //Tick creatures
     }
     private void SetupReferences() {
 

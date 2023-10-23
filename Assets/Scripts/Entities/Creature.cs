@@ -68,6 +68,7 @@ public class Creature : MonoBehaviour
     //    FixedTick();
     //}
 
+
     public void Initialize()
     {
         if (initialized) 
@@ -107,8 +108,8 @@ public class Creature : MonoBehaviour
     void SetupReferences()
     {
         rigidbodyComp = GetComponent<Rigidbody>();
-        stinkPS = transform.Find("StinkPS").GetComponent<ParticleSystem>();
-        cryPS = transform.Find("CryPS").GetComponent<ParticleSystem>();
+        stinkPS       = transform.Find("StinkPS").GetComponent<ParticleSystem>();
+        cryPS         = transform.Find("CryPS").GetComponent<ParticleSystem>();
     }
 
     private void UpdateStates()
@@ -140,7 +141,7 @@ public class Creature : MonoBehaviour
         UpdateMovement();
         Decelerate();
 
-        if(restTimeElapsed == 0)
+        if (restTimeElapsed == 0)
         {
             restDuration = UnityEngine.Random.value * stats.maxRestDuration + stats.decelerationTime;
         }
@@ -261,7 +262,6 @@ public class Creature : MonoBehaviour
         ChangeState(CreatureState.HELD);
         GetComponent<Collider>().enabled = false;
     }
-
     public void PutDown()
     {
         ChangeState(CreatureState.RUN);

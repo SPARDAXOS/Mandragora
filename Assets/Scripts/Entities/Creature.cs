@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
@@ -13,6 +14,7 @@ public struct CreatureStats
     public float turnRate;
 
     [Header("Behavior")]
+    //List<TaskType> taskList
     [Range(0, 1f)]
     public float shyness;
     public float viewRange;
@@ -25,20 +27,21 @@ public struct CreatureStats
     public float satisfaction;
     public bool hungry;
     public bool dirty;
-
-}
-public enum CreatureState
-{
-    RUN,
-    REST,
-    HELD,
-    INACTIVE
 }
 
 [RequireComponent(typeof(Rigidbody))]
 public class Creature : MonoBehaviour
 {
+    public enum CreatureState
+    {
+        NONE = 0,
+        RUN,
+        REST,
+        HELD,
+    }
+
     [SerializeField] private CreatureStats stats;
+    [SerializeField] private bool drawAIGizmos;
 
     private bool initialized = false;
     private CreatureState state;
@@ -190,7 +193,6 @@ public class Creature : MonoBehaviour
                 break;
         }
     }
-
     bool CastToTarget(Vector3 target, bool assignTarget)
     {
         Vector3 origin = transform.position;
@@ -199,14 +201,12 @@ public class Creature : MonoBehaviour
         if (!output && assignTarget) targetPosition = target;
         return output;
     }
-
     Vector3 CandidateTarget()
     {
         Vector3 candidate = stats.viewRange * UnityEngine.Random.insideUnitCircle;
         candidate = candidate.x0y();
         return candidate + transform.position.y * Vector3.up;
     }
-
     private void ChooseInput()
     {
         float dirDot = Vector3.Dot(direction, targetDirection);
@@ -215,7 +215,6 @@ public class Creature : MonoBehaviour
         else 
             Decelerate();
     }
-
     private void Accelerate()
     {
         if (speed < stats.maxSpeed)
@@ -234,8 +233,6 @@ public class Creature : MonoBehaviour
                 speed = 0f;
         }
     }
-
-
     private void UpdateDirection()
     {
         targetDirection = (targetPosition - transform.position).normalized;
@@ -254,21 +251,35 @@ public class Creature : MonoBehaviour
         transform.forward = direction;
     }
 
-    public void ChangeState(CreatureState state)
+    private void ChangeState(CreatureState state)
     {
         this.state = state;
     }
 
-    private void OnDrawGizmos()
+    public void PickUp(Player player)
     {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, stats.viewRange);
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(targetPosition, 0.5f);
+        ChangeState(CreatureState.HELD);
+        GetComponent<Collider>().enabled = false;
+    }
+
+    public void PutDown()
+    {
+        ChangeState(CreatureState.RUN);
+        GetComponent<Collider>().enabled = true;
     }
 
     private void OnCollisionEnter(Collision collision)
     {
         direction *= -0.5f;
+    }
+    private void OnDrawGizmos()
+    {
+        if (drawAIGizmos)
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(transform.position, stats.viewRange);
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireSphere(targetPosition, 0.5f);
+        }
     }
 }

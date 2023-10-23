@@ -149,7 +149,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stats:
-    maxSpeed: 3
+    maxSpeed: 2
     accelerationTime: 0.5
     decelerationTime: 1
     turnRate: 360
@@ -159,7 +159,8 @@ MonoBehaviour:
     restProbability: 0.01
     satisfaction: 0
     hungry: 0
-  dirty: 0
+    dirty: 0
+  drawAIGizmos: 0
 --- !u!1001 &1405697963936289669
 PrefabInstance:
   m_ObjectHideFlags: 0

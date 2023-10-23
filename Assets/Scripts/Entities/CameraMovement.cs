@@ -6,12 +6,14 @@ using UnityEngine;
 
 
 [Serializable]
-public struct CameraShake {
+public struct CameraShake 
+{
     public float amplitude;
     public float frequency;
     public bool isShaking;
 }
-public class CameraMovement : MonoBehaviour {
+public class CameraMovement : MonoBehaviour 
+{
     private bool initialized = false;
 
     private List<GameObject> targets;
@@ -26,7 +28,8 @@ public class CameraMovement : MonoBehaviour {
     public CameraShake cameraShake;
     private float zDist;
 
-    public void Initialize() {
+    public void Initialize() 
+    {
         if (initialized) 
             return;
 
@@ -38,7 +41,8 @@ public class CameraMovement : MonoBehaviour {
 
         initialized = true;
     }
-    public void FixedTick() {
+    public void FixedTick() 
+    {
         if (!initialized) 
             return;
 
@@ -58,18 +62,21 @@ public class CameraMovement : MonoBehaviour {
         return UnityEngine.Random.insideUnitSphere * cameraShake.amplitude;
     }
 
-    public IEnumerator ShakeFor(float duration) {
+    public IEnumerator ShakeFor(float duration) 
+    {
         cameraShake.isShaking = true;
         yield return new WaitForSeconds(duration);
         cameraShake.isShaking = false;
     }
 
-    public void AddTarget(GameObject target) {
+    public void AddTarget(GameObject target) 
+    {
         if (target)
             targets.Add(target);
     }
 
-    void UpdateTargetDistance() {
+    void UpdateTargetDistance() 
+    {
         float dist = GetDistBetweenTargets();
 
         targetDistance = dist / (2 * Mathf.Cos(cameraViewAngle) * Mathf.Tan(maxAngleBetweenTargets));
@@ -81,7 +88,8 @@ public class CameraMovement : MonoBehaviour {
     }
 
 
-    void UpdateTargetPosition() {
+    void UpdateTargetPosition() 
+    {
         zDist = -Mathf.Cos(cameraViewAngle) * targetDistance;
         Vector3 offset = new Vector3(0, Mathf.Sin(cameraViewAngle) * targetDistance, zDist);
         Vector3 position = GetPlayerCenter() + offset;
@@ -94,7 +102,8 @@ public class CameraMovement : MonoBehaviour {
         targetPos = position;
     }
 
-    Vector3 GetPlayerCenter() {
+    Vector3 GetPlayerCenter() 
+    {
         Vector3 output = Vector3.zero;
         for (int i = 0; i < targets.Count; i++) {
             if (!targets[i]) {
@@ -109,7 +118,8 @@ public class CameraMovement : MonoBehaviour {
         return output;
     }
 
-    float GetDistBetweenTargets() {
+    float GetDistBetweenTargets() 
+    {
         if (targets.Count < 2)
             return 0;
 

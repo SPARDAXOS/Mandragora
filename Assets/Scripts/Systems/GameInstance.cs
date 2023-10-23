@@ -28,6 +28,11 @@ public class GameInstance : MonoBehaviour {
         PLAYING,
         PAUSE_MENU
     }
+    public enum GameResults {
+        WIN,
+        LOSE
+    }
+
 
     [SerializeField] private ResourcesBundle entitiesBundle;
     [SerializeField] private ResourcesBundle levelsBundle;
@@ -54,14 +59,23 @@ public class GameInstance : MonoBehaviour {
     private GameObject mainCamera = null;
     private GameObject soundManager = null;
     private GameObject mainMenu = null;
+    private GameObject settingsMenu = null;
     private GameObject pauseMenu = null;
+    private GameObject winMenu = null;
+    private GameObject loseMenu = null;
+    private GameObject creditsMenu = null;
 
     private Player player1Script = null;
     private Player player2Script = null;
     private MainCamera cameraScript = null;
     private SoundManager soundManagerScript = null;
-    private MainMenu mainMenuScript = null;
- 
+    private UIMainMenu mainMenuScript = null;
+    private UISettingsMenu settingsMenuScript = null;
+    private UIPauseMenu pauseMenuScript = null;
+    private UILoseMenu loseMenuScript = null;
+    private UIWinMenu winMenuScript = null;
+    private UICreditsMenu creditsMenuScript = null;
+
 
 
     void Update() {
@@ -119,16 +133,6 @@ public class GameInstance : MonoBehaviour {
             levelsResources.Add(entry.name, entry.resource);
     }
     private void CreateEntities() {
-        if (!entitiesResources["MainMenu"])
-            Abort("Failed to find MainMenu resource");
-        else {
-            mainMenu = Instantiate(entitiesResources["MainMenu"]);
-            mainMenuScript = mainMenu.GetComponent<MainMenu>();
-            mainMenuScript.Initialize(this);
-            mainMenu.SetActive(false);
-        }
-
-
         if (!entitiesResources["SoundManager"])
             Abort("Failed to find SoundManager resource");
         else {
@@ -136,6 +140,65 @@ public class GameInstance : MonoBehaviour {
             soundManagerScript = soundManager.GetComponent<SoundManager>();
             soundManagerScript.Initialize();
         }
+
+
+
+        if (!entitiesResources["MainMenu"])
+            Abort("Failed to find MainMenu resource");
+        else {
+            mainMenu = Instantiate(entitiesResources["MainMenu"]);
+            mainMenuScript = mainMenu.GetComponent<UIMainMenu>();
+            mainMenuScript.Initialize(this);
+            mainMenu.SetActive(false);
+        }
+
+        if (!entitiesResources["SettingsMenu"])
+            Abort("Failed to find SettingsMenu resource");
+        else {
+            settingsMenu = Instantiate(entitiesResources["SettingsMenu"]);
+            settingsMenuScript = settingsMenu.GetComponent<UISettingsMenu>();
+            settingsMenuScript.Initialize(this, soundManagerScript);
+            settingsMenu.SetActive(false);
+        }
+
+        if (!entitiesResources["WinMenu"])
+            Abort("Failed to find WinMenu resource");
+        else {
+            winMenu = Instantiate(entitiesResources["WinMenu"]);
+            winMenuScript = winMenu.GetComponent<UIWinMenu>();
+            winMenuScript.Initialize(this);
+            winMenu.SetActive(false);
+        }
+
+        if (!entitiesResources["LoseMenu"])
+            Abort("Failed to find LoseMenu resource");
+        else {
+            loseMenu = Instantiate(entitiesResources["LoseMenu"]);
+            loseMenuScript = loseMenu.GetComponent<UILoseMenu>();
+            loseMenuScript.Initialize(this);
+            loseMenu.SetActive(false);
+        }
+
+        if (!entitiesResources["CreditsMenu"])
+            Abort("Failed to find CreditsMenu resource");
+        else {
+            creditsMenu = Instantiate(entitiesResources["CreditsMenu"]);
+            creditsMenuScript = creditsMenu.GetComponent<UICreditsMenu>();
+            creditsMenuScript.Initialize(this);
+            creditsMenu.SetActive(false);
+        }
+
+        if (!entitiesResources["PauseMenu"])
+            Abort("Failed to find PauseMenu resource");
+        else {
+            pauseMenu = Instantiate(entitiesResources["PauseMenu"]);
+            pauseMenuScript = pauseMenu.GetComponent<UIPauseMenu>();
+            pauseMenuScript.Initialize(this);
+            pauseMenu.SetActive(false);
+        }
+
+
+
         if (!entitiesResources["Player"])
             Abort("Failed to find Player resource");
         else {
@@ -198,7 +261,8 @@ public class GameInstance : MonoBehaviour {
     public void SetGameState(GameState state) {
         switch (state) {
             case GameState.NONE:
-                return;
+                Debug.LogWarning("NONE was sent to SetGameState()");
+                break;
             case GameState.MAIN_MENU: 
                 SetupMainMenuState(); 
                 break;
@@ -213,6 +277,9 @@ public class GameInstance : MonoBehaviour {
                 break;
             case GameState.LOSE_MENU:
                 SetupLoseMenuState();
+                break;
+            case GameState.CREDITS_MENU:
+                SetupCreditsMenuState();
                 break;
             case GameState.PLAYING:
                 SetupPlayingState();
@@ -233,6 +300,7 @@ public class GameInstance : MonoBehaviour {
         SetCursorState(true);
         HideAllMenus();
 
+        settingsMenu.SetActive(true);
     }
     private void SetupCustomizationMenuState() {
         SetCursorState(true);
@@ -247,6 +315,8 @@ public class GameInstance : MonoBehaviour {
         player2.SetActive(false);
         player1Script.DisableInput();
         player2Script.DisableInput();
+
+        winMenu.SetActive(true);
     }
     private void SetupLoseMenuState() {
         SetCursorState(true);
@@ -257,6 +327,14 @@ public class GameInstance : MonoBehaviour {
         player2.SetActive(false);
         player1Script.DisableInput();
         player2Script.DisableInput();
+
+        loseMenu.SetActive(true);
+    }
+    private void SetupCreditsMenuState() {
+        SetCursorState(true);
+        HideAllMenus();
+
+        creditsMenu.SetActive(true);
     }
     private void SetupPlayingState() {
         SetCursorState(true);
@@ -292,6 +370,16 @@ public class GameInstance : MonoBehaviour {
     }
 
 
+    public void GameOver(GameResults results) {
+        Debug.Log("Game is over with results " + results.ToString());
+
+
+        gameStarted = false;
+    }
+    private void StartGame() {
+        gameStarted = true;
+        //Activate all creatures, vfx and moving stuff in map! do this in SetupPlayingState()
+    }
     public bool IsGameStarted() {
         return gameStarted;
     }
@@ -307,7 +395,12 @@ public class GameInstance : MonoBehaviour {
     private void HideAllMenus() {
         //Add all menus here
         mainMenu.SetActive(false);
-        //pauseMenu.SetActive(false);
+        settingsMenu.SetActive(false);
+        winMenu.SetActive(false);
+        loseMenu.SetActive(false);
+        creditsMenu.SetActive(false);
+        pauseMenu.SetActive(false);
+        //Customization
     }
 
 

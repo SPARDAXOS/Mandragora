@@ -108,8 +108,8 @@ public class Creature : MonoBehaviour
     void SetupReferences()
     {
         rigidbodyComp = GetComponent<Rigidbody>();
-        stinkPS = transform.Find("StinkPS").GetComponent<ParticleSystem>();
-        cryPS = transform.Find("CryPS").GetComponent<ParticleSystem>();
+        stinkPS       = transform.Find("StinkPS").GetComponent<ParticleSystem>();
+        cryPS         = transform.Find("CryPS").GetComponent<ParticleSystem>();
     }
     private void UpdateStates()
     {
@@ -136,7 +136,7 @@ public class Creature : MonoBehaviour
         UpdateMovement();
         Decelerate();
 
-        if(restTimeElapsed == 0)
+        if (restTimeElapsed == 0)
         {
             restDuration = UnityEngine.Random.value * stats.maxRestDuration + stats.decelerationTime;
         }
@@ -259,7 +259,8 @@ public class Creature : MonoBehaviour
     }
     private void OnCollisionEnter(Collision collision)
     {
-        direction *= -0.5f;
+        direction *= -1f;
+        speed *= 0.5f;
     }
     private void OnDrawGizmos()
     {

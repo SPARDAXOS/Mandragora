@@ -166,7 +166,7 @@ public class SoundManager : MonoBehaviour {
     public float GetMasterVolume() {
         return masterVolume;
     }
-    public float GetTrackVolume() { 
+    public float GetMusicVolume() { 
         return trackVolume; 
     }
     public float GetSFXVolume() {
@@ -177,7 +177,7 @@ public class SoundManager : MonoBehaviour {
     public void SetMasterVolume(float volume) {
         masterVolume = volume;
     }
-    public void SetTrackVolume(float volume) {
+    public void SetMusicVolume(float volume) {
         trackVolume = volume;
     }
     public void SetSFXVolume(float volume) {

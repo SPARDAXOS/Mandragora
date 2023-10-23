@@ -24,6 +24,7 @@ public class GameInstance : MonoBehaviour {
         CUSTOMIZATION_MENU,
         WIN_MENU,
         LOSE_MENU,
+        CREDITS_MENU,
         PLAYING,
         PAUSE_MENU
     }

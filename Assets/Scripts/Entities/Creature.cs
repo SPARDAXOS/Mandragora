@@ -56,6 +56,7 @@ public class Creature : MonoBehaviour
     private Vector3 direction = Vector3.forward;
     private Vector3 targetDirection = Vector3.forward;
     private float speed;
+    private bool isMoving = false;
     private Vector3 velocity = Vector3.zero;
 
     float restTimeElapsed = 0;
@@ -65,6 +66,7 @@ public class Creature : MonoBehaviour
     private Collider col = null;
     private ParticleSystem stinkPS = null;
     private ParticleSystem cryPS = null;
+    private ParticleSystem runDustPS = null;
     private Level level;
 
     public void Initialize(Level level)
@@ -158,6 +160,11 @@ public class Creature : MonoBehaviour
             cryPS.Play();
         else if (!stats.hungry)
             cryPS.Stop();
+
+        if(isMoving && !runDustPS.isPlaying) 
+            runDustPS.Play();
+        else if(!isMoving)
+            runDustPS.Stop();
     }
     void SetupParticleSystems()
     {
@@ -181,6 +188,7 @@ public class Creature : MonoBehaviour
         col = GetComponent<Collider>();
         stinkPS       = transform.Find("StinkPS").GetComponent<ParticleSystem>();
         cryPS         = transform.Find("CryPS").GetComponent<ParticleSystem>();
+        runDustPS     = transform.Find("RunDustPS").GetComponent<ParticleSystem>();
     }
     private void UpdateStates()
     {
@@ -332,6 +340,10 @@ public class Creature : MonoBehaviour
     }
     private void UpdateMovement()
     {
+        if (speed > 0f) 
+            isMoving = true;
+        else 
+            isMoving = false;
         velocity = speed * direction;
         rigidbodyComp.velocity = velocity;
     }

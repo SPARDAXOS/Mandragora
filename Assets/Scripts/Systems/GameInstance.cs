@@ -2,6 +2,7 @@ using UnityEngine;
 using Mandragora;
 using UnityEditor;
 using System.Collections.Generic;
+using UnityEngine.UIElements;
 
 namespace Initialization {
     public class Initialization {
@@ -371,10 +372,14 @@ public class GameInstance : MonoBehaviour {
     }
 
 
-    public void GameOver(GameResults results) {
+    public void MatchFinished(GameResults results) {
         Debug.Log("Game is over with results " + results.ToString());
 
-
+        if (results == GameResults.WIN)
+            SetGameState(GameState.WIN_MENU);
+        else if (results == GameResults.LOSE)
+            SetGameState(GameState.LOSE_MENU);
+        soundManagerScript.PlayTrack("TestTrack1", true);
         gameStarted = false;
     }
     private void StartGame() {
@@ -387,11 +392,11 @@ public class GameInstance : MonoBehaviour {
 
 
     private void SetCursorState(bool state) {
-        Cursor.visible = state;
+        UnityEngine.Cursor.visible = state;
         if (state)
-            Cursor.lockState = CursorLockMode.None;
+            UnityEngine.Cursor.lockState = CursorLockMode.None;
         else
-            Cursor.lockState = CursorLockMode.Locked;
+            UnityEngine.Cursor.lockState = CursorLockMode.Locked;
     }
     private void HideAllMenus() {
         //Add all menus here

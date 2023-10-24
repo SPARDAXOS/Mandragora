@@ -42,7 +42,7 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_Extents: {x: 0.5, y: 0.5, z: 1.655}
   m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 1
@@ -76,7 +76,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 2.2, y: 1.3, z: 0}
-  m_LocalScale: {x: -4.6712656, y: 2.0799446, z: 12.998}
+  m_LocalScale: {x: 4.671266, y: 2.0799446, z: 12.998}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4328188855266038171}
@@ -179,7 +179,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.16666667
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: 2c1bb32db41d8174c951c6074d3cd919, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: 162cc5a2764506246ac5d84916a011fd, type: 2}
   m_BuildHeightMesh: 0
 --- !u!1 &383763035307712592
 GameObject:
@@ -293,7 +293,7 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_Extents: {x: 0.5, y: 0.5, z: 1.655}
   m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 1
@@ -428,7 +428,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0.41896936, z: -0, w: 0.9080004}
   m_LocalPosition: {x: 2.06, y: 2.79, z: 14.06}
-  m_LocalScale: {x: -2.2632916, y: 5.2743235, z: 3.6237235}
+  m_LocalScale: {x: 4.9378242, y: 5.2743235, z: 3.6237235}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4328188855266038171}
@@ -673,7 +673,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0.3863517, z: -0, w: 0.9223516}
   m_LocalPosition: {x: -15.16, y: 1.3, z: 12.84}
-  m_LocalScale: {x: -7.717287, y: 2.0799446, z: 3.041057}
+  m_LocalScale: {x: 7.717287, y: 2.0799446, z: 3.041057}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4328188855266038171}
@@ -757,7 +757,7 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_Extents: {x: 0.5, y: 0.5, z: 1.655}
   m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 1
@@ -984,7 +984,7 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_Extents: {x: 0.5, y: 0.5, z: 1.655}
   m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 1
@@ -1158,7 +1158,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 17.24, y: 1.3, z: -4.39}
-  m_LocalScale: {x: -4.780222, y: 2.0799446, z: 3.6237235}
+  m_LocalScale: {x: 4.780222, y: 2.0799446, z: 3.6237235}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4328188855266038171}
@@ -1228,7 +1228,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: -16.69, y: 1.3, z: 11.17}
-  m_LocalScale: {x: -7.717287, y: 2.0799446, z: 3.041057}
+  m_LocalScale: {x: 7.717287, y: 2.0799446, z: 3.041057}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4328188855266038171}
@@ -1298,7 +1298,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -12.6, y: 1.3, z: 14.23}
-  m_LocalScale: {x: -11.648735, y: 2.0799446, z: 3.041057}
+  m_LocalScale: {x: 11.64874, y: 2.0799446, z: 3.041057}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4328188855266038171}
@@ -1382,7 +1382,7 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_Extents: {x: 0.5, y: 0.5, z: 1.655}
   m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 1
@@ -1430,7 +1430,7 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_Extents: {x: 0.5, y: 0.5, z: 1.655}
   m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 1
@@ -1478,7 +1478,7 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_Extents: {x: 0.5, y: 0.5, z: 1.655}
   m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 1
@@ -1666,7 +1666,7 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_Extents: {x: 0.5, y: 0.5, z: 1.655}
   m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 1
@@ -2005,7 +2005,7 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_Extents: {x: 0.5, y: 0.5, z: 1.655}
   m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 1
@@ -2039,7 +2039,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: -18.82, y: 1.3, z: -11.25}
-  m_LocalScale: {x: -7.717287, y: 2.0799446, z: 3.041057}
+  m_LocalScale: {x: 7.717287, y: 2.0799446, z: 3.041057}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4328188855266038171}
@@ -2109,7 +2109,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 15.51, y: 1.3, z: -13.59}
-  m_LocalScale: {x: -7.717287, y: 2.0799446, z: 3.6237235}
+  m_LocalScale: {x: 7.717287, y: 2.0799446, z: 3.6237235}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4328188855266038171}
@@ -2262,6 +2262,7 @@ Transform:
   - {fileID: 8855479138669145919}
   - {fileID: 7758282358050564886}
   - {fileID: 4328188855266038171}
+  - {fileID: 8376283234921715206}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5819107718666195497
@@ -2277,9 +2278,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CreaturePrefab: {fileID: 6999313860858921807, guid: 41f4ed135d66d76409942cc5a6c18654, type: 3}
-  creaturesCount: 8
+  creaturesCount: 7
   spawnPointCalculationRetries: 10
-  spawnHeightOffset: 6.11
+  spawnHeightOffset: 5
   currentSatisfiedCreatures: 0
   navMeshBounds:
     m_Center: {x: 0, y: 0, z: 0}
@@ -2326,7 +2327,7 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_Extents: {x: 0.5, y: 0.5, z: 1.655}
   m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 1
@@ -2631,6 +2632,141 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 6496003265933644122, guid: 2c902f953e46e46439908ca4d44dd30e, type: 3}
   m_PrefabInstance: {fileID: 5500308265346902816}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &6015009650380739465
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 7838646876851414486}
+    m_Modifications:
+    - target: {fileID: 2830251031956030863, guid: 4a861b14ed1046542ac8e0c3185c3e9e, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 3.6329
+      objectReference: {fileID: 0}
+    - target: {fileID: 2830251031956030863, guid: 4a861b14ed1046542ac8e0c3185c3e9e, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 3.6143
+      objectReference: {fileID: 0}
+    - target: {fileID: 2830251031956030863, guid: 4a861b14ed1046542ac8e0c3185c3e9e, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 3.9029
+      objectReference: {fileID: 0}
+    - target: {fileID: 2830251031956030863, guid: 4a861b14ed1046542ac8e0c3185c3e9e, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 12.18
+      objectReference: {fileID: 0}
+    - target: {fileID: 2830251031956030863, guid: 4a861b14ed1046542ac8e0c3185c3e9e, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2830251031956030863, guid: 4a861b14ed1046542ac8e0c3185c3e9e, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 11.77
+      objectReference: {fileID: 0}
+    - target: {fileID: 2830251031956030863, guid: 4a861b14ed1046542ac8e0c3185c3e9e, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2830251031956030863, guid: 4a861b14ed1046542ac8e0c3185c3e9e, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2830251031956030863, guid: 4a861b14ed1046542ac8e0c3185c3e9e, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2830251031956030863, guid: 4a861b14ed1046542ac8e0c3185c3e9e, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2830251031956030863, guid: 4a861b14ed1046542ac8e0c3185c3e9e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2830251031956030863, guid: 4a861b14ed1046542ac8e0c3185c3e9e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2830251031956030863, guid: 4a861b14ed1046542ac8e0c3185c3e9e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7649039127974261413, guid: 4a861b14ed1046542ac8e0c3185c3e9e, type: 3}
+      propertyPath: m_Name
+      value: CreatureDeliveryStation
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7649039127974261413, guid: 4a861b14ed1046542ac8e0c3185c3e9e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8166144647972616697}
+    - targetCorrespondingSourceObject: {fileID: 7649039127974261413, guid: 4a861b14ed1046542ac8e0c3185c3e9e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 29699729207762573}
+  m_SourcePrefab: {fileID: 100100000, guid: 4a861b14ed1046542ac8e0c3185c3e9e, type: 3}
+--- !u!1 &4134097642441777452 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7649039127974261413, guid: 4a861b14ed1046542ac8e0c3185c3e9e, type: 3}
+  m_PrefabInstance: {fileID: 6015009650380739465}
+  m_PrefabAsset: {fileID: 0}
+--- !u!33 &8166144647972616697
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4134097642441777452}
+  m_Mesh: {fileID: -5495902117074765545, guid: 581fb4f61bfc2454d9a13199a0be2607, type: 3}
+--- !u!23 &29699729207762573
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4134097642441777452}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: b6b2b90938c95f24280d2dae35deb887, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!4 &8376283234921715206 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2830251031956030863, guid: 4a861b14ed1046542ac8e0c3185c3e9e, type: 3}
+  m_PrefabInstance: {fileID: 6015009650380739465}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &6613600529937806379
 PrefabInstance:

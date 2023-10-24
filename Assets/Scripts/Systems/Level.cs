@@ -134,10 +134,13 @@ public class Level : MonoBehaviour {
     }
 
 
+    public void RegisterCreatureMaximumDisatisfied() {
+        gameInstance.MatchFinished(GameInstance.GameResults.LOSE);
+    }
     public void RegisterSatisfiedCreature() {
         currentSatisfiedCreatures++;
-        if(currentSatisfiedCreatures == creaturesCount) {
-            Debug.Log("Game Completed!");
+        if (currentSatisfiedCreatures == creaturesCount) {
+            gameInstance.MatchFinished(GameInstance.GameResults.WIN);
         }
     }
 

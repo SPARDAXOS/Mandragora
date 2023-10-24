@@ -320,7 +320,7 @@ MonoBehaviour:
   CreaturePrefab: {fileID: 6999313860858921807, guid: 41f4ed135d66d76409942cc5a6c18654, type: 3}
   creaturesCount: 8
   spawnPointCalculationRetries: 10
-  spawnHeightOffset: 7
+  spawnHeightOffset: 6.11
   navMeshBounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}

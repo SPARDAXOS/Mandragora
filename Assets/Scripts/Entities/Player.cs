@@ -23,6 +23,8 @@ public class Player : MonoBehaviour {
     private Vector3 direction;
     private Vector3 velocity;
 
+    public bool inTaskStationRange = false;
+
     private GameObject pickupPoint = null;
 
     private PlayerControlScheme activeControlScheme = null;
@@ -129,11 +131,8 @@ public class Player : MonoBehaviour {
         if (isInteractingTrigger) {
             if (!heldCreature)
                 Pickup();
-            else if (heldCreature) {
-               
-                heldCreature.PutDown();
-                heldCreature = null;
-            }
+            else if (heldCreature && !inTaskStationRange)
+                DropHeldCreature();
         }
 
         if (activeControlScheme.pause.triggered)
@@ -206,6 +205,21 @@ public class Player : MonoBehaviour {
     }
     public bool IsInteractingHeld() {
         return isInteractingHeld;
+    }
+
+    public void SetInTaskStationRange(bool state) {
+        inTaskStationRange = state;
+    }
+
+    public Creature GetHeldCreature() {
+        return heldCreature;
+    }
+    public void DropHeldCreature() {
+        if (!heldCreature)
+            return;
+
+        heldCreature.PutDown();
+        heldCreature = null;
     }
 
     private void OnDrawGizmos() {

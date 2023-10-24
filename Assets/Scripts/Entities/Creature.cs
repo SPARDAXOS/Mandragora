@@ -75,6 +75,7 @@ public class Creature : MonoBehaviour
         this.level = level;
 
         SetupReferences();
+        SetupParticleSystems();
 
         state = CreatureState.FALL;
 
@@ -89,7 +90,8 @@ public class Creature : MonoBehaviour
     public void FixedTick()
     {
         UpdateStates();
-        UpdateParticles();
+        
+        CheckPS();
     }
     public bool IsSatisfied()
     {
@@ -103,9 +105,29 @@ public class Creature : MonoBehaviour
             if (task == completedTask)
             {
                 taskList.RemoveAt(i);
+                CheckTask(completedTask, false);
+
                 //return;
             }
         }
+    }
+
+    void CheckTask(TaskStation.TaskType task, bool state)
+    {
+        switch (task)
+        {
+            case TaskStation.TaskType.FEEDING:
+                stats.hungry = state;
+                break;
+            case TaskStation.TaskType.BATHING:
+                stats.dirty = state;
+                break;
+        }
+    }
+
+    bool TaskListContains(TaskStation.TaskType task)
+    {
+        return taskList.Contains(task);
     }
 
     public bool DoesRequireTask(TaskStation.TaskType type) {
@@ -125,7 +147,7 @@ public class Creature : MonoBehaviour
         active = state;
         gameObject.SetActive(active);
     }
-    void UpdateParticles()
+    void CheckPS()
     {
         if (stats.dirty && !stinkPS.isPlaying)
             stinkPS.Play();
@@ -136,6 +158,22 @@ public class Creature : MonoBehaviour
             cryPS.Play();
         else if (!stats.hungry)
             cryPS.Stop();
+    }
+    void SetupParticleSystems()
+    {
+        foreach(TaskStation.TaskType task in taskList)
+        {
+            if(task == TaskStation.TaskType.BATHING)
+            {
+                stinkPS.Play();
+                stats.dirty = true;
+            }
+            if (task == TaskStation.TaskType.BATHING)
+            {
+                cryPS.Play();
+                stats.hungry = true;
+            }
+        }
     }
     void SetupReferences()
     {
@@ -161,11 +199,11 @@ public class Creature : MonoBehaviour
     }
     private void RunBehavior()
     {
+        ChooseTarget();
+        ChooseInput();
         UpdateDirection();
         UpdateRotation();
         UpdateMovement();
-        ChooseInput();
-        ChooseTarget();
     }
     private void RestBehavior()
     {
@@ -190,7 +228,6 @@ public class Creature : MonoBehaviour
 
     void FallBehavior()
     {
-        //Debug.Log(rigidbodyComp.velocity.y);
         if (transform.position.y < 1f)
         {
             

@@ -232,7 +232,7 @@ public class Creature : MonoBehaviour
     private void UpdateGravity() {
         Vector3 currentVelocity = rigidbodyComp.velocity;
         rigidbodyComp.velocity += new Vector3(0.0f, -stats.gravityScale * Time.fixedDeltaTime, 0.0f);
-        Debug.Log(-stats.gravityScale * Time.fixedDeltaTime);
+        //Debug.Log(-stats.gravityScale * Time.fixedDeltaTime);
     }
     private void UpdateDirection()
     {

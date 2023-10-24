@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxSpeed: 20
   turnRate: 7
-  accelerationRate: 200
-  decelerationRate: 200
+  accelerationRate: 164.4
+  decelerationRate: 106.9

@@ -134,7 +134,7 @@ MonoBehaviour:
   pickupMask:
     serializedVersion: 2
     m_Bits: 64
-  showPickupTrigger: 1
+  showPickupTrigger: 0
 --- !u!1001 &5605139720784332902
 PrefabInstance:
   m_ObjectHideFlags: 0

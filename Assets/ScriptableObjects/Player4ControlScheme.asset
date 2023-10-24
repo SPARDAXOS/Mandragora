@@ -126,3 +126,12 @@ MonoBehaviour:
       m_Action: Interact
       m_Flags: 0
     m_Flags: 0
+  pause:
+    m_Name: Pause
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 98c9ea3b-130c-4ece-a344-c6ce7b6524ec
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0

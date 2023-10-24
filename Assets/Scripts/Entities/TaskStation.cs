@@ -190,9 +190,11 @@ public class TaskStation : MonoBehaviour {
     }
 
     private void CompleteInteraction() {
+        //Consider breaking these out into reusable func
         interactionOngoing = false;
         DisableInteraction();
         DisableParticleSystem();
+
         sparklePS.Play();
         //-Gets picked up creature and toggles off TaskType!
         targetPlayer.EnableMovement();
@@ -270,6 +272,7 @@ public class TaskStation : MonoBehaviour {
     }
 
 
+    //VERY BUGGY
     //NOTES:
     //Gets a bit finicky if a player leaves while another is already in.
     //-Also when both players are in but the second one in tries to interact!
@@ -277,6 +280,7 @@ public class TaskStation : MonoBehaviour {
     private void OnTriggerEnter(Collider other) {
         if (!targetPlayer && other.CompareTag("Player")) {
             targetPlayer = other.GetComponent<Player>();
+            targetPlayer.SetInTaskStationRange(true);
             playerInRange = true;
             interactionIndicator.SetActive(true);
         }
@@ -285,6 +289,14 @@ public class TaskStation : MonoBehaviour {
         if (targetPlayer && other.CompareTag("Player")) {
             var script = other.GetComponent<Player>();
             if (targetPlayer == script) {
+                if (interactionOngoing) {
+                    interactionOngoing = false;
+                    DisableInteraction();
+                    DisableParticleSystem();
+                    targetPlayer.EnableMovement();
+                }
+
+                targetPlayer.SetInTaskStationRange(false);
                 targetPlayer = null;
                 playerInRange = false;
                 interactionIndicator.SetActive(false);

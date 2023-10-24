@@ -16,6 +16,8 @@ public class Level : MonoBehaviour {
 
     private bool initialize = false;
 
+    public uint currentSatisfiedCreatures = 0;
+
     float leftNavMeshEdge  = 0.0f;
     float rightNavMeshEdge = 0.0f;
     float upperNavMeshEdge = 0.0f;
@@ -129,10 +131,18 @@ public class Level : MonoBehaviour {
     }
 
 
+    public void RegisterSatisfiedCreature() {
+        currentSatisfiedCreatures++;
+        if(currentSatisfiedCreatures == creaturesCount) {
+            Debug.Log("Game Completed!");
+        }
+    }
+
     public void StartLevel() {
         foreach (var entry in creatures)
             entry.SetActive(true);
         RandomizeCreatureSpawns();
+        currentSatisfiedCreatures = 0;
     }
     public void GameOver() {
 

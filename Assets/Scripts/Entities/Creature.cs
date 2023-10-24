@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
@@ -9,83 +10,206 @@ public struct CreatureStats
     public float maxSpeed;
     public float accelerationTime;
     public float decelerationTime;
+    public float gravityScale;
     [Tooltip("Degrees per second.")]
     public float turnRate;
 
     [Header("Behavior")]
+    //List<TaskType> taskList
     [Range(0, 1f)]
     public float shyness;
     public float viewRange;
+    public float maxRestDuration;
+    [Range(0, 1f)]
+    public float restProbability;
 
     [Header("Variables")]
     [Range(0, 1f)]
     public float satisfaction;
-}
-
-public enum CreatureState
-{
-    GROUNDED,
-    HELD,
-    INACTIVE
+    public bool hungry;
+    public bool dirty;
 }
 
 [RequireComponent(typeof(Rigidbody))]
 public class Creature : MonoBehaviour
 {
-    private bool initialized;
+    public enum CreatureState
+    {
+        NONE = 0,
+        RUN,
+        REST,
+        HELD,
+    }
 
-    private Rigidbody rigidbodyComp = null;
-
-    private CreatureState state;
     [SerializeField] private CreatureStats stats;
+    [SerializeField] private bool drawAIGizmos;
+
+    private bool initialized = false;
+    private bool active;
+    private CreatureState state;
     private float accelerationIncrement;
     private float decelerationIncrement;
 
+    private Vector3 targetPosition;
     private Vector3 direction = Vector3.forward;
     private Vector3 targetDirection = Vector3.forward;
-
     private float speed;
     private Vector3 velocity = Vector3.zero;
 
+    float restTimeElapsed = 0;
+    float restDuration = 0;
 
-    void Start()
-    {
-        Initialize();
-    }
-
-    void FixedUpdate()
-    {
-        FixedTick();
-    }
+    private Rigidbody rigidbodyComp = null;
+    private ParticleSystem stinkPS = null;
+    private ParticleSystem cryPS = null;
 
     public void Initialize()
     {
-        if(initialized) 
+        if (initialized) 
             return;
 
-        rigidbodyComp = GetComponent<Rigidbody>();
-        accelerationIncrement = Time.deltaTime * stats.maxSpeed / stats.accelerationTime;
-        decelerationIncrement = Time.deltaTime * stats.maxSpeed / stats.decelerationTime;
+        SetupReferences();
+
+        state = CreatureState.RUN;
+
+        accelerationIncrement = Time.fixedDeltaTime * stats.maxSpeed / stats.accelerationTime;
+        decelerationIncrement = Time.fixedDeltaTime * stats.maxSpeed / stats.decelerationTime;
+
         direction = RandomDirection();
-        targetDirection = RandomDirection();
+        FindNewValidTarget();
 
         initialized = true;
     }
-
     public void FixedTick()
     {
-        Accelerate();
+        UpdateGravity(); //TEMP
+        UpdateStates();
+        UpdateParticles();
+    }
+    public bool GetActive()
+    {
+        return active;
+    }
+    public void SetActive(bool state)
+    {
+        active = state;
+        gameObject.SetActive(active);
+    }
+    void UpdateParticles()
+    {
+        if (stats.dirty && !stinkPS.isPlaying)
+            stinkPS.Play();
+        else if (!stats.dirty)
+            stinkPS.Stop();
+
+        if (stats.hungry && !cryPS.isPlaying)
+            cryPS.Play();
+        else if (!stats.hungry)
+            cryPS.Stop();
+    }
+    void SetupReferences()
+    {
+        rigidbodyComp = GetComponent<Rigidbody>();
+        stinkPS       = transform.Find("StinkPS").GetComponent<ParticleSystem>();
+        cryPS         = transform.Find("CryPS").GetComponent<ParticleSystem>();
+    }
+    private void UpdateStates()
+    {
+        switch(state)
+        {
+            case CreatureState.RUN:
+                RunBehavior();
+                break;
+            case CreatureState.REST:
+                RestBehavior();
+                break;
+        }
+    }
+    private void RunBehavior()
+    {
         UpdateDirection();
         UpdateRotation();
         UpdateMovement();
+        ChooseInput();
+        ChooseTarget();
     }
+    private void RestBehavior()
+    {
+        UpdateMovement();
+        Decelerate();
 
+        if (restTimeElapsed == 0)
+        {
+            restDuration = UnityEngine.Random.value * stats.maxRestDuration + stats.decelerationTime;
+        }
+
+        else if(restTimeElapsed > restDuration)
+        {
+            state = CreatureState.RUN;
+            restTimeElapsed = 0;
+            FindNewValidTarget();
+            return;
+        }
+
+        restTimeElapsed += Time.fixedDeltaTime;
+    }
     private Vector3 RandomDirection()
     {
         Vector2 random2D = (UnityEngine.Random.insideUnitCircle).normalized;
         return new Vector3(random2D.x, 0, random2D.y);
     }
+    void ChooseTarget()
+    {
+        bool pathObstructed = CastToTarget(targetPosition, false);
 
+        float breakDist = speed * stats.decelerationTime;
+        bool isClose = (targetPosition - transform.position).sqrMagnitude < breakDist * breakDist;
+        bool willRest = UnityEngine.Random.value <= stats.restProbability;
+
+        if (isClose && willRest)
+        {
+            ChangeState(CreatureState.REST);
+            return;
+        }
+
+        if (pathObstructed)
+            FindNewValidTarget();
+    }
+    void FindNewValidTarget()
+    {
+        int retryLimit = 50;
+        int retryIndex = 0;
+
+        while (retryIndex < retryLimit)
+        {
+            retryIndex++;
+            Vector3 candidateTarget = CandidateTarget();
+            if (!CastToTarget(candidateTarget, true))
+                break;
+        }
+    }
+    bool CastToTarget(Vector3 target, bool assignTarget)
+    {
+        Vector3 origin = transform.position;
+        Vector3 direction = target - transform.position;
+        bool output = Physics.SphereCast(new Ray(origin, direction), 0.25f, stats.viewRange, ~LayerMask.NameToLayer("Ignore Raycast"));
+        if (!output && assignTarget) targetPosition = target;
+        return output;
+    }
+    Vector3 CandidateTarget()
+    {
+        Vector3 candidate = stats.viewRange * UnityEngine.Random.insideUnitCircle;
+        candidate = candidate.x0y();
+        return candidate + transform.position.y * Vector3.up;
+    }
+    private void ChooseInput()
+    {
+        float dirDot = Vector3.Dot(direction, targetDirection);
+        if(dirDot > -0.5f)
+            Accelerate();
+        else 
+            Decelerate();
+    }
     private void Accelerate()
     {
         if (speed < stats.maxSpeed)
@@ -95,7 +219,6 @@ public class Creature : MonoBehaviour
                 speed = stats.maxSpeed;
         }
     }
-
     private void Decelerate()
     {
         if (speed > 0f)
@@ -106,19 +229,55 @@ public class Creature : MonoBehaviour
         }
     }
 
+    private void UpdateGravity() {
+        Vector3 currentVelocity = rigidbodyComp.velocity;
+        rigidbodyComp.velocity += new Vector3(0.0f, -stats.gravityScale * Time.fixedDeltaTime, 0.0f);
+        Debug.Log(-stats.gravityScale * Time.fixedDeltaTime);
+    }
     private void UpdateDirection()
     {
-        direction = Vector3.RotateTowards(transform.forward, targetDirection, stats.turnRate * Time.fixedDeltaTime * Mathf.Deg2Rad, 0.0f);
-    }
+        targetDirection = (targetPosition - transform.position).normalized;
 
+        direction = Vector3.RotateTowards(direction, targetDirection, stats.turnRate * Time.fixedDeltaTime * Mathf.Deg2Rad, 0.0f);
+        direction.y = 0;
+        direction = direction.normalized;
+    }
     private void UpdateMovement()
     {
-        velocity = transform.forward * speed;
+        velocity = speed * direction;
         rigidbodyComp.velocity = velocity;
     }
-
     private void UpdateRotation()
     {
         transform.forward = direction;
+    }
+    private void ChangeState(CreatureState state)
+    {
+        this.state = state;
+    }
+    public void PickUp(Player player)
+    {
+        ChangeState(CreatureState.HELD);
+        GetComponent<Collider>().enabled = false;
+    }
+    public void PutDown()
+    {
+        ChangeState(CreatureState.RUN);
+        GetComponent<Collider>().enabled = true;
+    }
+    private void OnCollisionEnter(Collision collision)
+    {
+        direction *= -1f;
+        speed *= 0.5f;
+    }
+    private void OnDrawGizmos()
+    {
+        if (drawAIGizmos)
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(transform.position, stats.viewRange);
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireSphere(targetPosition, 0.5f);
+        }
     }
 }

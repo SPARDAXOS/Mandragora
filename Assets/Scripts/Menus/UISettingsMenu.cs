@@ -1,22 +1,53 @@
 using UnityEngine;
+using UnityEngine.UI;
 
-public class UISettingsMenu : MonoBehaviour
-{
+public class UISettingsMenu : MonoBehaviour {
+
     private bool initialize = false;
+
     private GameInstance gameInstance = null;
+    private SoundManager soundManager = null;
 
+    private Slider MasterSlider;
+    private Slider SFXSlider;
+    private Slider MusicSlider;
 
-    public void Initialize(GameInstance reference)
-    {
+    public void Initialize(GameInstance gameInstance, SoundManager soundManager) {
         if (initialize)
             return;
 
-        gameInstance = reference;
+        this.gameInstance = gameInstance;
+        this.soundManager = soundManager;
+        SetupReference();
         initialize = true;
     }
+    private void SetupReference() {
+        MasterSlider = transform.Find("MasterSlider").GetComponent<Slider>();
+        SFXSlider = transform.Find("SFXSlider").GetComponent<Slider>();
+        MusicSlider = transform.Find("MusicSlider").GetComponent<Slider>();
 
-    public void ReturnFromSettings()
-    {
+        MasterSlider.value = soundManager.GetMasterVolume();
+        SFXSlider.value = soundManager.GetSFXVolume();
+        MusicSlider.value = soundManager.GetMusicVolume();
+    }
 
+    public void ReturnButton() {
+        if (gameInstance.IsGameStarted())
+            gameInstance.PauseGame();
+        else
+            gameInstance.SetGameState(GameInstance.GameState.MAIN_MENU);
+    }
+
+    public void SetMasterSlider() {
+        if (initialize)
+            soundManager.SetMasterVolume(MasterSlider.value);
+    }
+    public void SetSFXSlider() {
+        if (initialize)
+            soundManager.SetSFXVolume(SFXSlider.value);
+    }
+    public void SetMusicSlider() {
+        if (initialize)
+            soundManager.SetMusicVolume(MusicSlider.value);
     }
 }

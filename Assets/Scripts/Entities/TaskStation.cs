@@ -190,28 +190,35 @@ public class TaskStation : MonoBehaviour {
     }
 
     private void CompleteInteraction() {
-        //Consider breaking these out into reusable func
-        interactionOngoing = false;
-        DisableInteraction();
-        DisableParticleSystem();
-
+        EndInteraction();
         sparklePS.Play();
-        //-Gets picked up creature and toggles off TaskType!
-        targetPlayer.EnableMovement();
+        targetPlayer.GetHeldCreature().CompleteTask(taskType);
     }
 
 
     private void CheckInput() {
-        //And ONLY if current held creature requires the TaskType that this station provides!
+        Creature creature = targetPlayer.GetHeldCreature();
+        if (!creature)
+            return;
+        if (!creature.DoesRequireTask(taskType))
+            return;
+
         if (targetPlayer.IsInteractingTrigger())
-            Intearct();
+            StartInteraction();
     }
-    private void Intearct() {
+    private void StartInteraction() {
         interactionOngoing = true;
         EnableInteraction();
         EnableParticleSystem();
         targetPlayer.DisableMovement();
+
         interactionIndicator.SetActive(false);
+    }
+    private void EndInteraction() {
+        interactionOngoing = false;
+        DisableInteraction();
+        DisableParticleSystem();
+        targetPlayer.EnableMovement();
     }
 
 
@@ -289,12 +296,8 @@ public class TaskStation : MonoBehaviour {
         if (targetPlayer && other.CompareTag("Player")) {
             var script = other.GetComponent<Player>();
             if (targetPlayer == script) {
-                if (interactionOngoing) {
-                    interactionOngoing = false;
-                    DisableInteraction();
-                    DisableParticleSystem();
-                    targetPlayer.EnableMovement();
-                }
+                if (interactionOngoing)
+                    EndInteraction();
 
                 targetPlayer.SetInTaskStationRange(false);
                 targetPlayer = null;

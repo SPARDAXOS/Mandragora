@@ -3,6 +3,7 @@ using Mandragora;
 using System.Collections.Generic;
 using Unity.AI.Navigation;
 using UnityEngine.AI;
+using Unity.VisualScripting;
 
 public class Level : MonoBehaviour {
 
@@ -95,7 +96,7 @@ public class Level : MonoBehaviour {
         for (uint i = 0; i < creaturesCount; i++) {
             GameObject go = Instantiate(CreaturePrefab);
             Creature script = go.GetComponent<Creature>();
-            script.Initialize();
+            script.Initialize(this);
             script.SetActive(false);
             creatures.Add(script);
         }
@@ -109,9 +110,11 @@ public class Level : MonoBehaviour {
         for (uint i = 0; i < spawnPointCalculationRetries; i++) {
             float randomX = Random.Range(leftNavMeshEdge, rightNavMeshEdge);
             float randomZ = Random.Range(lowerNavMeshEdge, upperNavMeshEdge);
-            Vector3 randomPoint = new Vector3(randomX, navMeshBounds.center.y, randomZ);
-            if (NavMesh.SamplePosition(randomPoint, out hit, 1.0f, NavMesh.AllAreas))
+            Vector3 randomPoint = new Vector3(randomX, gameObject.transform.position.y, randomZ);
+            if (NavMesh.SamplePosition(randomPoint, out hit, 1.0f, NavMesh.AllAreas)) {
+                Debug.Log(hit.position);
                 return hit.position;
+            }
         }
         return Vector3.zero;
     }

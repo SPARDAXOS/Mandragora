@@ -135,6 +135,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   showPickupTrigger: 0
+  inTaskStationRange: 0
 --- !u!1001 &5605139720784332902
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -227,7 +228,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1894999411360204043, guid: 121d2dc03bc9dd541a964d68a88dba7d, type: 3}
       propertyPath: InitialModule.startLifetime.scalar
-      value: 2
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 1894999411360204044, guid: 121d2dc03bc9dd541a964d68a88dba7d, type: 3}
       propertyPath: m_LocalScale.x

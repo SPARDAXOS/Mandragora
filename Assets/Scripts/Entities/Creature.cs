@@ -67,14 +67,14 @@ public class Creature : MonoBehaviour
     private ParticleSystem stinkPS = null;
     private ParticleSystem cryPS = null;
     private ParticleSystem runDustPS = null;
-    private Level level;
+    private Level levelScript;
 
     public void Initialize(Level level)
     {
         if (initialized) 
             return;
 
-        this.level = level;
+        this.levelScript = level;
 
         SetupReferences();
         SetupParticleSystems();
@@ -365,6 +365,13 @@ public class Creature : MonoBehaviour
         ChangeState(CreatureState.RUN);
         col.enabled = true;
     }
+
+
+    public void RegisterSatisfied() {
+        SetActive(false);
+        levelScript.RegisterSatisfiedCreature();
+    }
+
     private void OnCollisionEnter(Collision collision)
     {
         //direction *= -1f;

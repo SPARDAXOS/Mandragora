@@ -3,9 +3,6 @@ using UnityEngine;
 public class CreatureDeliveryStation : MonoBehaviour {
 
 
-
-
-
     private void OnTriggerEnter(Collider other) {
 
         if (other.CompareTag("Player")) {
@@ -14,9 +11,11 @@ public class CreatureDeliveryStation : MonoBehaviour {
             if (!creature)
                 return;
 
-            //Probably something like register complete
+            if (!creature.IsSatisfied())
+                return;
+
+            creature.RegisterSatisfied();
             player.DropHeldCreature();
-            creature.SetActive(false);
             //Some sparks?
         }
     }

@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fec23b72d2cb807468bccdbaa69fe8e8, type: 3}
   m_Name: PlayerStats
   m_EditorClassIdentifier: 
- 
-  maxSpeed: 201
+
+  maxSpeed: 458
+
   turnRate: 5.93
-  accelerationRate: 364
+  accelerationRate: 498
   decelerationRate: 864
 

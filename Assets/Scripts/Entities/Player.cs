@@ -6,7 +6,7 @@ public class Player : MonoBehaviour {
 
     [SerializeField] private PlayerStats stats;
     [SerializeField] private float pickupCheckBoxSize = 1.0f;
-    [SerializeField] private float pickupCheckOffset = 0.5f;
+    [SerializeField] private Vector3 pickupCheckOffset;
     [SerializeField] private LayerMask pickupMask;
 
     [Header("Debugging")]
@@ -51,10 +51,10 @@ public class Player : MonoBehaviour {
         initialized = true;
     }
     private void SetupReferences() {
-        meshRendererComp = GetComponent<MeshRenderer>();
-        if (!meshRendererComp)
-            GameInstance.Abort("Failed to get MeshRenderer component on " + gameObject.name);
-        mainMaterial = meshRendererComp.materials[0];
+        //meshRendererComp = GetComponent<MeshRenderer>();
+        //if (!meshRendererComp)
+        //    GameInstance.Abort("Failed to get MeshRenderer component on " + gameObject.name);
+        //mainMaterial = meshRendererComp.materials[0];
 
         pickupPoint = transform.Find("PickupPoint").gameObject;
 
@@ -92,7 +92,7 @@ public class Player : MonoBehaviour {
         if (!initialized)
             return;
 
-        mainMaterial.color = color;
+        //mainMaterial.color = color;
     }
     public void EnableInput() {
 
@@ -180,7 +180,10 @@ public class Player : MonoBehaviour {
 
 
     private void Pickup() {
-        Vector3 boxcastOrigin = transform.position + transform.forward * pickupCheckOffset;
+        Vector3 boxcastOrigin = transform.position;
+        boxcastOrigin.x += pickupCheckOffset.x * transform.forward.x;
+        boxcastOrigin.y += pickupCheckOffset.y * transform.forward.y;
+        boxcastOrigin.z += pickupCheckOffset.z;
         Vector3 boxExtent = new Vector3(pickupCheckBoxSize / 2.0f, pickupCheckBoxSize / 2.0f, pickupCheckBoxSize / 2.0f);
 
         var HitResults = Physics.BoxCastAll(boxcastOrigin, boxExtent, transform.forward, transform.rotation, 0.0f, pickupMask.value);
@@ -207,7 +210,10 @@ public class Player : MonoBehaviour {
 
     private void OnDrawGizmos() {
         if (showPickupTrigger) {
-            Vector3 boxcastOrigin = transform.position + transform.forward * pickupCheckOffset;
+            Vector3 boxcastOrigin = transform.position;
+            boxcastOrigin.x += pickupCheckOffset.x * transform.forward.x;
+            boxcastOrigin.y += pickupCheckOffset.y * transform.forward.y;
+            boxcastOrigin.z += pickupCheckOffset.z;
             Vector3 boxSize = new Vector3(pickupCheckBoxSize, pickupCheckBoxSize, pickupCheckBoxSize);
             Gizmos.color = Color.yellow;
             Gizmos.DrawCube(boxcastOrigin, boxSize);

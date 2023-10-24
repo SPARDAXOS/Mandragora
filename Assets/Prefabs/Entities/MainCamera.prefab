@@ -105,7 +105,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e66f7e576e289274ab03b3d6253da27b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  restingCameraDistance: 5
+  restingCameraDistance: 20
   zOffset: -1
   maxAngleBetweenTargets: 25
   zoomToFitFactor: 0.3

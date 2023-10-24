@@ -97,20 +97,23 @@ public class Creature : MonoBehaviour
     }
     public void CompleteTask(TaskStation.TaskType completedTask)
     {
-        for(int i = 0; i < taskList.Count; i++)
+        for (int i = 0; i < taskList.Count; i++)
         {
             TaskStation.TaskType task = taskList[i];
             if (task == completedTask)
             {
                 taskList.RemoveAt(i);
-                return;
+                //return;
             }
         }
     }
 
-    List<TaskStation.TaskType> GetTasks()
-    {
-        return taskList;
+    public bool DoesRequireTask(TaskStation.TaskType type) {
+        foreach(var entry in taskList) {
+            if (entry == type)
+                return true;
+        }
+        return false;
     }
 
     public bool GetActive()
@@ -187,7 +190,7 @@ public class Creature : MonoBehaviour
 
     void FallBehavior()
     {
-        Debug.Log(rigidbodyComp.velocity.y);
+        //Debug.Log(rigidbodyComp.velocity.y);
         if (transform.position.y < 1f)
         {
             

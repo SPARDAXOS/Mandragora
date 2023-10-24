@@ -65,11 +65,14 @@ public class Creature : MonoBehaviour
     private Collider col = null;
     private ParticleSystem stinkPS = null;
     private ParticleSystem cryPS = null;
+    private Level level;
 
-    public void Initialize()
+    public void Initialize(Level level)
     {
         if (initialized) 
             return;
+
+        this.level = level;
 
         SetupReferences();
 
@@ -88,6 +91,28 @@ public class Creature : MonoBehaviour
         UpdateStates();
         UpdateParticles();
     }
+    public bool IsSatisfied()
+    {
+        return taskList.Count == 0;
+    }
+    public void CompleteTask(TaskStation.TaskType completedTask)
+    {
+        for(int i = 0; i < taskList.Count; i++)
+        {
+            TaskStation.TaskType task = taskList[i];
+            if (task == completedTask)
+            {
+                taskList.RemoveAt(i);
+                return;
+            }
+        }
+    }
+
+    List<TaskStation.TaskType> GetTasks()
+    {
+        return taskList;
+    }
+
     public bool GetActive()
     {
         return active;

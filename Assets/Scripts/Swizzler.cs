@@ -72,4 +72,14 @@ public static class Swizzler
     {
         return new Vector3(input.x, input.y, 0f);
     }
+
+    // Vector2 from swizzled Vector3
+    public static Vector2 xy(this Vector3 input)
+    {
+        return new Vector2(input.x, input.y);
+    }
+    public static Vector2 xz(this Vector3 input)
+    {
+        return new Vector2(input.x, input.z);
+    }
 }

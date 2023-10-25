@@ -112,10 +112,6 @@ public class Creature : MonoBehaviour
         UpdateSatisfaction();
     }
 
-    public bool IsSatisfied()
-    {
-        return taskList.Count == 0;
-    }
     public void CompleteTask(TaskStation.TaskType completedTask)
     {
         for (int i = 0; i < taskList.Count; i++)
@@ -142,11 +138,15 @@ public class Creature : MonoBehaviour
         }
         return false;
     }
+
     private void GetDissatisfactionMultiplier()
     {
         dissatisfactionMultiplier = Mathf.Sqrt((float)taskList.Count / (float)numTasksAtStart);
     }
-
+    public bool IsSatisfied()
+    {
+        return taskList.Count == 0;
+    }
     private void UpdateSatisfaction()
     {
         float increment = (1f / stats.baseTimeUntilDissatisfied) * dissatisfactionMultiplier * Time.deltaTime;
@@ -161,7 +161,7 @@ public class Creature : MonoBehaviour
 
     void UpdateMaterials()
     {
-        if(taskList.Count == 0) 
+        if(IsSatisfied()) 
         {
             meshRenderer.material = satisfiedMaterial;
             return;

@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
+using System.Xml.Linq;
 using UnityEngine;
 
 [Serializable]
@@ -23,11 +23,9 @@ public struct CreatureStats
     public float maxRestDuration;
     [Range(0, 1f)]
     public float restProbability;
-
-    [Header("Variables")]
-    [Tooltip("The time in seconds from the point of satisfaction to dissatisfaction.")]
+    [Tooltip("Time in seconds when you only have one task.")]
     [Range(0, 120f)]
-    public float timeUntilDissatisfied;
+    public float baseTimeUntilDissatisfied;
 }
 
 [RequireComponent(typeof(Rigidbody))]
@@ -46,11 +44,19 @@ public class Creature : MonoBehaviour
     [SerializeField] private bool drawAIGizmos;
     public List<TaskStation.TaskType> taskList;
     [SerializeField] private Material satisfiedMaterial, dissatisfiedMaterial;
+    [SerializeField] private GameObject changeMaterialOn;
+    private SkinnedMeshRenderer meshRenderer;
+    [Range (0, 1f)]
+    [SerializeField] private float dissatisfaction;
+
+    private int numTasksAtStart;
 
     private bool initialized = false;
     private bool active;
     public CreatureState state;
     private bool isHeld;
+
+    private float dissatisfactionMultiplier;
 
     private float accelerationIncrement;
     private float decelerationIncrement;
@@ -80,6 +86,10 @@ public class Creature : MonoBehaviour
         this.levelScript = level;
 
         SetupReferences();
+
+        numTasksAtStart = taskList.Count;
+
+        GetDissatisfactionMultiplier();
         SetupParticleSystems();
 
         state = CreatureState.FALL;
@@ -97,6 +107,11 @@ public class Creature : MonoBehaviour
         UpdateStates();
 
     }
+    public void Tick()
+    {
+        UpdateSatisfaction();
+    }
+
     public bool IsSatisfied()
     {
         return taskList.Count == 0;
@@ -109,25 +124,50 @@ public class Creature : MonoBehaviour
             if (task == completedTask)
             {
                 taskList.RemoveAt(i);
+                GetDissatisfactionMultiplier();
                 SetParticleSystemState(completedTask, false);
             }
         }
     }
-
-    //levelScript.RegisterCreatureMaximumDisatisfied();
 
     bool TaskListContains(TaskStation.TaskType task)
     {
         return taskList.Contains(task);
         
     }
-
     public bool DoesRequireTask(TaskStation.TaskType type) {
         foreach(var entry in taskList) {
             if (entry == type)
                 return true;
         }
         return false;
+    }
+    private void GetDissatisfactionMultiplier()
+    {
+        dissatisfactionMultiplier = Mathf.Sqrt((float)taskList.Count / (float)numTasksAtStart);
+    }
+
+    private void UpdateSatisfaction()
+    {
+        float increment = (1f / stats.baseTimeUntilDissatisfied) * dissatisfactionMultiplier * Time.deltaTime;
+
+        dissatisfaction += increment;
+
+        if(dissatisfaction > 1f)
+            levelScript.RegisterCreatureMaximumDisatisfied();
+
+        UpdateMaterials();
+    }
+
+    void UpdateMaterials()
+    {
+        if(taskList.Count == 0) 
+        {
+            meshRenderer.material = satisfiedMaterial;
+            return;
+        }
+
+        meshRenderer.material.Lerp(satisfiedMaterial, dissatisfiedMaterial, dissatisfaction);
     }
 
     public bool GetActive()
@@ -191,6 +231,7 @@ public class Creature : MonoBehaviour
         stinkPS = transform.Find("StinkPS").GetComponent<ParticleSystem>();
         cryPS = transform.Find("CryPS").GetComponent<ParticleSystem>();
         runDustPS = transform.Find("RunDustPS").GetComponent<ParticleSystem>();
+        meshRenderer = changeMaterialOn.GetComponent<SkinnedMeshRenderer>();
     }
     private void UpdateStates()
     {
@@ -360,6 +401,7 @@ public class Creature : MonoBehaviour
             isMoving = true;
         else 
             isMoving = false;
+
         velocity = speed * direction;
         rigidbodyComp.velocity = velocity;
     }

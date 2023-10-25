@@ -16,13 +16,19 @@ public class Player : MonoBehaviour {
     private bool initialized = false;
     private bool isMoving = false;
     private bool isInteractingTrigger = false;
+    private bool isDashingTrigger = false;
     private bool isInteractingHeld = false;
 
     private bool isKnockedback = false;
     public bool isGrounded = false;
+    public bool isDashing = false;
+    public bool isStunned = false;
 
 
     public float currentSpeed = 0.0f;
+    public float dashTimer = 0.0f;
+    public float stunTimer = 0.0f;
+
     private Vector3 direction;
 
     private bool inTaskStationRange = false;
@@ -79,13 +85,14 @@ public class Player : MonoBehaviour {
         rigidbodyComp.useGravity = !stats.customGravity;
 
 
-        if (heldCreature) {
-            heldCreature.transform.position = pickupPoint.transform.position;
+        UpdateStunTimer();
+        UpdateDashTimer();
+        UpdateHeldCreature();
 
-        }
-        
         CheckGrounded();
         CheckInput();
+        CheckDash();
+        CheckPickup();
     }
     public void FixedTick() {
         if (!initialized)
@@ -99,12 +106,10 @@ public class Player : MonoBehaviour {
 
 
         if (isKnockedback) {
-            if (isGrounded && rigidbodyComp.velocity.y < 0.0f) {
-                Debug.Log("Knockback ended!");
+            if (isGrounded && rigidbodyComp.velocity.y < 0.0f)
                 isKnockedback = false;
-            }
         }
-        else
+        else if (!isDashing)
             UpdateMovement();
     }
 
@@ -119,12 +124,14 @@ public class Player : MonoBehaviour {
 
         activeControlScheme.movement.Enable();
         activeControlScheme.interact.Enable();
+        activeControlScheme.dash.Enable();
         activeControlScheme.pause.Enable();
     }
     public void DisableInput() {
 
         activeControlScheme.movement.Disable();
         activeControlScheme.interact.Disable();
+        activeControlScheme.dash.Disable();
         activeControlScheme.pause.Disable();
     }
     public void EnableMovement() {
@@ -134,25 +141,48 @@ public class Player : MonoBehaviour {
         activeControlScheme.movement.Disable();
     }
 
+    public void EnableInteractionInput() {
+        activeControlScheme.movement.Enable();
+        activeControlScheme.interact.Enable();
+        activeControlScheme.dash.Enable();
 
+    }
+    public void DisableInteractionInput() {
+        activeControlScheme.movement.Disable();
+        activeControlScheme.interact.Disable();
+        activeControlScheme.dash.Disable();
+    }
+
+    private void CheckDash() {
+        if (isDashingTrigger && !isDashing) {
+            isDashing = true;
+            rigidbodyComp.velocity = transform.forward * stats.dashSpeed;
+            dashTimer = stats.dashLength;
+            direction = transform.forward;
+        }
+    }
+    private void CheckPickup() {
+        if (isInteractingTrigger) {
+            if (!heldCreature)
+                Pickup();
+            else if (heldCreature && !inTaskStationRange) {
+                //Doesnt work!
+                Vector3 direction = transform.forward;
+                direction.y = 1.0f;
+                heldCreature.ApplyImpulse(direction, 200.0f);
+                DropHeldCreature();
+            }
+        }
+    }
     private void CheckInput() {
         if (!activeControlScheme)
             return;
 
         isInteractingTrigger = activeControlScheme.interact.triggered;
+        isDashingTrigger = activeControlScheme.dash.triggered;
         isInteractingHeld = activeControlScheme.interact.IsPressed();
         isMoving = activeControlScheme.movement.IsPressed();
-        
 
-
-
-        //Testing
-        if (isInteractingTrigger) {
-            if (!heldCreature)
-                Pickup();
-            else if (heldCreature && !inTaskStationRange)
-                DropHeldCreature();
-        }
 
         if (activeControlScheme.pause.triggered)
             gameInstance.PauseGame();
@@ -198,7 +228,6 @@ public class Player : MonoBehaviour {
         if (isGrounded)
             return;
 
-        Debug.Log("Gravity!");
         float gravity = stats.gravityScale * Time.fixedDeltaTime;
         rigidbodyComp.velocity += new Vector3(0.0f, -gravity, 0.0f);
     }
@@ -208,6 +237,35 @@ public class Player : MonoBehaviour {
         startingPosition.y += 1;
         isGrounded = Physics.BoxCast(startingPosition, Vector3.one / 2, -transform.up, transform.rotation, 1.0f);
     }
+
+    private void UpdateDashTimer() {
+        if (dashTimer > 0.0f) {
+            dashTimer -= Time.deltaTime;
+            if (dashTimer <= 0.0f) {
+                //StopDashing(-transform.forward);
+                //
+                dashTimer = 0.0f;
+                isDashing = false;
+                currentSpeed = stats.maxSpeed * stats.retainedSpeed;
+                Debug.Log("Dashing finished!");
+            }
+        }
+    }
+    private void UpdateStunTimer() {
+        if (stunTimer > 0.0f) {
+            stunTimer -= Time.deltaTime;
+            if(stunTimer <= 0.0f) {
+                //Consider moving this and the turn on to func!
+                stunTimer = 0.0f;
+                isStunned = false;
+                EnableInteractionInput();
+                //Disable VFX
+            }
+        }
+        else
+            isStunned = false;
+    }
+
 
 
     private void Pickup() {
@@ -225,11 +283,22 @@ public class Player : MonoBehaviour {
                     Debug.LogError("Attempted to pickup invalid Creature that did not own creature script!");
                     continue;
                 }
+                if (isDashing) {
+                    Debug.Log("Dash interrupted by pickup!");
+                    StopDashing(transform.forward);
+                }
 
                 heldCreature = script;
                 heldCreature.PickUp(this);
             }
         }
+    }
+    private void UpdateHeldCreature() {
+        if (!heldCreature)
+            return;
+
+        //heldCreature.transform.position = Vector3.Lerp(heldCreature.transform.position, pickupPoint.transform.position, 0.01f);
+        heldCreature.transform.position = pickupPoint.transform.position;
     }
 
     public bool IsInteractingTrigger() {
@@ -250,6 +319,7 @@ public class Player : MonoBehaviour {
         if (!heldCreature)
             return;
 
+        //Disable VFX
         heldCreature.PutDown();
         heldCreature = null;
     }
@@ -259,23 +329,83 @@ public class Player : MonoBehaviour {
         if (isKnockedback)
             return;
 
-        Debug.Log("Knockback started!");
-        rigidbodyComp.velocity = direction * force;
+        rigidbodyComp.velocity = Vector3.zero;
+
+        //rigidbodyComp.velocity = direction * force;
+        ApplyImpulse(direction, force);
         isKnockedback = true;
     }
+    public void ApplyImpulse(Vector3 direction, float force) {
+        rigidbodyComp.velocity += direction * force;
+    }
+    public void ApplyStun(float duration, bool stack = false) {
+        if (stack)
+            stunTimer += duration;
+        else
+            stunTimer = duration;
 
+        if (stunTimer > 0.0f) {
+            DisableInteractionInput();
+            //Start VFX
+            isStunned = true;
+        }
+    }
+    private void StopDashing(Vector3 retainedSpeedDirection) {
+        isDashing = false;
+        dashTimer = 0.0f;
+
+        Vector3 directionToHit = retainedSpeedDirection - transform.position;
+        directionToHit.y = 0.0f;
+        direction = -directionToHit;
+        currentSpeed = stats.maxSpeed * stats.retainedSpeed;
+    }
+
+
+    private void OnCollisionStay(Collision collision) {
+        if (collision == null)
+            return;
+
+        if (collision.collider.CompareTag("Floor"))
+            return;
+
+        //Move stop dashing to func
+        if (isDashing) {
+            StopDashing(collision.GetContact(0).point);
+
+            Debug.Log("Adjusted direction while dash hit! - stay");
+        }
+    }
     private void OnCollisionEnter(Collision collision) {
+
+        if (collision == null)
+            return;
+
+
+
         if (collision.collider.CompareTag("Player")) {
             var script = collision.collider.GetComponent<Player>();
 
             Vector3 knockbackDirection = script.transform.position - transform.position;
             knockbackDirection.Normalize();
             knockbackDirection.y = Mathf.Sin(Mathf.Deg2Rad * stats.knockbackHeightAngle);
-            script.ApplyKnockback(knockbackDirection, stats.knockbackForce / 2);
+            if (isDashing) {
+                script.ApplyKnockback(knockbackDirection, (stats.knockbackForce / 2) * stats.knockbackMultiplier);
+                ApplyStun(stats.stunDuration, false);
+                Debug.Log("Stunned!");
+            }
+            else
+                script.ApplyKnockback(knockbackDirection, stats.knockbackForce / 2);
+
             if (heldCreature) {
                 heldCreature.PutDown();
                 heldCreature = null;
             }
+        }
+
+        if (isDashing) {
+            StopDashing(collision.GetContact(0).point);
+
+            Debug.Log("Adjusted direction while dash hit!");
         }
     }
 

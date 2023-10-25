@@ -52,6 +52,11 @@ public class Level : MonoBehaviour {
 
         foreach (var entry in taskStations)
             entry.Tick();
+
+        if (gameInstance.IsGameStarted()) {
+            foreach (var entry in creatures)
+                entry.Tick();
+        }
     }
     public void FixedTick() {
         if (gameInstance.IsGameStarted()) {
@@ -111,10 +116,8 @@ public class Level : MonoBehaviour {
             float randomX = Random.Range(leftNavMeshEdge, rightNavMeshEdge);
             float randomZ = Random.Range(lowerNavMeshEdge, upperNavMeshEdge);
             Vector3 randomPoint = new Vector3(randomX, gameObject.transform.position.y, randomZ);
-            if (NavMesh.SamplePosition(randomPoint, out hit, 1.0f, NavMesh.AllAreas)) {
-                Debug.Log(hit.position);
+            if (NavMesh.SamplePosition(randomPoint, out hit, 1.0f, NavMesh.AllAreas))
                 return hit.position;
-            }
         }
         return Vector3.zero;
     }
@@ -145,8 +148,11 @@ public class Level : MonoBehaviour {
     }
 
     public void StartLevel() {
-        foreach (var entry in creatures)
+        foreach (var entry in creatures) {
+            //Might cause problems. The order of execution.
             entry.SetActive(true);
+            entry.SetupStartState();
+        }
         RandomizeCreatureSpawns();
         currentSatisfiedCreatures = 0;
     }

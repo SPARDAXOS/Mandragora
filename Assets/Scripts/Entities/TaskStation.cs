@@ -7,7 +7,9 @@ public class TaskStation : MonoBehaviour {
     public enum TaskType {
         NONE = 0,
         BATHING,
-        FEEDING
+        FEEDING,
+        HEALING,
+        SLEEPING
     }
     public enum ActionType {
         MASH,
@@ -226,8 +228,20 @@ public class TaskStation : MonoBehaviour {
         if (taskType == TaskType.BATHING)
             bathBubblePS.Play();
 
+        //Feeding
+        //Healing
+        //Sleeping
 
     }
+    private void DisableParticleSystem() {
+        if (taskType == TaskType.BATHING)
+            bathBubblePS.Stop();
+
+        //Feeding
+        //Healing
+        //Sleeping
+    }
+
     private void EnableInteraction() {
         if (actionType == ActionType.MASH || actionType == ActionType.HOLD) {
             normalBarFrame.SetActive(true);
@@ -257,11 +271,7 @@ public class TaskStation : MonoBehaviour {
             QTEBarAnimationComp.Stop();
         }
     }
-    private void DisableParticleSystem() {
-        if (taskType == TaskType.BATHING)
-            bathBubblePS.Stop();
 
-    }
 
 
     private void UpdateQTE() {

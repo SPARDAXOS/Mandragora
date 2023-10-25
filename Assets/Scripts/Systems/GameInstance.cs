@@ -47,7 +47,7 @@ public class GameInstance : MonoBehaviour {
 
 
     private bool gameStarted = false;
-
+    private bool gamePaused = false;
 
 
     private GameObject currentLevel;
@@ -362,6 +362,7 @@ public class GameInstance : MonoBehaviour {
 
         pauseMenu.SetActive(true);
         Time.timeScale = 0.0f;
+        gamePaused = true;
     }
     public void UnpauseGame() {
         HideAllMenus();
@@ -369,6 +370,7 @@ public class GameInstance : MonoBehaviour {
 
         pauseMenu.SetActive(false);
         Time.timeScale = 1.0f;
+        gamePaused = false;
     }
 
 

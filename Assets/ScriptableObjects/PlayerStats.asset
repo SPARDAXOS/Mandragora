@@ -20,3 +20,8 @@ MonoBehaviour:
   gravityScale: 20
   knockbackForce: 30
   knockbackHeightAngle: 45
+  dashSpeed: 30
+  dashLength: 0.3
+  retainedSpeed: 1
+  knockbackMultiplier: 2
+  stunDuration: 3.5

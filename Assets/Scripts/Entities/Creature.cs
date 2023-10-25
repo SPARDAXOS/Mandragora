@@ -97,7 +97,6 @@ public class Creature : MonoBehaviour
         direction = RandomDirection();
         FindNewValidTarget();
 
-
         initialized = true;
     }
     public void FixedTick()
@@ -108,6 +107,17 @@ public class Creature : MonoBehaviour
     public void Tick()
     {
 
+    }
+
+    /// <summary>
+    /// Use this to set how your entity should be at the start of the game.
+    /// </summary>
+    public void SetupStartState() {
+
+
+
+
+        SetupParticleSystems();
     }
 
     void SetupReferences()
@@ -186,25 +196,29 @@ public class Creature : MonoBehaviour
 
     void CheckRunDust()
     {
-        if(isMoving && !runDustPS.isPlaying) 
+        if (isMoving && !runDustPS.isPlaying) 
             runDustPS.Play();
         else if(!isMoving && runDustPS.isPlaying)
             runDustPS.Stop();
     }
     void SetupParticleSystems()
     {
-        foreach(TaskStation.TaskType task in taskList)
-        {
-            switch (task)
-            {
-                case TaskStation.TaskType.BATHING:
-                    stinkPS.Play();
-                    break;
-                case TaskStation.TaskType.FEEDING:
-                    cryPS.Play();
-                    break;
-            }
-        }
+        foreach (var entry in taskList)
+            SetParticleSystemState(entry, true);
+
+
+        //foreach (TaskStation.TaskType task in taskList)
+        //{
+        //    switch (task)
+        //    {
+        //        case TaskStation.TaskType.BATHING:
+        //            stinkPS.Play();
+        //            break;
+        //        case TaskStation.TaskType.FEEDING:
+        //            cryPS.Play();
+        //            break;
+        //    }
+        //}
     }
     void SetParticleSystemState(TaskStation.TaskType task, bool state)
     {
@@ -245,6 +259,8 @@ public class Creature : MonoBehaviour
             case CreatureState.FALL:
                 FallBehavior();
                 break;
+
+                //Held?
         }
     }
     private void RunBehavior()
@@ -416,6 +432,9 @@ public class Creature : MonoBehaviour
         col.enabled = false;
         speed = 0f;
         isHeld = true;
+        
+        if (runDustPS.isPlaying)
+            runDustPS.Stop();
     }
     public void PutDown()
     {
@@ -424,6 +443,10 @@ public class Creature : MonoBehaviour
         isHeld = false;
         rigidbodyComp.velocity = Vector3.zero;
     }
+    public void ApplyImpulse(Vector3 direction, float force) {
+        rigidbodyComp.velocity += direction * force;
+    }
+
 
     public void RegisterSatisfied() {
         SetActive(false);

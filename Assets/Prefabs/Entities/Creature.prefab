@@ -108,7 +108,7 @@ MonoBehaviour:
     viewRange: 4
     maxRestDuration: 1
     restProbability: 0.25
-    baseTimeUntilDissatisfied: 50.8
+    timeUntilDissatisfied: 60
   drawAIGizmos: 0
   taskList: 0100000002000000
   satisfiedMaterial: {fileID: 2100000, guid: a90a943932679e44587087b20903f0e6, type: 2}
@@ -150,7 +150,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1602645000612654526, guid: 2925672ae78425b4597f0e8765d4749f, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.97
+      value: 2.577
       objectReference: {fileID: 0}
     - target: {fileID: 1602645000612654526, guid: 2925672ae78425b4597f0e8765d4749f, type: 3}
       propertyPath: m_LocalPosition.z
@@ -365,11 +365,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7238772451885342900, guid: 43bd00e0d29137c46b1191882aea24c5, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.47
+      value: 1.981
       objectReference: {fileID: 0}
     - target: {fileID: 7238772451885342900, guid: 43bd00e0d29137c46b1191882aea24c5, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 0.872
       objectReference: {fileID: 0}
     - target: {fileID: 7238772451885342900, guid: 43bd00e0d29137c46b1191882aea24c5, type: 3}
       propertyPath: m_LocalRotation.w

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [Serializable]
@@ -24,10 +25,9 @@ public struct CreatureStats
     public float restProbability;
 
     [Header("Variables")]
-    [Range(0, 1f)]
-    public float satisfaction;
-    public bool hungry;
-    public bool dirty;
+    [Tooltip("The time in seconds from the point of satisfaction to dissatisfaction.")]
+    [Range(0, 120f)]
+    public float timeUntilDissatisfied;
 }
 
 [RequireComponent(typeof(Rigidbody))]
@@ -45,10 +45,13 @@ public class Creature : MonoBehaviour
     [SerializeField] private CreatureStats stats;
     [SerializeField] private bool drawAIGizmos;
     public List<TaskStation.TaskType> taskList;
+    [SerializeField] private Material satisfiedMaterial, dissatisfiedMaterial;
 
     private bool initialized = false;
     private bool active;
     public CreatureState state;
+    private bool isHeld;
+
     private float accelerationIncrement;
     private float decelerationIncrement;
 
@@ -92,8 +95,7 @@ public class Creature : MonoBehaviour
     public void FixedTick()
     {
         UpdateStates();
-        
-        CheckPS();
+
     }
     public bool IsSatisfied()
     {
@@ -107,29 +109,17 @@ public class Creature : MonoBehaviour
             if (task == completedTask)
             {
                 taskList.RemoveAt(i);
-                CheckTask(completedTask, false);
-
-                //return;
+                SetParticleSystemState(completedTask, false);
             }
         }
     }
 
-    void CheckTask(TaskStation.TaskType task, bool state)
-    {
-        switch (task)
-        {
-            case TaskStation.TaskType.FEEDING:
-                stats.hungry = state;
-                break;
-            case TaskStation.TaskType.BATHING:
-                stats.dirty = state;
-                break;
-        }
-    }
+    //levelScript.RegisterCreatureMaximumDisatisfied();
 
     bool TaskListContains(TaskStation.TaskType task)
     {
         return taskList.Contains(task);
+        
     }
 
     public bool DoesRequireTask(TaskStation.TaskType type) {
@@ -149,22 +139,35 @@ public class Creature : MonoBehaviour
         active = state;
         gameObject.SetActive(active);
     }
-    void CheckPS()
+
+    void CheckRunDust()
     {
-        if (stats.dirty && !stinkPS.isPlaying)
-            stinkPS.Play();
-        else if (!stats.dirty)
-            stinkPS.Stop();
-
-        if (stats.hungry && !cryPS.isPlaying)
-            cryPS.Play();
-        else if (!stats.hungry)
-            cryPS.Stop();
-
         if(isMoving && !runDustPS.isPlaying) 
             runDustPS.Play();
-        else if(!isMoving)
+        else if(!isMoving && runDustPS.isPlaying)
             runDustPS.Stop();
+    }
+    void SetParticleSystemState(TaskStation.TaskType task, bool state)
+    {
+        switch (task)
+        {
+            case TaskStation.TaskType.FEEDING:
+                {
+                    if (state && !cryPS.isPlaying)
+                        cryPS.Play();
+                    else 
+                        cryPS.Stop();
+                }
+                break;
+            case TaskStation.TaskType.BATHING:
+                {
+                    if (state && !stinkPS.isPlaying)
+                        stinkPS.Play();
+                    else
+                        stinkPS.Stop();
+                }
+                break;
+        }
     }
     void SetupParticleSystems()
     {
@@ -173,26 +176,28 @@ public class Creature : MonoBehaviour
             if(task == TaskStation.TaskType.BATHING)
             {
                 stinkPS.Play();
-                stats.dirty = true;
             }
             if (task == TaskStation.TaskType.BATHING)
             {
                 cryPS.Play();
-                stats.hungry = true;
             }
         }
     }
+
     void SetupReferences()
     {
-        rigidbodyComp = GetComponent<Rigidbody>();
+        rigidbodyComp   = GetComponent<Rigidbody>();
         col = GetComponent<Collider>();
-        stinkPS       = transform.Find("StinkPS").GetComponent<ParticleSystem>();
-        cryPS         = transform.Find("CryPS").GetComponent<ParticleSystem>();
-        runDustPS     = transform.Find("RunDustPS").GetComponent<ParticleSystem>();
+        stinkPS = transform.Find("StinkPS").GetComponent<ParticleSystem>();
+        cryPS = transform.Find("CryPS").GetComponent<ParticleSystem>();
+        runDustPS = transform.Find("RunDustPS").GetComponent<ParticleSystem>();
     }
     private void UpdateStates()
     {
-        switch(state)
+        if(!isHeld)
+            CheckFallState();
+
+        switch (state)
         {
             case CreatureState.RUN:
                 RunBehavior();
@@ -212,11 +217,13 @@ public class Creature : MonoBehaviour
         UpdateDirection();
         UpdateRotation();
         UpdateMovement();
+        CheckRunDust();
     }
     private void RestBehavior()
     {
         UpdateMovement();
         Decelerate();
+        CheckRunDust();
 
         if (restTimeElapsed == 0)
         {
@@ -233,17 +240,26 @@ public class Creature : MonoBehaviour
 
         restTimeElapsed += Time.fixedDeltaTime;
     }
-
     void FallBehavior()
     {
-        if (transform.position.y < 1f)
+        /*if (transform.position.y < 1f)
         {
-            
             ChangeState(CreatureState.REST);
             return;
-        }
+        }*/
 
         UpdateGravity();
+    }
+
+    void CheckFallState()
+    {
+        float yVelocity = rigidbodyComp.velocity.y;
+        if (yVelocity < -0.01)
+        {
+            ChangeState(CreatureState.FALL);
+        }
+        else if (state == CreatureState.FALL)
+            ChangeState(CreatureState.REST);
     }
 
     private Vector3 RandomDirection()
@@ -300,6 +316,7 @@ public class Creature : MonoBehaviour
         candidate = candidate.x0y();
         return candidate + transform.position.y * Vector3.up;
     }
+
     private void ChooseInput()
     {
         float dirDot = Vector3.Dot(direction, targetDirection);
@@ -326,7 +343,6 @@ public class Creature : MonoBehaviour
                 speed = 0f;
         }
     }
-
     private void UpdateGravity() {
         rigidbodyComp.velocity += new Vector3(0.0f, -stats.gravityScale * Time.fixedDeltaTime, 0.0f);
     }
@@ -351,6 +367,7 @@ public class Creature : MonoBehaviour
     {
         transform.forward = direction;
     }
+
     private void ChangeState(CreatureState state)
     {
         this.state = state;
@@ -359,24 +376,21 @@ public class Creature : MonoBehaviour
     {
         ChangeState(CreatureState.HELD);
         col.enabled = false;
+        isHeld = true;
     }
     public void PutDown()
     {
         ChangeState(CreatureState.RUN);
         col.enabled = true;
+        isHeld = false;
+        rigidbodyComp.velocity = Vector3.zero;
     }
-
 
     public void RegisterSatisfied() {
         SetActive(false);
         levelScript.RegisterSatisfiedCreature();
     }
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        //direction *= -1f;
-        //speed *= 0.5f;
-    }
     private void OnDrawGizmos()
     {
         if (drawAIGizmos)

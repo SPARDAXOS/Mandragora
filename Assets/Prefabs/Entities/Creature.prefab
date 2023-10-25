@@ -104,15 +104,15 @@ MonoBehaviour:
     decelerationTime: 1
     gravityScale: 5
     turnRate: 360
-    shyness: 0
+    shyness: 0.038
     viewRange: 4
     maxRestDuration: 1
     restProbability: 0.25
-    satisfaction: 0
-    hungry: 0
-    dirty: 0
+    timeUntilDissatisfied: 0
   drawAIGizmos: 0
   taskList: 0100000002000000
+  satisfiedMaterial: {fileID: 0}
+  dissatisfiedMaterial: {fileID: 0}
   state: 0
 --- !u!1001 &1405697963936289669
 PrefabInstance:

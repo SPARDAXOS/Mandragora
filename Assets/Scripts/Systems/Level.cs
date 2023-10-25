@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.AI.Navigation;
 using UnityEngine.AI;
 using Unity.VisualScripting;
+using static UnityEngine.EventSystems.EventTrigger;
 
 public class Level : MonoBehaviour {
 
@@ -34,7 +35,9 @@ public class Level : MonoBehaviour {
     private List<Creature> creatures = new List<Creature>();
     private TaskStation[] taskStations;
 
-    public Bounds navMeshBounds = new Bounds();
+    private Bounds navMeshBounds = new Bounds();
+
+    private Creature tutorialCreature = null;
 
 
     public void Initialize(GameInstance instance) {
@@ -123,6 +126,9 @@ public class Level : MonoBehaviour {
     }
     private void RandomizeCreatureSpawns() {
         foreach(var creature in creatures) {
+            if (!creature.GetActive())
+                continue;
+
             Vector3 spawnPosition = GetRandomPointOnNavMesh();
             spawnPosition.y += spawnHeightOffset;
             creature.transform.position = spawnPosition;
@@ -138,14 +144,30 @@ public class Level : MonoBehaviour {
 
 
     public void RegisterCreatureMaximumDisatisfied() {
-        gameInstance.MatchFinished(GameInstance.GameResults.LOSE);
+        gameInstance.LevelFinished(GameInstance.GameResults.LOSE);
     }
     public void RegisterSatisfiedCreature() {
         currentSatisfiedCreatures++;
         if (currentSatisfiedCreatures == creaturesCount) {
-            gameInstance.MatchFinished(GameInstance.GameResults.WIN);
+            gameInstance.LevelFinished(GameInstance.GameResults.WIN);
         }
     }
+
+
+    public Creature StartTutorial() {
+        if (tutorialCreature)
+            return tutorialCreature;
+
+        tutorialCreature = creatures[0];
+        tutorialCreature.ClearAllTasks();
+        tutorialCreature.SetActive(true);
+        tutorialCreature.SetupStartState();
+        Vector3 spawnPosition = GetRandomPointOnNavMesh();
+        spawnPosition.y += spawnHeightOffset;
+        tutorialCreature.transform.position = spawnPosition;
+        return tutorialCreature;
+    }
+
 
     public void StartLevel() {
         foreach (var entry in creatures) {

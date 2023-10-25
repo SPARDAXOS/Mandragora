@@ -15,7 +15,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &7411365812128946718
 Transform:
@@ -48,6 +48,5 @@ MonoBehaviour:
   levelsBundle: {fileID: 11400000, guid: 26945b0305d55654e96aad91e8ae5997, type: 2}
   player1ControlScheme: {fileID: 11400000, guid: c8571a4dc279c79409265de61e23c8ba, type: 2}
   player2ControlScheme: {fileID: 11400000, guid: ab22c9cb5ecda9c449b57b56b7c03d51, type: 2}
-  player3ControlScheme: {fileID: 11400000, guid: 40a3446187ee4e44e8a9ba24f73dfad7, type: 2}
-  player4ControlScheme: {fileID: 11400000, guid: 54c052e816989614fbcf1b46bb99e364, type: 2}
+  playTutorials: 1
   currentGameState: 0

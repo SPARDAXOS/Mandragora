@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Xml.Linq;
 using UnityEngine;
 
 [Serializable]
@@ -23,9 +22,9 @@ public struct CreatureStats
     public float maxRestDuration;
     [Range(0, 1f)]
     public float restProbability;
-    [Tooltip("Time in seconds when you only have one task.")]
+    [Tooltip("Time in seconds from the initial number of tasks.")]
     [Range(0, 120f)]
-    public float baseTimeUntilDissatisfied;
+    public float timeUntilDissatisfied;
 }
 
 [RequireComponent(typeof(Rigidbody))]
@@ -57,6 +56,7 @@ public class Creature : MonoBehaviour
     private bool isHeld;
 
     private float dissatisfactionMultiplier;
+    private float timeIncrement;
 
     private float accelerationIncrement;
     private float decelerationIncrement;
@@ -84,15 +84,12 @@ public class Creature : MonoBehaviour
             return;
 
         this.levelScript = level;
-
-        SetupReferences();
-
         numTasksAtStart = taskList.Count;
 
+        SetupReferences();
         GetDissatisfactionMultiplier();
-        SetupParticleSystems();
 
-        state = CreatureState.FALL;
+        timeIncrement = (1f / stats.timeUntilDissatisfied) * Time.fixedDeltaTime;
 
         accelerationIncrement = Time.fixedDeltaTime * stats.maxSpeed / stats.accelerationTime;
         decelerationIncrement = Time.fixedDeltaTime * stats.maxSpeed / stats.decelerationTime;
@@ -100,16 +97,27 @@ public class Creature : MonoBehaviour
         direction = RandomDirection();
         FindNewValidTarget();
 
+
         initialized = true;
     }
     public void FixedTick()
     {
         UpdateStates();
-
+        UpdateSatisfaction();
     }
     public void Tick()
     {
-        UpdateSatisfaction();
+
+    }
+
+    void SetupReferences()
+    {
+        rigidbodyComp   = GetComponent<Rigidbody>();
+        col = GetComponent<Collider>();
+        stinkPS = transform.Find("StinkPS").GetComponent<ParticleSystem>();
+        cryPS = transform.Find("CryPS").GetComponent<ParticleSystem>();
+        runDustPS = transform.Find("RunDustPS").GetComponent<ParticleSystem>();
+        meshRenderer = changeMaterialOn.GetComponent<SkinnedMeshRenderer>();
     }
 
     public void CompleteTask(TaskStation.TaskType completedTask)
@@ -120,12 +128,11 @@ public class Creature : MonoBehaviour
             if (task == completedTask)
             {
                 taskList.RemoveAt(i);
-                GetDissatisfactionMultiplier();
                 SetParticleSystemState(completedTask, false);
+                GetDissatisfactionMultiplier();
             }
         }
     }
-
     bool TaskListContains(TaskStation.TaskType task)
     {
         return taskList.Contains(task);
@@ -141,7 +148,7 @@ public class Creature : MonoBehaviour
 
     private void GetDissatisfactionMultiplier()
     {
-        dissatisfactionMultiplier = Mathf.Sqrt((float)taskList.Count / (float)numTasksAtStart);
+        dissatisfactionMultiplier = Mathf.Sqrt((float)taskList.Count / numTasksAtStart);
     }
     public bool IsSatisfied()
     {
@@ -149,16 +156,13 @@ public class Creature : MonoBehaviour
     }
     private void UpdateSatisfaction()
     {
-        float increment = (1f / stats.baseTimeUntilDissatisfied) * dissatisfactionMultiplier * Time.deltaTime;
+        dissatisfaction += timeIncrement * dissatisfactionMultiplier;
 
-        dissatisfaction += increment;
-
-        if(dissatisfaction > 1f)
+        if (dissatisfaction > 1f)
             levelScript.RegisterCreatureMaximumDisatisfied();
 
         UpdateMaterials();
     }
-
     void UpdateMaterials()
     {
         if(IsSatisfied()) 
@@ -187,6 +191,21 @@ public class Creature : MonoBehaviour
         else if(!isMoving && runDustPS.isPlaying)
             runDustPS.Stop();
     }
+    void SetupParticleSystems()
+    {
+        foreach(TaskStation.TaskType task in taskList)
+        {
+            switch (task)
+            {
+                case TaskStation.TaskType.BATHING:
+                    stinkPS.Play();
+                    break;
+                case TaskStation.TaskType.FEEDING:
+                    cryPS.Play();
+                    break;
+            }
+        }
+    }
     void SetParticleSystemState(TaskStation.TaskType task, bool state)
     {
         switch (task)
@@ -195,7 +214,7 @@ public class Creature : MonoBehaviour
                 {
                     if (state && !cryPS.isPlaying)
                         cryPS.Play();
-                    else 
+                    else if (cryPS.isPlaying)
                         cryPS.Stop();
                 }
                 break;
@@ -203,36 +222,13 @@ public class Creature : MonoBehaviour
                 {
                     if (state && !stinkPS.isPlaying)
                         stinkPS.Play();
-                    else
+                    else if (stinkPS.isPlaying)
                         stinkPS.Stop();
                 }
                 break;
         }
     }
-    void SetupParticleSystems()
-    {
-        foreach(TaskStation.TaskType task in taskList)
-        {
-            if(task == TaskStation.TaskType.BATHING)
-            {
-                stinkPS.Play();
-            }
-            if (task == TaskStation.TaskType.BATHING)
-            {
-                cryPS.Play();
-            }
-        }
-    }
 
-    void SetupReferences()
-    {
-        rigidbodyComp   = GetComponent<Rigidbody>();
-        col = GetComponent<Collider>();
-        stinkPS = transform.Find("StinkPS").GetComponent<ParticleSystem>();
-        cryPS = transform.Find("CryPS").GetComponent<ParticleSystem>();
-        runDustPS = transform.Find("RunDustPS").GetComponent<ParticleSystem>();
-        meshRenderer = changeMaterialOn.GetComponent<SkinnedMeshRenderer>();
-    }
     private void UpdateStates()
     {
         if(!isHeld)
@@ -418,6 +414,7 @@ public class Creature : MonoBehaviour
     {
         ChangeState(CreatureState.HELD);
         col.enabled = false;
+        speed = 0f;
         isHeld = true;
     }
     public void PutDown()

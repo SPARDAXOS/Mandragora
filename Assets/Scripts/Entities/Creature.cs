@@ -23,9 +23,9 @@ public struct CreatureStats
     public float maxRestDuration;
     [Range(0, 1f)]
     public float restProbability;
-    [Tooltip("Time in seconds when you only have one task.")]
+    [Tooltip("Time in seconds from the initial number of tasks.")]
     [Range(0, 120f)]
-    public float baseTimeUntilDissatisfied;
+    public float timeUntilDissatisfied;
 }
 
 [RequireComponent(typeof(Rigidbody))]
@@ -149,7 +149,7 @@ public class Creature : MonoBehaviour
     }
     private void UpdateSatisfaction()
     {
-        float increment = (1f / stats.baseTimeUntilDissatisfied) * dissatisfactionMultiplier * Time.deltaTime;
+        float increment = (1f / stats.timeUntilDissatisfied) * dissatisfactionMultiplier * Time.deltaTime;
 
         dissatisfaction += increment;
 
@@ -158,7 +158,6 @@ public class Creature : MonoBehaviour
 
         UpdateMaterials();
     }
-
     void UpdateMaterials()
     {
         if(IsSatisfied()) 

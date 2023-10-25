@@ -2,6 +2,7 @@ using Mandragora;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static Player;
 
 public class TaskStation : MonoBehaviour {
     public enum TaskType {
@@ -32,12 +33,15 @@ public class TaskStation : MonoBehaviour {
 
     [Space(10)]
     [Header("QTE")]
-    [SerializeField] private KeyCode[] possibleQTEKeys;
+    [SerializeField] private KeyCode[] player1PossibleQTEKeys;
+    [SerializeField] private KeyCode[] player2PossibleQTEKeys;
     [Range(1, 10)][SerializeField] private uint QTECount = 5;
 
 
 
     private bool initialized = false;
+
+    private PlayerType playerType = PlayerType.NONE;
 
     private MainCamera cameraScript = null;
     private Player targetPlayer = null;
@@ -194,7 +198,7 @@ public class TaskStation : MonoBehaviour {
     private void CompleteInteraction() {
         EndInteraction();
         sparklePS.Play();
-        targetPlayer.GetHeldCreature().CompleteTask(taskType);
+        targetPlayer.GetHeldCreature().CompleteTask(taskType); //This crashed! //FIX THIS HERE!!!!!!! IDK HOW IT CRASHED!
     }
 
 
@@ -210,14 +214,15 @@ public class TaskStation : MonoBehaviour {
     }
     private void StartInteraction() {
         interactionOngoing = true;
+        playerType = targetPlayer.GetPlayerType();
         EnableInteraction();
         EnableParticleSystem();
         targetPlayer.DisableMovement();
-
         interactionIndicator.SetActive(false);
     }
     private void EndInteraction() {
         interactionOngoing = false;
+        playerType = PlayerType.NONE;
         DisableInteraction();
         DisableParticleSystem();
         targetPlayer.EnableMovement();
@@ -276,9 +281,20 @@ public class TaskStation : MonoBehaviour {
 
     private void UpdateQTE() {
         KeyCode NewQTE = currentTargetQTE;
-        while(NewQTE == currentTargetQTE) {
-            int rand = UnityEngine.Random.Range(0, possibleQTEKeys.Length);
-            NewQTE = possibleQTEKeys[rand];
+        int rand = 0;
+        while (NewQTE == currentTargetQTE) {
+            if (playerType == PlayerType.PLAYER_1) {
+                rand = UnityEngine.Random.Range(0, player1PossibleQTEKeys.Length);
+                NewQTE = player1PossibleQTEKeys[rand];
+            }
+            else if (playerType == PlayerType.PLAYER_2) {
+                rand = UnityEngine.Random.Range(0, player2PossibleQTEKeys.Length);
+                NewQTE = player2PossibleQTEKeys[rand];
+            }
+            else {
+                Debug.LogError("Infinite loop detected at UpdateQTE() - TaskStation");
+                return;
+            }
         }
 
         currentTargetQTE = NewQTE;

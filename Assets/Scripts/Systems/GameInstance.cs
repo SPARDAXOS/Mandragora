@@ -39,6 +39,7 @@ public class GameInstance : MonoBehaviour {
     [SerializeField] private ResourcesBundle levelsBundle;
     [SerializeField] private PlayerControlScheme player1ControlScheme;
     [SerializeField] private PlayerControlScheme player2ControlScheme;
+    [SerializeField] private bool playTutorials = false;
 
 
     public GameState currentGameState = GameState.NONE;
@@ -59,6 +60,7 @@ public class GameInstance : MonoBehaviour {
     private GameObject eventSystem = null;
     private GameObject mainCamera = null;
     private GameObject soundManager = null;
+    private GameObject tutorialSequencer = null;
     private GameObject mainMenu = null;
     private GameObject settingsMenu = null;
     private GameObject pauseMenu = null;
@@ -70,6 +72,7 @@ public class GameInstance : MonoBehaviour {
     private Player player2Script = null;
     private MainCamera cameraScript = null;
     private SoundManager soundManagerScript = null;
+    private TutorialSequencer tutorialSequencerScript = null;
     private UIMainMenu mainMenuScript = null;
     private UISettingsMenu settingsMenuScript = null;
     private UIPauseMenu pauseMenuScript = null;
@@ -142,8 +145,15 @@ public class GameInstance : MonoBehaviour {
             soundManagerScript.Initialize();
         }
 
+        if (!entitiesResources["TutorialSequencer"])
+            Abort("Failed to find TutorialSequencer resource");
+        else {
+            tutorialSequencer = Instantiate(entitiesResources["TutorialSequencer"]);
+            tutorialSequencerScript = tutorialSequencer.GetComponent<TutorialSequencer>();
+            tutorialSequencerScript.Initialize();
+        }
 
-
+        
         if (!entitiesResources["MainMenu"])
             Abort("Failed to find MainMenu resource");
         else {
@@ -206,14 +216,14 @@ public class GameInstance : MonoBehaviour {
             player1 = Instantiate(entitiesResources["Player"]);
             player1.name = "Player_1";
             player1Script = player1.GetComponent<Player>();
-            player1Script.Initialize(player1ControlScheme, this, soundManagerScript);
+            player1Script.Initialize(Player.PlayerType.PLAYER_1, player1ControlScheme, this, soundManagerScript);
             player1Script.SetColor(Color.blue);
             player1.SetActive(false);
 
             player2 = Instantiate(entitiesResources["Player"]);
             player2.name = "Player_2";
             player2Script = player2.GetComponent<Player>();
-            player2Script.Initialize(player2ControlScheme, this, soundManagerScript);
+            player2Script.Initialize(Player.PlayerType.PLAYER_2, player2ControlScheme, this, soundManagerScript);
             player2Script.SetColor(Color.red);
             player2.SetActive(false);
         }
@@ -251,6 +261,9 @@ public class GameInstance : MonoBehaviour {
         player1Script.Tick();
         player2Script.Tick();
         currentLevelScript.Tick();
+
+        if (tutorialSequencerScript.IsTutorialRunning())
+            tutorialSequencerScript.Tick();
     }
     private void UpdateFixedPlayingState() {
         player1Script.FixedTick();
@@ -351,7 +364,7 @@ public class GameInstance : MonoBehaviour {
         player1Script.EnableInput();
         player2Script.EnableInput();
         soundManagerScript.PlayTrack("TestTrack2", true);
-        currentGameState = GameState.PLAYING;
+        currentGameState = GameState.PLAYING;     
         StartGame();
     }
 
@@ -373,8 +386,7 @@ public class GameInstance : MonoBehaviour {
         gamePaused = false;
     }
 
-
-    public void MatchFinished(GameResults results) {
+    public void LevelFinished(GameResults results) {
         Debug.Log("Game is over with results " + results.ToString());
 
         if (results == GameResults.WIN)
@@ -386,11 +398,24 @@ public class GameInstance : MonoBehaviour {
     }
     private void StartGame() {
         gameStarted = true;
-        currentLevelScript.StartLevel();
+
+        if (playTutorials)
+            tutorialSequencerScript.StartTutorial(this, currentLevelScript);
+        else
+            currentLevelScript.StartLevel();
     }
     public bool IsGameStarted() {
         return gameStarted;
     }
+
+
+    public Player GetPlayer1Script() {
+        return player1Script;
+    }
+    public Player GetPlayer2Script() {
+        return player2Script;
+    }
+
 
 
     private void SetCursorState(bool state) {

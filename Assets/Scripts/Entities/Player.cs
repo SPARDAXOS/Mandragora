@@ -3,6 +3,12 @@ using UnityEngine;
 
 public class Player : MonoBehaviour {
 
+    public enum PlayerType {
+        NONE = 0,
+        PLAYER_1,
+        PLAYER_2
+    }
+
     [SerializeField] private PlayerStats stats;
     [SerializeField] private float pickupCheckBoxSize = 1.0f;
     [SerializeField] private Vector3 pickupCheckOffset;
@@ -12,6 +18,7 @@ public class Player : MonoBehaviour {
     [SerializeField] private bool showPickupTrigger = true;
 
 
+    private PlayerType playerType = PlayerType.NONE;
 
     private bool initialized = false;
     private bool isMoving = false;
@@ -49,10 +56,11 @@ public class Player : MonoBehaviour {
     private MeshRenderer meshRendererComp = null;
     private Material mainMaterial;
 
-    public void Initialize(PlayerControlScheme controlScheme, GameInstance gameInstance, SoundManager soundManager) {
+    public void Initialize(PlayerType type, PlayerControlScheme controlScheme, GameInstance gameInstance, SoundManager soundManager) {
         if (initialized)
             return;
 
+        playerType = type;
         activeControlScheme = controlScheme;
         this.gameInstance = gameInstance;
         this.soundManager = soundManager;
@@ -306,6 +314,15 @@ public class Player : MonoBehaviour {
     }
     public bool IsInteractingHeld() {
         return isInteractingHeld;
+    }
+    public bool IsMoving() {
+        return isMoving;
+    }
+    public bool IsDashing() {
+        return isDashing;
+    }
+    public PlayerType GetPlayerType() {
+        return playerType;
     }
 
     public void SetInTaskStationRange(bool state) {

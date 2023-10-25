@@ -130,6 +130,16 @@ public class Creature : MonoBehaviour
         meshRenderer = changeMaterialOn.GetComponent<SkinnedMeshRenderer>();
     }
 
+    public void ClearAllTasks() {
+        taskList.Clear();
+    }
+    public void AddTask(TaskStation.TaskType type) {
+        if (taskList.Contains(type))
+            return;
+
+        taskList.Add(type);
+        SetParticleSystemState(type, true);
+    }
     public void CompleteTask(TaskStation.TaskType completedTask)
     {
         for (int i = 0; i < taskList.Count; i++)
@@ -137,16 +147,12 @@ public class Creature : MonoBehaviour
             TaskStation.TaskType task = taskList[i];
             if (task == completedTask)
             {
+                Debug.Log("Removed!");
                 taskList.RemoveAt(i);
                 SetParticleSystemState(completedTask, false);
                 GetDissatisfactionMultiplier();
             }
         }
-    }
-    bool TaskListContains(TaskStation.TaskType task)
-    {
-        return taskList.Contains(task);
-        
     }
     public bool DoesRequireTask(TaskStation.TaskType type) {
         foreach(var entry in taskList) {

@@ -1,6 +1,5 @@
 using Mandragora;
 using UnityEngine;
-using UnityEngine.Rendering.VirtualTexturing;
 
 public class Player : MonoBehaviour {
 
@@ -19,11 +18,14 @@ public class Player : MonoBehaviour {
     private bool isInteractingTrigger = false;
     private bool isInteractingHeld = false;
 
-    private float currentSpeed = 0.0f;
-    private Vector3 direction;
-    private Vector3 velocity;
+    private bool isKnockedback = false;
+    public bool isGrounded = false;
 
-    public bool inTaskStationRange = false;
+
+    public float currentSpeed = 0.0f;
+    private Vector3 direction;
+
+    private bool inTaskStationRange = false;
 
     private GameObject pickupPoint = null;
 
@@ -74,19 +76,36 @@ public class Player : MonoBehaviour {
         if (!initialized)
             return;
 
+        rigidbodyComp.useGravity = !stats.customGravity;
+
+
         if (heldCreature) {
             heldCreature.transform.position = pickupPoint.transform.position;
 
         }
         
+        CheckGrounded();
         CheckInput();
     }
     public void FixedTick() {
         if (!initialized)
             return;
 
-        UpdateMovement();
+
         UpdateRotation();
+
+        if (stats.customGravity)
+            UpdateGravity();
+
+
+        if (isKnockedback) {
+            if (isGrounded && rigidbodyComp.velocity.y < 0.0f) {
+                Debug.Log("Knockback ended!");
+                isKnockedback = false;
+            }
+        }
+        else
+            UpdateMovement();
     }
 
 
@@ -168,21 +187,34 @@ public class Player : MonoBehaviour {
         }
     }
     private void UpdateMovement() {
-        velocity = direction * currentSpeed * Time.fixedDeltaTime;
-        rigidbodyComp.velocity = velocity;
+        Vector3 velocity = direction * currentSpeed * Time.fixedDeltaTime;
+        rigidbodyComp.velocity = new Vector3(velocity.x, rigidbodyComp.velocity.y, velocity.z);
     }
     private void UpdateRotation() {
         transform.forward 
             = Vector3.RotateTowards(transform.forward, direction, stats.turnRate * Time.fixedDeltaTime, 0.0f);
     }
+    private void UpdateGravity() {
+        if (isGrounded)
+            return;
 
+        Debug.Log("Gravity!");
+        float gravity = stats.gravityScale * Time.fixedDeltaTime;
+        rigidbodyComp.velocity += new Vector3(0.0f, -gravity, 0.0f);
+    }
+
+    private void CheckGrounded() {
+        Vector3 startingPosition = transform.position;
+        startingPosition.y += 1;
+        isGrounded = Physics.BoxCast(startingPosition, Vector3.one / 2, -transform.up, transform.rotation, 1.0f);
+    }
 
 
     private void Pickup() {
         Vector3 boxcastOrigin = transform.position;
         boxcastOrigin.x += pickupCheckOffset.x * transform.forward.x;
         boxcastOrigin.y += pickupCheckOffset.y * transform.forward.y;
-        boxcastOrigin.z += pickupCheckOffset.z;
+        boxcastOrigin.z += pickupCheckOffset.z * transform.forward.z;
         Vector3 boxExtent = new Vector3(pickupCheckBoxSize / 2.0f, pickupCheckBoxSize / 2.0f, pickupCheckBoxSize / 2.0f);
 
         var HitResults = Physics.BoxCastAll(boxcastOrigin, boxExtent, transform.forward, transform.rotation, 0.0f, pickupMask.value);
@@ -222,15 +254,46 @@ public class Player : MonoBehaviour {
         heldCreature = null;
     }
 
+
+    public void ApplyKnockback(Vector3 direction, float force) {
+        if (isKnockedback)
+            return;
+
+        Debug.Log("Knockback started!");
+        rigidbodyComp.velocity = direction * force;
+        isKnockedback = true;
+    }
+
+    private void OnCollisionEnter(Collision collision) {
+        if (collision.collider.CompareTag("Player")) {
+            var script = collision.collider.GetComponent<Player>();
+
+            Vector3 knockbackDirection = script.transform.position - transform.position;
+            knockbackDirection.Normalize();
+            knockbackDirection.y = Mathf.Sin(Mathf.Deg2Rad * stats.knockbackHeightAngle);
+            script.ApplyKnockback(knockbackDirection, stats.knockbackForce / 2);
+            if (heldCreature) {
+                heldCreature.PutDown();
+                heldCreature = null;
+            }
+        }
+    }
+
+
+
+
     private void OnDrawGizmos() {
         if (showPickupTrigger) {
             Vector3 boxcastOrigin = transform.position;
             boxcastOrigin.x += pickupCheckOffset.x * transform.forward.x;
             boxcastOrigin.y += pickupCheckOffset.y * transform.forward.y;
-            boxcastOrigin.z += pickupCheckOffset.z;
+            boxcastOrigin.z += pickupCheckOffset.z * transform.forward.z;
             Vector3 boxSize = new Vector3(pickupCheckBoxSize, pickupCheckBoxSize, pickupCheckBoxSize);
             Gizmos.color = Color.yellow;
             Gizmos.DrawCube(boxcastOrigin, boxSize);
         }
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawCube(transform.position, Vector3.one);
     }
 }

@@ -1,5 +1,6 @@
 using Mandragora;
 using UnityEngine;
+using UnityEngine.Windows;
 using static UnityEngine.UI.Image;
 
 public class Player : MonoBehaviour {
@@ -132,12 +133,15 @@ public class Player : MonoBehaviour {
         UpdateDashTimers();
         UpdateHeldCreature();
 
+        UpdateInput();
         CheckGrounded();
-        CheckInput();
+        CheckPath();
+        CheckMovement();
+        CheckMovementPS();
+        CheckPause();
         CheckDash();
         CheckPickup();
         CheckThrow();
-        CheckCollidingObject();
     }
     public void FixedTick() {
         if (!initialized)
@@ -145,7 +149,6 @@ public class Player : MonoBehaviour {
 
 
         UpdateRotation();
-
         if (stats.customGravity)
             UpdateGravity();
 
@@ -205,7 +208,44 @@ public class Player : MonoBehaviour {
 
 
 
+    private void CheckKnockback(Player target, Vector3 contactPoint) {
 
+        Vector3 knockbackDirection = target.transform.position - transform.position;
+        knockbackDirection.Normalize();
+
+
+
+
+        if (isDashing) {
+            if (heldCreature) {
+                heldCreature.ApplyImpulse(Vector3.up, stats.dashCreatureDropForce);
+                DropHeldCreature();
+            }
+            StopDashing();
+            Vector3 targetDirection = contactPoint - transform.position;
+            targetDirection.Normalize();
+            //ApplyDashRetainedSpeed(-targetDirection); //nOT REALLY NEEDED HERE!
+
+            ApplyStun(stats.stunDuration, false);
+
+            knockbackDirection.x *= Mathf.Cos(Mathf.Deg2Rad * stats.dashKnockbackHeightAngle);
+            knockbackDirection.y = Mathf.Sin(Mathf.Deg2Rad * stats.dashKnockbackHeightAngle);
+            knockbackDirection.z *= Mathf.Cos(Mathf.Deg2Rad * stats.dashKnockbackHeightAngle);
+            target.ApplyKnockback(knockbackDirection, stats.dashKnockbackForce); //Push other by full force
+            Debug.Log("Dash Knockback - " + gameObject.name);
+        }
+        else {
+            if (heldCreature) {
+                heldCreature.ApplyImpulse(Vector3.up, stats.knockbackCreatureDropForce);
+                DropHeldCreature();
+            }
+            knockbackDirection.x *= Mathf.Cos(Mathf.Deg2Rad * stats.knockbackHeightAngle);
+            knockbackDirection.y = Mathf.Sin(Mathf.Deg2Rad * stats.knockbackHeightAngle);
+            knockbackDirection.z *= Mathf.Cos(Mathf.Deg2Rad * stats.knockbackHeightAngle);
+            target.ApplyKnockback(knockbackDirection, stats.knockbackForce);
+            Debug.Log("Normal Knockback - " + gameObject.name);
+        }
+    }
     private void CheckDash() {
         if (isStunned || !isGrounded || dashCooldownTimer > 0.0f)
             return;
@@ -239,7 +279,79 @@ public class Player : MonoBehaviour {
                 DropHeldCreature();
         }
     }
-    private void CheckInput() {
+
+    private void CheckGrounded() {
+        Vector3 startingPosition = transform.position;
+        startingPosition.y += 1;
+        isGrounded = Physics.BoxCast(startingPosition, Vector3.one / 2, -transform.up, transform.rotation, 1.0f);
+    }
+    private void CheckPath() {
+        Vector3 origin = transform.position;
+        origin.y += 0.01f;
+        origin.x -= pathCheckOffset * transform.forward.x;
+        origin.z -= pathCheckOffset * transform.forward.z;
+
+        RaycastHit hit;
+        if (Physics.BoxCast(origin, normalBoxColliderSize / 2, transform.forward, out hit, transform.rotation, pathCheckOffset * 2)) {
+            if (hit.collider.CompareTag("Player") || hit.collider.CompareTag("Creature")) {
+                pathBlocked = false;
+                return;
+            }
+            else {
+                if (isDashing) {
+                    StopDashing();
+                    Vector3 targetDirection = hit.point - transform.position;
+                    //targetDirection.Normalize();
+                    //ApplyDashRetainedSpeed(-targetDirection);
+                    Debug.Log("Dash Stopped cause touching!!");
+
+
+                    Vector3 bounceDirection = -transform.forward;
+                    bounceDirection.x *= Mathf.Cos(Mathf.Deg2Rad * stats.objectBounceOffAngle);
+                    bounceDirection.y = Mathf.Sin(Mathf.Deg2Rad * stats.objectBounceOffAngle);
+                    bounceDirection.z *= Mathf.Cos(Mathf.Deg2Rad * stats.objectBounceOffAngle);
+                    ApplyKnockback(bounceDirection, stats.objectBouceOffForce); //ALWAYS USE THIS INSTEAD OF THE IMPULSE ONE!
+                                                                                //ApplyImpulse(bounceDirection, stats.bounceOffForce);
+                }
+                pathBlocked = true;
+            }
+        }
+        else
+            pathBlocked = false;
+    }
+    private void CheckReverse(Vector2 newDirection) {
+        Vector2 currentDirection = new Vector2(direction.x, direction.z);
+        float dot = Vector2.Dot(currentDirection, newDirection);
+        if (dot == -1) {
+            currentSpeed *= stats.reverseRetainedSpeed;
+
+        }
+    }
+
+
+    private void CheckPause() {
+        if (activeControlScheme.pause.triggered)
+            gameInstance.PauseGame();
+    }
+    private void CheckMovement() {
+        if (isMoving) {
+            Vector2 input = activeControlScheme.movement.ReadValue<Vector2>();
+            CheckReverse(input);
+
+            direction = new Vector3(input.x, 0.0f, input.y);
+            if(!pathBlocked)
+                Accelerate();
+        }
+        else if (currentSpeed > 0.0f)
+            Decelerate();
+    }
+    private void CheckMovementPS() {
+        if (isMoving && !runDustPS.isPlaying)
+            runDustPS.Play();
+        else if (!isMoving && runDustPS.isPlaying)
+            runDustPS.Stop();
+    }
+    private void UpdateInput() {
         if (!activeControlScheme)
             return;
 
@@ -248,23 +360,6 @@ public class Player : MonoBehaviour {
         isThrowingTrigger = activeControlScheme.throwAway.triggered;
         isInteractingHeld = activeControlScheme.interact.IsPressed();
         isMoving = activeControlScheme.movement.IsPressed();
-
-        if (activeControlScheme.pause.triggered)
-            gameInstance.PauseGame();
-
-        //Break into update func
-        if (isMoving && !runDustPS.isPlaying)
-            runDustPS.Play();
-        else if (!isMoving && runDustPS.isPlaying)
-            runDustPS.Stop();
-
-        if (isMoving) {
-            Vector2 input = activeControlScheme.movement.ReadValue<Vector2>();
-            direction = new Vector3(input.x, 0.0f , input.y);
-            Accelerate();
-        }
-        else if (currentSpeed > 0.0f)
-            Decelerate();
     }
 
     private void Accelerate() {
@@ -282,6 +377,13 @@ public class Player : MonoBehaviour {
         }
     }
     private void UpdateMovement() {
+        //WORKS BUT QUESTIONABLE!
+        if (pathBlocked) {
+            //rigidbodyComp.velocity = Vector3.zero;
+            //currentSpeed *= stats.speedRetainedOnHit;
+            //return;
+        }
+
         Vector3 velocity = direction * currentSpeed * Time.fixedDeltaTime;
         rigidbodyComp.velocity = new Vector3(velocity.x, rigidbodyComp.velocity.y, velocity.z);
     }
@@ -297,14 +399,9 @@ public class Player : MonoBehaviour {
         rigidbodyComp.velocity += new Vector3(0.0f, -gravity, 0.0f);
     }
 
-    private void CheckGrounded() {
-        Vector3 startingPosition = transform.position;
-        startingPosition.y += 1;
-        isGrounded = Physics.BoxCast(startingPosition, Vector3.one / 2, -transform.up, transform.rotation, 1.0f);
-    }
+
 
     private void UpdateDashTimers() {
-
         if (dashCooldownTimer > 0.0f) {
             dashCooldownTimer -= Time.deltaTime;
             if (dashCooldownTimer < 0.0f)
@@ -316,7 +413,6 @@ public class Player : MonoBehaviour {
             if (dashTimer <= 0.0f) {
                 StopDashing();
                 ApplyDashRetainedSpeed(transform.forward);
-                //currentSpeed = stats.maxSpeed * stats.retainedSpeed;
                 Debug.LogWarning("Dashing finished!");
             }
         }
@@ -324,7 +420,7 @@ public class Player : MonoBehaviour {
     private void UpdateStunTimer() {
         if (stunTimer > 0.0f) {
             stunTimer -= Time.deltaTime;
-            if(stunTimer <= 0.0f) {
+            if (stunTimer <= 0.0f) {
                 //Consider moving this and the turn on to func!
                 stunTimer = 0.0f;
                 isStunned = false;
@@ -388,14 +484,16 @@ public class Player : MonoBehaviour {
     public bool IsThrowing() {
         return isThrowingTrigger;
     }
+
+
     public PlayerType GetPlayerType() {
         return playerType;
     }
-
-
     public bool GetInTaskStationRange() {
         return inTaskStationRange;
     }
+
+
     public void SetInTaskStationRange(bool state) {
         inTaskStationRange = state;
     }
@@ -433,11 +531,8 @@ public class Player : MonoBehaviour {
             return;
 
         rigidbodyComp.velocity = Vector3.zero;
-        ApplyImpulse(direction, force);
-        isKnockedback = true;
-    }
-    public void ApplyImpulse(Vector3 direction, float force) {
         rigidbodyComp.velocity += direction * force;
+        isKnockedback = true;
     }
     public void ApplyStun(float duration, bool stack = false) {
         if (stack)
@@ -463,72 +558,17 @@ public class Player : MonoBehaviour {
         currentSpeed = stats.maxSpeed * stats.retainedSpeed;
     }
 
-    private void CheckCollidingObject() {
-        Vector3 origin = transform.position;
-        origin.y += 0.01f;
-        origin.x -= pathCheckOffset * transform.forward.x;
-        origin.z -= pathCheckOffset * transform.forward.z;
 
-        RaycastHit hit;
-        if (Physics.BoxCast(origin, normalBoxColliderSize / 2, transform.forward, out hit, transform.rotation, pathCheckOffset * 2)) {
-            Debug.LogWarning("Blocked by " + hit.collider.name);
-            pathBlocked = true;
-
-
-
-
-
-            if (isDashing) {
-                StopDashing();
-                Vector3 targetDirection = hit.point - transform.position;
-                targetDirection.Normalize();
-                ApplyDashRetainedSpeed(-targetDirection);
-
-                Debug.LogWarning("Dash Stopped cause touching!!");
-            }
-        }
-        else
-            pathBlocked = false;
-    }
 
 
     private void OnCollisionEnter(Collision collision) {
-
         if (collision == null)
             return;
 
         if (collision.collider.CompareTag("Player")) {
             var script = collision.collider.GetComponent<Player>();
-
-            Vector3 knockbackDirection = script.transform.position - transform.position;
-            knockbackDirection.Normalize();
-
-            knockbackDirection.x *= Mathf.Cos(Mathf.Deg2Rad * stats.knockbackHeightAngle);
-            knockbackDirection.y = Mathf.Sin(Mathf.Deg2Rad * stats.knockbackHeightAngle);
-            knockbackDirection.z *= Mathf.Cos(Mathf.Deg2Rad * stats.knockbackHeightAngle);
-
-
-            if (isDashing) {
-                if (heldCreature) {
-                    heldCreature.ApplyImpulse(Vector3.up, stats.dashCreatureDropForce);
-                    DropHeldCreature();
-                }
-                StopDashing();
-                Vector3 targetDirection = collision.GetContact(0).point - transform.position;
-                targetDirection.Normalize();
-                ApplyDashRetainedSpeed(-targetDirection); //nOT REALLY NEEDED HERE!
-
-                ApplyStun(stats.stunDuration, false);
-                script.ApplyKnockback(knockbackDirection, (stats.knockbackForce / 2) * stats.knockbackMultiplier);
-                Debug.LogWarning("Dash Stopped cause hit player!");
-            }
-            else {
-                if (heldCreature) {
-                    heldCreature.ApplyImpulse(Vector3.up, stats.knockbackCreatureDropForce);
-                    DropHeldCreature();
-                }
-                script.ApplyKnockback(knockbackDirection, stats.knockbackForce / 2);
-            }
+            if (script)
+                CheckKnockback(script, collision.GetContact(0).point);
         }
     }
 

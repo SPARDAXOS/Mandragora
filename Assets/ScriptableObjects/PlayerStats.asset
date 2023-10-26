@@ -17,7 +17,7 @@ MonoBehaviour:
   accelerationRate: 498
   decelerationRate: 864
   reverseRetainedSpeed: 0.1
-  speedRetainedOnHit: 0.455
+  speedRetainedOnHit: 0.95
   customGravity: 0
   gravityScale: 20
   knockbackForce: 15

@@ -3,8 +3,6 @@ using Mandragora;
 using System.Collections.Generic;
 using Unity.AI.Navigation;
 using UnityEngine.AI;
-using Unity.VisualScripting;
-using static UnityEngine.EventSystems.EventTrigger;
 
 public class Level : MonoBehaviour {
 
@@ -14,7 +12,7 @@ public class Level : MonoBehaviour {
 
     [Header("Spawner")]
     [Range(1, 15)] [SerializeField] private uint spawnPointCalculationRetries = 10;
-    [Range(0.0f, 10.0f)][SerializeField] private float spawnHeightOffset = 7.0f;
+    [Range(0.0f, 20.0f)][SerializeField] private float spawnHeightOffset = 7.0f;
 
     private bool initialize = false;
 

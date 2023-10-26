@@ -109,7 +109,7 @@ MonoBehaviour:
     maxRestDuration: 1
     restProbability: 0.05
     escapeHeldProbability: 0.05
-    timeUntilDissatisfied: 60
+    timeUntilDissatisfied: 120
   drawAIGizmos: 1
   taskList: 0100000002000000
   satisfiedMaterial: {fileID: 2100000, guid: a90a943932679e44587087b20903f0e6, type: 2}

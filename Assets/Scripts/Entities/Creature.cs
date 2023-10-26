@@ -368,6 +368,7 @@ public class Creature : MonoBehaviour
         float breakDist = 0.5f * speed * stats.decelerationTime;
         float sqrDistToTarget = (targetPosition - transform.position).sqrMagnitude;
         bool isClose = sqrDistToTarget < breakDist * breakDist;
+
         float random = UnityEngine.Random.value;
         float probability = stats.restProbability;
         if (!isErratic) probability *= Time.fixedDeltaTime;
@@ -382,6 +383,7 @@ public class Creature : MonoBehaviour
                 ChangeState(CreatureState.REST);
             else if(sqrDistToTarget < turnRadius * turnRadius || isErratic)
                 FindNewValidTarget();
+            
             return;
         }
 

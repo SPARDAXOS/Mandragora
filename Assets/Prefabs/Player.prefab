@@ -134,9 +134,15 @@ MonoBehaviour:
   pickupMask:
     serializedVersion: 2
     m_Bits: 64
+  pickupBoxColliderSize: {x: 1.5, y: 3, z: 3}
+  pickupBoxColliderOffset: {x: 0, y: 1.5, z: 1}
   showPickupTrigger: 0
   isGrounded: 0
+  isDashing: 0
+  isStunned: 0
   currentSpeed: 0
+  dashTimer: 0
+  stunTimer: 0
 --- !u!1001 &5605139720784332902
 PrefabInstance:
   m_ObjectHideFlags: 0

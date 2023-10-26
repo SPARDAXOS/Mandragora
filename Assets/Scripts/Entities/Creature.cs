@@ -60,6 +60,7 @@ public class Creature : MonoBehaviour
     private bool active;
     public CreatureState state;
     private bool isHeld;
+    private bool tutorialCreature;
     private float deltaHeldEscapeProbability;
 
     private float dissatisfactionMultiplier = 1f;
@@ -322,6 +323,8 @@ public class Creature : MonoBehaviour
     }
     void HeldBehavior()
     {
+        rigidbodyComp.velocity = Vector3.zero;
+
         if (!doEscapeHeld) 
             return;
 
@@ -490,6 +493,15 @@ public class Creature : MonoBehaviour
     public void RegisterSatisfied() {
         SetActive(false);
         levelScript.RegisterSatisfiedCreature();
+    }
+
+    public void SetTutorialCreature(bool state)
+    {
+        tutorialCreature = state;
+    }
+    public bool GetTutorialCreature() 
+    {
+        return tutorialCreature;
     }
 
     private void OnDrawGizmos()

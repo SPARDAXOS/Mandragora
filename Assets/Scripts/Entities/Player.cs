@@ -288,8 +288,6 @@ public class Player : MonoBehaviour {
             isStunned = false;
     }
 
-
-
     private void Pickup() {
         Vector3 boxcastOrigin = transform.position;
         boxcastOrigin.x += pickupCheckOffset.x * transform.forward.x;

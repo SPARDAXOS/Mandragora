@@ -127,6 +127,7 @@ public class Creature : MonoBehaviour
 
         StartDissatisfaction();
         queueTasks = taskList;
+        tutorialCreature = false;
 
         direction = RandomDirection();
         state = CreatureState.FALL;
@@ -204,8 +205,6 @@ public class Creature : MonoBehaviour
         dissatisfaction = 0f;
         doDissatisfaction = false;
     }
-
-
     void UpdateMaterials()
     {
         if(IsSatisfied()) 

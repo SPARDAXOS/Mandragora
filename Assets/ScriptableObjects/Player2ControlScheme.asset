@@ -99,12 +99,12 @@ MonoBehaviour:
     m_Name: Throw Away
     m_Type: 0
     m_ExpectedControlType: 
-    m_Id: d64aa326-d3bc-4291-87a0-123f30253c82
+    m_Id: 337253b5-c5b0-4653-b0cd-39af27bde7b4
     m_Processors: 
     m_Interactions: 
     m_SingletonActionBindings:
     - m_Name: 
-      m_Id: 0bd9b49d-e9f7-4062-aef8-2a2e6d9d361b
+      m_Id: 4d5739c5-4626-4db0-b958-d17b0c594b7a
       m_Path: <Keyboard>/numpad0
       m_Interactions: 
       m_Processors: 

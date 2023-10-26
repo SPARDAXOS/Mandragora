@@ -325,15 +325,11 @@ public class Creature : MonoBehaviour
     {
         rigidbodyComp.velocity = Vector3.zero;
 
-        if (!doEscapeHeld || !player) 
+        if (!doEscapeHeld || !player || player.GetInTaskStationRange()) 
             return;
 
         float random = UnityEngine.Random.value;
 
-        if (player)
-        {
-            
-        }
 
         if (random < deltaHeldEscapeProbability)
         {

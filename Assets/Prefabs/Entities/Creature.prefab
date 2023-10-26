@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3259651457021180055}
-  - component: {fileID: 9135386428048894539}
+  - component: {fileID: 3566713537586945079}
   - component: {fileID: 8286512445207717520}
   - component: {fileID: 485047807280192455}
   m_Layer: 6
@@ -38,8 +38,8 @@ Transform:
   - {fileID: 1474805611932351975}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &9135386428048894539
-BoxCollider:
+--- !u!135 &3566713537586945079
+SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -57,8 +57,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 2.7, y: 2.8, z: 2.4}
-  m_Center: {x: 0, y: 1.47, z: 0}
+  m_Radius: 1.5
+  m_Center: {x: 0, y: 1.44, z: 0}
 --- !u!54 &8286512445207717520
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -109,7 +109,7 @@ MonoBehaviour:
     maxRestDuration: 1
     restProbability: 0.05
     escapeHeldProbability: 0.05
-    timeUntilDissatisfied: 120
+    timeUntilDissatisfied: 60
   drawAIGizmos: 1
   taskList: 0100000002000000
   satisfiedMaterial: {fileID: 2100000, guid: a90a943932679e44587087b20903f0e6, type: 2}
@@ -118,6 +118,7 @@ MonoBehaviour:
   dissatisfaction: 0
   doDissatisfaction: 0
   doEscapeHeld: 0
+  isErratic: 0
   state: 0
 --- !u!1001 &1405697963936289669
 PrefabInstance:

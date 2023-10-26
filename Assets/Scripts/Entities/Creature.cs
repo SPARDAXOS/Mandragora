@@ -52,6 +52,7 @@ public class Creature : MonoBehaviour
     [SerializeField] private float dissatisfaction;
     public bool doDissatisfaction;
     public bool doEscapeHeld;
+    [SerializeField] bool isErratic;
 
     private List<TaskStation.TaskType> queueTasks;
     private int numTasksAtStart;
@@ -109,7 +110,6 @@ public class Creature : MonoBehaviour
             return;
 
         UpdateStates();
-        Debug.Log(rigidbodyComp.velocity.y);
     }
     public void Tick()
     {
@@ -129,6 +129,7 @@ public class Creature : MonoBehaviour
         queueTasks = taskList;
         tutorialCreature = false;
 
+        speed = 0;
         direction = RandomDirection();
         state = CreatureState.FALL;
         FindNewValidTarget();
@@ -364,15 +365,22 @@ public class Creature : MonoBehaviour
     {
         bool pathObstructed = CastToTarget(targetPosition, false);
 
-        float breakDist = speed * stats.decelerationTime;
-        bool isClose = (targetPosition - transform.position).sqrMagnitude < breakDist * breakDist;
-        bool willRest = UnityEngine.Random.value <= stats.restProbability;
+        float breakDist = 0.5f * speed * stats.decelerationTime;
+        float sqrDistToTarget = (targetPosition - transform.position).sqrMagnitude;
+        bool isClose = sqrDistToTarget < breakDist * breakDist;
+        float random = UnityEngine.Random.value;
+        float probability = stats.restProbability;
+        if (!isErratic) probability *= Time.fixedDeltaTime;
+
+        bool willRest = random <= probability;
+
+        float turnRadius = speed * 2 * Mathf.PI * (stats.turnRate / 360f);
 
         if (isClose)
         {
             if (willRest)
                 ChangeState(CreatureState.REST);
-            else
+            else if(sqrDistToTarget < turnRadius * turnRadius || isErratic)
                 FindNewValidTarget();
             return;
         }
@@ -395,10 +403,13 @@ public class Creature : MonoBehaviour
     }
     bool CastToTarget(Vector3 target, bool assignTarget)
     {
+        if (!Physics.CheckSphere(target, 0.5f))
+            return false;
+
         Vector3 origin = transform.position;
         Vector3 direction = target - transform.position;
         colliderComp.enabled = false;
-        bool output = Physics.SphereCast(new Ray(origin, direction), 0.25f, stats.viewRange);
+        bool output = Physics.SphereCast(new Ray(origin, direction), 0.5f, stats.viewRange);
         colliderComp.enabled = true;
         if (!output && assignTarget) targetPosition = target;
         return output;

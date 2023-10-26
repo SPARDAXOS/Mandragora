@@ -41,13 +41,15 @@ public class Creature : MonoBehaviour
 
     [SerializeField] private CreatureStats stats;
     [SerializeField] private bool drawAIGizmos;
-    public List<TaskStation.TaskType> taskList;
+    [SerializeField] private List<TaskStation.TaskType> taskList;
     [SerializeField] private Material satisfiedMaterial, dissatisfiedMaterial;
     [SerializeField] private GameObject changeMaterialOn;
     private SkinnedMeshRenderer meshRenderer;
     [Range (0, 1f)]
     [SerializeField] private float dissatisfaction;
+    public bool doDissatisfaction;
 
+    private List<TaskStation.TaskType> queueTasks;
     private int numTasksAtStart;
 
     private bool initialized = false;
@@ -55,9 +57,8 @@ public class Creature : MonoBehaviour
     public CreatureState state;
     private bool isHeld;
 
-    private float dissatisfactionMultiplier;
+    private float dissatisfactionMultiplier = 1f;
     private float timeIncrement;
-
     private float accelerationIncrement;
     private float decelerationIncrement;
 
@@ -72,7 +73,7 @@ public class Creature : MonoBehaviour
     float restDuration = 0;
 
     private Rigidbody rigidbodyComp = null;
-    private Collider col = null;
+    private Collider colliderComp = null;
     private ParticleSystem stinkPS = null;
     private ParticleSystem cryPS = null;
     private ParticleSystem runDustPS = null;
@@ -84,29 +85,28 @@ public class Creature : MonoBehaviour
             return;
 
         this.levelScript = level;
-        numTasksAtStart = taskList.Count;
 
         SetupReferences();
-        GetDissatisfactionMultiplier();
 
-        timeIncrement = (1f / stats.timeUntilDissatisfied) * Time.fixedDeltaTime;
+        timeIncrement = (1f / stats.timeUntilDissatisfied);
 
         accelerationIncrement = Time.fixedDeltaTime * stats.maxSpeed / stats.accelerationTime;
         decelerationIncrement = Time.fixedDeltaTime * stats.maxSpeed / stats.decelerationTime;
-
-        direction = RandomDirection();
-        FindNewValidTarget();
 
         initialized = true;
     }
     public void FixedTick()
     {
+        if (!initialized)
+            return;
+
         UpdateStates();
-        UpdateSatisfaction();
+        
     }
     public void Tick()
     {
-
+        if (doDissatisfaction)
+            UpdateSatisfaction();
     }
 
     /// <summary>
@@ -114,8 +114,11 @@ public class Creature : MonoBehaviour
     /// </summary>
     public void SetupStartState() {
 
+        StartDissatisfaction();
+        queueTasks = taskList;
 
-
+        direction = RandomDirection();
+        FindNewValidTarget();
 
         SetupParticleSystems();
     }
@@ -123,7 +126,7 @@ public class Creature : MonoBehaviour
     void SetupReferences()
     {
         rigidbodyComp   = GetComponent<Rigidbody>();
-        col = GetComponent<Collider>();
+        colliderComp = GetComponent<Collider>();
         stinkPS = transform.Find("StinkPS").GetComponent<ParticleSystem>();
         cryPS = transform.Find("CryPS").GetComponent<ParticleSystem>();
         runDustPS = transform.Find("RunDustPS").GetComponent<ParticleSystem>();
@@ -172,13 +175,25 @@ public class Creature : MonoBehaviour
     }
     private void UpdateSatisfaction()
     {
-        dissatisfaction += timeIncrement * dissatisfactionMultiplier;
+        dissatisfaction += timeIncrement * Time.deltaTime;
 
         if (dissatisfaction > 1f)
             levelScript.RegisterCreatureMaximumDisatisfied();
 
         UpdateMaterials();
     }
+    public void StartDissatisfaction()
+    {
+        dissatisfaction = 0f;
+        doDissatisfaction = true;
+    }
+    public void StopDissatisfaction()
+    {
+        dissatisfaction = 0f;
+        doDissatisfaction = false;
+    }
+
+
     void UpdateMaterials()
     {
         if(IsSatisfied()) 
@@ -211,20 +226,6 @@ public class Creature : MonoBehaviour
     {
         foreach (var entry in taskList)
             SetParticleSystemState(entry, true);
-
-
-        //foreach (TaskStation.TaskType task in taskList)
-        //{
-        //    switch (task)
-        //    {
-        //        case TaskStation.TaskType.BATHING:
-        //            stinkPS.Play();
-        //            break;
-        //        case TaskStation.TaskType.FEEDING:
-        //            cryPS.Play();
-        //            break;
-        //    }
-        //}
     }
     void SetParticleSystemState(TaskStation.TaskType task, bool state)
     {
@@ -363,9 +364,9 @@ public class Creature : MonoBehaviour
     {
         Vector3 origin = transform.position;
         Vector3 direction = target - transform.position;
-        col.enabled = false;
+        colliderComp.enabled = false;
         bool output = Physics.SphereCast(new Ray(origin, direction), 0.25f, stats.viewRange);
-        col.enabled = true;
+        colliderComp.enabled = true;
         if (!output && assignTarget) targetPosition = target;
         return output;
     }
@@ -435,7 +436,7 @@ public class Creature : MonoBehaviour
     public void PickUp(Player player)
     {
         ChangeState(CreatureState.HELD);
-        col.enabled = false;
+        colliderComp.enabled = false;
         speed = 0f;
         isHeld = true;
         
@@ -445,11 +446,14 @@ public class Creature : MonoBehaviour
     public void PutDown()
     {
         ChangeState(CreatureState.RUN);
-        col.enabled = true;
+        colliderComp.enabled = true;
         isHeld = false;
         rigidbodyComp.velocity = Vector3.zero;
+
+        ApplyImpulse(Vector3.up, 10);
     }
     public void ApplyImpulse(Vector3 direction, float force) {
+        state = CreatureState.FALL;
         rigidbodyComp.velocity += direction * force;
     }
 

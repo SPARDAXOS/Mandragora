@@ -22,6 +22,9 @@ public struct CreatureStats
     public float maxRestDuration;
     [Range(0, 1f)]
     public float restProbability;
+    [Tooltip("Probability each second of escaping the held state each second.")]
+    [Range(0, 1f)]
+    public float escapeHeldProbability;
     [Tooltip("Time in seconds from the initial number of tasks.")]
     [Range(0, 120f)]
     public float timeUntilDissatisfied;
@@ -56,6 +59,7 @@ public class Creature : MonoBehaviour
     private bool active;
     public CreatureState state;
     private bool isHeld;
+    private float deltaHeldEscapeProbability;
 
     private float dissatisfactionMultiplier = 1f;
     private float timeIncrement;
@@ -74,6 +78,7 @@ public class Creature : MonoBehaviour
 
     private Rigidbody rigidbodyComp = null;
     private Collider colliderComp = null;
+    private Player player = null;
     private ParticleSystem stinkPS = null;
     private ParticleSystem cryPS = null;
     private ParticleSystem runDustPS = null;
@@ -89,6 +94,7 @@ public class Creature : MonoBehaviour
         SetupReferences();
 
         timeIncrement = (1f / stats.timeUntilDissatisfied);
+        CalculateEscapeProbability();
 
         accelerationIncrement = Time.fixedDeltaTime * stats.maxSpeed / stats.accelerationTime;
         decelerationIncrement = Time.fixedDeltaTime * stats.maxSpeed / stats.decelerationTime;
@@ -105,6 +111,9 @@ public class Creature : MonoBehaviour
     }
     public void Tick()
     {
+        if (!initialized)
+            return;
+
         if (doDissatisfaction)
             UpdateSatisfaction();
     }
@@ -312,7 +321,18 @@ public class Creature : MonoBehaviour
     }
     void HeldBehavior()
     {
-        
+        float random = UnityEngine.Random.value;
+
+        if(random < deltaHeldEscapeProbability && player)
+        {
+            player.DropHeldCreature();
+            ApplyImpulse(Vector3.up, 10f);
+        }
+    }
+
+    void CalculateEscapeProbability()
+    {
+        deltaHeldEscapeProbability = stats.escapeHeldProbability != 0 ? 1 - Mathf.Exp(Mathf.Log(1 - stats.escapeHeldProbability) / 60) : 0;
     }
 
     void CheckFallState()
@@ -443,6 +463,7 @@ public class Creature : MonoBehaviour
     }
     public void PickUp(Player player)
     {
+        this.player = player;
         ChangeState(CreatureState.HELD);
         colliderComp.enabled = false;
         speed = 0f;
@@ -456,6 +477,7 @@ public class Creature : MonoBehaviour
         ChangeState(CreatureState.FALL);
         colliderComp.enabled = true;
         isHeld = false;
+        player = null;
     }
     public void ApplyImpulse(Vector3 direction, float force) {
         rigidbodyComp.velocity = direction * force;

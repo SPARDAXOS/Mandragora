@@ -108,6 +108,7 @@ MonoBehaviour:
     viewRange: 10
     maxRestDuration: 1
     restProbability: 0.05
+    escapeHeldProbability: 0.5
     timeUntilDissatisfied: 120
   drawAIGizmos: 1
   taskList: 0100000002000000

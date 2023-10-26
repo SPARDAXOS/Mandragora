@@ -322,6 +322,8 @@ public class Creature : MonoBehaviour
     }
     void HeldBehavior()
     {
+        rigidbodyComp.velocity = Vector3.zero;
+
         if (!doEscapeHeld) 
             return;
 

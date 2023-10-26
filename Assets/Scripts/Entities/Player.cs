@@ -11,14 +11,20 @@ public class Player : MonoBehaviour {
     }
 
     [SerializeField] private PlayerStats stats;
+
+    [Header("Pickup")]
     [SerializeField] private float pickupCheckBoxSize = 1.0f;
     [SerializeField] private Vector3 pickupCheckOffset;
     [SerializeField] private LayerMask pickupMask;
     [SerializeField] private Vector3 pickupBoxColliderSize;
     [SerializeField] private Vector3 pickupBoxColliderOffset;
- 
+
+    [Header("Navigation")]
+    [SerializeField] private float pathCheckOffset = 0.1f;
+
     [Header("Debugging")]
     [SerializeField] private bool showPickupTrigger = true;
+    [SerializeField] private bool showPathCheck = true;
 
 
     private PlayerType playerType = PlayerType.NONE;
@@ -34,6 +40,8 @@ public class Player : MonoBehaviour {
     private bool isGrounded = false;
     private bool isDashing = false;
     private bool isStunned = false;
+
+    private bool pathBlocked = false;
 
 
     public float currentSpeed = 0.0f;
@@ -450,44 +458,37 @@ public class Player : MonoBehaviour {
         dashCooldownTimer = stats.dashCooldown;
     }
     private void ApplyDashRetainedSpeed(Vector3 target) {
-
         target.y = 0.0f; //Just in case
         direction = target;
         currentSpeed = stats.maxSpeed * stats.retainedSpeed;
-
-
-
-        //Vector3 directionToHit = target - transform.position;
-        //directionToHit.y = 0.0f;
-        //direction = -directionToHit;
-        //currentSpeed = stats.maxSpeed * stats.retainedSpeed;
     }
 
     private void CheckCollidingObject() {
         Vector3 origin = transform.position;
         origin.y += 0.01f;
-
-        float offsetForward = 0.1f;
-        origin.x -= offsetForward * transform.forward.x;
-        origin.z -= offsetForward * transform.forward.z;
-
-
-        //origin.x *= -transform.forward.x * offsetForward;
-        //origin.z *= -transform.forward.z * offsetForward;
+        origin.x -= pathCheckOffset * transform.forward.x;
+        origin.z -= pathCheckOffset * transform.forward.z;
 
         RaycastHit hit;
-        if (Physics.BoxCast(origin, normalBoxColliderSize / 2, transform.forward, out hit, transform.rotation, offsetForward)) {
-            Debug.LogWarning(hit.collider.name);
-            
+        if (Physics.BoxCast(origin, normalBoxColliderSize / 2, transform.forward, out hit, transform.rotation, pathCheckOffset * 2)) {
+            Debug.LogWarning("Blocked by " + hit.collider.name);
+            pathBlocked = true;
+
+
+
+
+
             if (isDashing) {
                 StopDashing();
                 Vector3 targetDirection = hit.point - transform.position;
                 targetDirection.Normalize();
-                ApplyDashRetainedSpeed(targetDirection);
+                ApplyDashRetainedSpeed(-targetDirection);
 
-                Debug.LogWarning("Dash Stopped cause object!");
+                Debug.LogWarning("Dash Stopped cause touching!!");
             }
         }
+        else
+            pathBlocked = false;
     }
 
 
@@ -545,22 +546,19 @@ public class Player : MonoBehaviour {
             Gizmos.DrawCube(boxcastOrigin, boxSize);
         }
 
-
-        Vector3 ownPos = transform.position;
-        Vector3 target = transform.position;
-        float offset = 1.0f;
-
-
-        ownPos.x = ownPos.x - (offset * transform.forward.x);
-        ownPos.z = ownPos.z - (offset * transform.forward.z);
-        target.x += (offset * transform.forward.x);
-        target.z += (offset * transform.forward.z);
-
-
-
-        Gizmos.color = Color.blue;
-        Gizmos.DrawCube(ownPos, Vector3.one);
-        Gizmos.color = Color.red;
-        Gizmos.DrawCube(target, Vector3.one);
+        if (showPathCheck) {
+            Vector3 start = transform.position;
+            Vector3 target = transform.position;
+      
+            start.x -= pathCheckOffset * transform.forward.x;
+            start.z -= pathCheckOffset * transform.forward.z;
+            target.x += pathCheckOffset * transform.forward.x;
+            target.z += pathCheckOffset * transform.forward.z;
+        
+            Gizmos.color = Color.blue;
+            Gizmos.DrawCube(start, normalBoxColliderSize);
+            Gizmos.color = Color.red;
+            Gizmos.DrawCube(target, normalBoxColliderSize);
+        }
     }
 }

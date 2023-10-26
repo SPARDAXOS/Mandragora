@@ -95,6 +95,23 @@ MonoBehaviour:
       m_Action: Dash
       m_Flags: 0
     m_Flags: 0
+  throwAway:
+    m_Name: Throw Away
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 7d7ad6ef-8fc1-4280-a3f6-69a82c005a67
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 5513bb7a-0889-4f09-8389-1e4d29c63510
+      m_Path: <Keyboard>/q
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Throw Away
+      m_Flags: 0
+    m_Flags: 0
   pause:
     m_Name: Pause
     m_Type: 0

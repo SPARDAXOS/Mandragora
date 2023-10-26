@@ -13,7 +13,9 @@ public class Player : MonoBehaviour {
     [SerializeField] private float pickupCheckBoxSize = 1.0f;
     [SerializeField] private Vector3 pickupCheckOffset;
     [SerializeField] private LayerMask pickupMask;
-
+    [SerializeField] private Vector3 pickupBoxColliderSize;
+    [SerializeField] private Vector3 pickupBoxColliderOffset;
+ 
     [Header("Debugging")]
     [SerializeField] private bool showPickupTrigger = true;
 
@@ -39,6 +41,9 @@ public class Player : MonoBehaviour {
 
     private Vector3 direction;
 
+    private Vector3 normalBoxColliderSize;
+    private Vector3 normalBoxColliderOffset;
+
     private bool inTaskStationRange = false;
 
     private GameObject pickupPoint = null;
@@ -54,6 +59,7 @@ public class Player : MonoBehaviour {
     private Creature heldCreature = null;
 
     private Rigidbody rigidbodyComp = null;
+    private BoxCollider boxColliderComp = null;
     private MeshRenderer meshRendererComp = null;
     private Material mainMaterial;
 
@@ -83,6 +89,13 @@ public class Player : MonoBehaviour {
         rigidbodyComp = GetComponent<Rigidbody>();
         if (!rigidbodyComp)
             GameInstance.Abort("Failed to get Rigidbody component on " + gameObject.name);
+
+        boxColliderComp = GetComponent<BoxCollider>();
+        if (!boxColliderComp)
+            GameInstance.Abort("Failed to get BoxCollider component on " + gameObject.name);
+
+        normalBoxColliderSize = boxColliderComp.size;
+        normalBoxColliderOffset = boxColliderComp.center;
     }
 
 
@@ -308,8 +321,7 @@ public class Player : MonoBehaviour {
                     StopDashing(transform.forward);
                 }
 
-                heldCreature = script;
-                heldCreature.PickUp(this);
+                PickupCreature(script);
             }
         }
     }
@@ -320,6 +332,9 @@ public class Player : MonoBehaviour {
         //heldCreature.transform.position = Vector3.Lerp(heldCreature.transform.position, pickupPoint.transform.position, 0.01f);
         heldCreature.transform.position = pickupPoint.transform.position;
     }
+
+
+
 
     public bool IsInteractingTrigger() {
         return isInteractingTrigger;
@@ -340,12 +355,27 @@ public class Player : MonoBehaviour {
         return playerType;
     }
 
+
+
     public void SetInTaskStationRange(bool state) {
         inTaskStationRange = state;
     }
 
+
+
+
+
     public Creature GetHeldCreature() {
         return heldCreature;
+    }
+    public void PickupCreature(Creature target) {
+        if (!target)
+            return;
+
+        heldCreature = target;
+        heldCreature.PickUp(this);
+        boxColliderComp.size = pickupBoxColliderSize;
+        boxColliderComp.center = pickupBoxColliderOffset;
     }
     public void DropHeldCreature() {
         if (!heldCreature)
@@ -354,6 +384,8 @@ public class Player : MonoBehaviour {
         //Disable VFX
         heldCreature.PutDown();
         heldCreature = null;
+        boxColliderComp.size = normalBoxColliderSize;
+        boxColliderComp.center = normalBoxColliderOffset;
     }
 
 
@@ -429,9 +461,11 @@ public class Player : MonoBehaviour {
             else
                 script.ApplyKnockback(knockbackDirection, stats.knockbackForce / 2);
 
+
             if (heldCreature) {
-                heldCreature.PutDown();
-                heldCreature = null;
+                DropHeldCreature();
+                //heldCreature.PutDown();
+                //heldCreature = null;
             }
         }
 

@@ -286,13 +286,23 @@ public class Player : MonoBehaviour {
         isGrounded = Physics.BoxCast(startingPosition, Vector3.one / 2, -transform.up, transform.rotation, 1.0f);
     }
     private void CheckPath() {
+
+
+        //Compensate the center of the colliders too!!
+
         Vector3 origin = transform.position;
         origin.y += 0.01f;
         origin.x -= pathCheckOffset * transform.forward.x;
         origin.z -= pathCheckOffset * transform.forward.z;
 
+        Vector3 halfExtent;
+        if (heldCreature)
+            halfExtent = pickupBoxColliderSize / 2;
+        else
+            halfExtent = normalBoxColliderSize / 2;
+
         RaycastHit hit;
-        if (Physics.BoxCast(origin, normalBoxColliderSize / 2, transform.forward, out hit, transform.rotation, pathCheckOffset * 2)) {
+        if (Physics.BoxCast(origin, halfExtent, transform.forward, out hit, transform.rotation, pathCheckOffset * 2)) {
             if (hit.collider.CompareTag("Player") || hit.collider.CompareTag("Creature")) {
                 pathBlocked = false;
                 return;
@@ -339,7 +349,7 @@ public class Player : MonoBehaviour {
             CheckReverse(input);
 
             direction = new Vector3(input.x, 0.0f, input.y);
-            if(!pathBlocked)
+            if (!pathBlocked)
                 Accelerate();
         }
         else if (currentSpeed > 0.0f)
@@ -380,7 +390,7 @@ public class Player : MonoBehaviour {
         //WORKS BUT QUESTIONABLE!
         if (pathBlocked) {
             //rigidbodyComp.velocity = Vector3.zero;
-            //currentSpeed *= stats.speedRetainedOnHit;
+            currentSpeed *= stats.speedRetainedOnHit;
             //return;
         }
 
@@ -594,11 +604,20 @@ public class Player : MonoBehaviour {
             start.z -= pathCheckOffset * transform.forward.z;
             target.x += pathCheckOffset * transform.forward.x;
             target.z += pathCheckOffset * transform.forward.z;
-        
+
+            //Compensate the center of the colliders too!!
+
+
+            Vector3 Extent;
+            if (heldCreature)
+                Extent = pickupBoxColliderSize;
+            else
+                Extent = normalBoxColliderSize;
+
             Gizmos.color = Color.blue;
-            Gizmos.DrawCube(start, normalBoxColliderSize);
+            Gizmos.DrawCube(start, Extent);
             Gizmos.color = Color.red;
-            Gizmos.DrawCube(target, normalBoxColliderSize);
+            Gizmos.DrawCube(target, Extent);
         }
     }
 }

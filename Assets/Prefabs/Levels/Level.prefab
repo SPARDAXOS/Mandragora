@@ -2496,7 +2496,7 @@ MonoBehaviour:
   CreaturePrefab: {fileID: 6999313860858921807, guid: 41f4ed135d66d76409942cc5a6c18654, type: 3}
   creaturesCount: 7
   spawnPointCalculationRetries: 10
-  spawnHeightOffset: 5
+  spawnHeightOffset: 10
   currentSatisfiedCreatures: 0
 --- !u!1 &9007967179712997531
 GameObject:

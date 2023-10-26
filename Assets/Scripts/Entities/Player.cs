@@ -30,6 +30,7 @@ public class Player : MonoBehaviour {
     public bool isGrounded = false;
     public bool isDashing = false;
     public bool isStunned = false;
+    private bool isThrowingTrigger = false;
 
 
     public float currentSpeed = 0.0f;
@@ -101,6 +102,7 @@ public class Player : MonoBehaviour {
         CheckInput();
         CheckDash();
         CheckPickup();
+        CheckThrow();
     }
     public void FixedTick() {
         if (!initialized)
@@ -133,6 +135,7 @@ public class Player : MonoBehaviour {
         activeControlScheme.movement.Enable();
         activeControlScheme.interact.Enable();
         activeControlScheme.dash.Enable();
+        activeControlScheme.throwAway.Enable();
         activeControlScheme.pause.Enable();
     }
     public void DisableInput() {
@@ -140,25 +143,29 @@ public class Player : MonoBehaviour {
         activeControlScheme.movement.Disable();
         activeControlScheme.interact.Disable();
         activeControlScheme.dash.Disable();
+        activeControlScheme.throwAway.Disable();
         activeControlScheme.pause.Disable();
     }
     public void EnableMovement() {
         activeControlScheme.movement.Enable();
+        activeControlScheme.dash.Enable();
     }
     public void DisableMovement() {
         activeControlScheme.movement.Disable();
+        activeControlScheme.dash.Disable();
     }
 
     public void EnableInteractionInput() {
         activeControlScheme.movement.Enable();
         activeControlScheme.interact.Enable();
         activeControlScheme.dash.Enable();
-
+        activeControlScheme.throwAway.Enable();
     }
     public void DisableInteractionInput() {
         activeControlScheme.movement.Disable();
         activeControlScheme.interact.Disable();
         activeControlScheme.dash.Disable();
+        activeControlScheme.throwAway.Disable();
     }
 
     private void CheckDash() {
@@ -169,17 +176,24 @@ public class Player : MonoBehaviour {
             direction = transform.forward;
         }
     }
+    private void CheckThrow() {
+        if (isThrowingTrigger) {
+            if (!heldCreature)
+                return;
+            else {
+                Vector3 throwDirection = transform.forward;
+                throwDirection.y = Mathf.Sin(Mathf.Deg2Rad * stats.throwHeightAngle);
+                heldCreature.ApplyImpulse(throwDirection, stats.throwForce);
+                DropHeldCreature();
+            }
+        }
+    }
     private void CheckPickup() {
         if (isInteractingTrigger) {
             if (!heldCreature)
                 Pickup();
-            else if (heldCreature && !inTaskStationRange) {
-                //Doesnt work!
-                Vector3 direction = transform.forward;
-                direction.y = 1.0f;
-                heldCreature.ApplyImpulse(direction, 200.0f);
+            else if (heldCreature && !inTaskStationRange)
                 DropHeldCreature();
-            }
         }
     }
     private void CheckInput() {
@@ -188,9 +202,9 @@ public class Player : MonoBehaviour {
 
         isInteractingTrigger = activeControlScheme.interact.triggered;
         isDashingTrigger = activeControlScheme.dash.triggered;
+        isThrowingTrigger = activeControlScheme.throwAway.triggered;
         isInteractingHeld = activeControlScheme.interact.IsPressed();
         isMoving = activeControlScheme.movement.IsPressed();
-
 
         if (activeControlScheme.pause.triggered)
             gameInstance.PauseGame();
@@ -321,6 +335,9 @@ public class Player : MonoBehaviour {
     public bool IsDashing() {
         return isDashing;
     }
+    public bool IsThrowing() {
+        return isThrowingTrigger;
+    }
     public PlayerType GetPlayerType() {
         return playerType;
     }
@@ -360,6 +377,7 @@ public class Player : MonoBehaviour {
             stunTimer += duration;
         else
             stunTimer = duration;
+
 
         if (stunTimer > 0.0f) {
             DisableInteractionInput();

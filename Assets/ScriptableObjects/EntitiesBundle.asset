@@ -21,6 +21,8 @@ MonoBehaviour:
     resource: {fileID: 6595343267326584282, guid: 45c4030c803345249a5c631cf3c735de, type: 3}
   - name: SoundManager
     resource: {fileID: 7906748765533704297, guid: 96001c6e814683147a8b74e3270a9c06, type: 3}
+  - name: TutorialSequencer
+    resource: {fileID: 8719757065877370611, guid: 175b544ce79c616439f8b4682dc8b996, type: 3}
   - name: MainMenu
     resource: {fileID: 6427310810563698336, guid: 15660ac71df7aef4390c9e1dbd7d31c5, type: 3}
   - name: PauseMenu

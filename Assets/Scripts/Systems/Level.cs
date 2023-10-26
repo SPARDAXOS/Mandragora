@@ -3,6 +3,8 @@ using Mandragora;
 using System.Collections.Generic;
 using Unity.AI.Navigation;
 using UnityEngine.AI;
+using Unity.VisualScripting;
+using static UnityEngine.EventSystems.EventTrigger;
 
 public class Level : MonoBehaviour {
 
@@ -15,6 +17,8 @@ public class Level : MonoBehaviour {
     [Range(0.0f, 10.0f)][SerializeField] private float spawnHeightOffset = 7.0f;
 
     private bool initialize = false;
+
+    public uint currentSatisfiedCreatures = 0;
 
     float leftNavMeshEdge  = 0.0f;
     float rightNavMeshEdge = 0.0f;
@@ -31,7 +35,9 @@ public class Level : MonoBehaviour {
     private List<Creature> creatures = new List<Creature>();
     private TaskStation[] taskStations;
 
-    public Bounds navMeshBounds = new Bounds();
+    private Bounds navMeshBounds = new Bounds();
+
+    private Creature tutorialCreature = null;
 
 
     public void Initialize(GameInstance instance) {
@@ -49,6 +55,11 @@ public class Level : MonoBehaviour {
 
         foreach (var entry in taskStations)
             entry.Tick();
+
+        if (gameInstance.IsGameStarted()) {
+            foreach (var entry in creatures)
+                entry.Tick();
+        }
     }
     public void FixedTick() {
         if (gameInstance.IsGameStarted()) {
@@ -93,7 +104,7 @@ public class Level : MonoBehaviour {
         for (uint i = 0; i < creaturesCount; i++) {
             GameObject go = Instantiate(CreaturePrefab);
             Creature script = go.GetComponent<Creature>();
-            script.Initialize();
+            script.Initialize(this);
             script.SetActive(false);
             creatures.Add(script);
         }
@@ -107,7 +118,7 @@ public class Level : MonoBehaviour {
         for (uint i = 0; i < spawnPointCalculationRetries; i++) {
             float randomX = Random.Range(leftNavMeshEdge, rightNavMeshEdge);
             float randomZ = Random.Range(lowerNavMeshEdge, upperNavMeshEdge);
-            Vector3 randomPoint = new Vector3(randomX, navMeshBounds.center.y, randomZ);
+            Vector3 randomPoint = new Vector3(randomX, gameObject.transform.position.y, randomZ);
             if (NavMesh.SamplePosition(randomPoint, out hit, 1.0f, NavMesh.AllAreas))
                 return hit.position;
         }
@@ -115,6 +126,9 @@ public class Level : MonoBehaviour {
     }
     private void RandomizeCreatureSpawns() {
         foreach(var creature in creatures) {
+            if (!creature.GetActive())
+                continue;
+
             Vector3 spawnPosition = GetRandomPointOnNavMesh();
             spawnPosition.y += spawnHeightOffset;
             creature.transform.position = spawnPosition;
@@ -129,10 +143,40 @@ public class Level : MonoBehaviour {
     }
 
 
+    public void RegisterCreatureMaximumDisatisfied() {
+        gameInstance.LevelFinished(GameInstance.GameResults.LOSE);
+    }
+    public void RegisterSatisfiedCreature() {
+        currentSatisfiedCreatures++;
+        if (currentSatisfiedCreatures == creaturesCount) {
+            gameInstance.LevelFinished(GameInstance.GameResults.WIN);
+        }
+    }
+
+
+    public Creature StartTutorial() {
+        if (tutorialCreature)
+            return tutorialCreature;
+
+        tutorialCreature = creatures[0];
+        tutorialCreature.ClearAllTasks();
+        tutorialCreature.SetActive(true);
+        tutorialCreature.SetupStartState();
+        Vector3 spawnPosition = GetRandomPointOnNavMesh();
+        spawnPosition.y += spawnHeightOffset;
+        tutorialCreature.transform.position = spawnPosition;
+        return tutorialCreature;
+    }
+
+
     public void StartLevel() {
-        foreach (var entry in creatures)
+        foreach (var entry in creatures) {
+            //Might cause problems. The order of execution.
             entry.SetActive(true);
+            entry.SetupStartState();
+        }
         RandomizeCreatureSpawns();
+        currentSatisfiedCreatures = 0;
     }
     public void GameOver() {
 

@@ -2,12 +2,15 @@ using Mandragora;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static Player;
 
 public class TaskStation : MonoBehaviour {
     public enum TaskType {
         NONE = 0,
         BATHING,
-        FEEDING
+        FEEDING,
+        HEALING,
+        SLEEPING
     }
     public enum ActionType {
         MASH,
@@ -30,12 +33,15 @@ public class TaskStation : MonoBehaviour {
 
     [Space(10)]
     [Header("QTE")]
-    [SerializeField] private KeyCode[] possibleQTEKeys;
+    [SerializeField] private KeyCode[] player1PossibleQTEKeys;
+    [SerializeField] private KeyCode[] player2PossibleQTEKeys;
     [Range(1, 10)][SerializeField] private uint QTECount = 5;
 
 
 
     private bool initialized = false;
+
+    private PlayerType playerType = PlayerType.NONE;
 
     private MainCamera cameraScript = null;
     private Player targetPlayer = null;
@@ -190,26 +196,36 @@ public class TaskStation : MonoBehaviour {
     }
 
     private void CompleteInteraction() {
-        interactionOngoing = false;
-        DisableInteraction();
-        DisableParticleSystem();
+        EndInteraction();
         sparklePS.Play();
-        //-Gets picked up creature and toggles off TaskType!
-        targetPlayer.EnableMovement();
+        targetPlayer.GetHeldCreature().CompleteTask(taskType); //This crashed! //FIX THIS HERE!!!!!!! IDK HOW IT CRASHED!
     }
 
 
     private void CheckInput() {
-        //And ONLY if current held creature requires the TaskType that this station provides!
+        Creature creature = targetPlayer.GetHeldCreature();
+        if (!creature)
+            return;
+        if (!creature.DoesRequireTask(taskType))
+            return;
+
         if (targetPlayer.IsInteractingTrigger())
-            Intearct();
+            StartInteraction();
     }
-    private void Intearct() {
+    private void StartInteraction() {
         interactionOngoing = true;
+        playerType = targetPlayer.GetPlayerType();
         EnableInteraction();
         EnableParticleSystem();
         targetPlayer.DisableMovement();
         interactionIndicator.SetActive(false);
+    }
+    private void EndInteraction() {
+        interactionOngoing = false;
+        playerType = PlayerType.NONE;
+        DisableInteraction();
+        DisableParticleSystem();
+        targetPlayer.EnableMovement();
     }
 
 
@@ -217,8 +233,20 @@ public class TaskStation : MonoBehaviour {
         if (taskType == TaskType.BATHING)
             bathBubblePS.Play();
 
+        //Feeding
+        //Healing
+        //Sleeping
 
     }
+    private void DisableParticleSystem() {
+        if (taskType == TaskType.BATHING)
+            bathBubblePS.Stop();
+
+        //Feeding
+        //Healing
+        //Sleeping
+    }
+
     private void EnableInteraction() {
         if (actionType == ActionType.MASH || actionType == ActionType.HOLD) {
             normalBarFrame.SetActive(true);
@@ -248,18 +276,25 @@ public class TaskStation : MonoBehaviour {
             QTEBarAnimationComp.Stop();
         }
     }
-    private void DisableParticleSystem() {
-        if (taskType == TaskType.BATHING)
-            bathBubblePS.Stop();
 
-    }
 
 
     private void UpdateQTE() {
         KeyCode NewQTE = currentTargetQTE;
-        while(NewQTE == currentTargetQTE) {
-            int rand = UnityEngine.Random.Range(0, possibleQTEKeys.Length);
-            NewQTE = possibleQTEKeys[rand];
+        int rand = 0;
+        while (NewQTE == currentTargetQTE) {
+            if (playerType == PlayerType.PLAYER_1) {
+                rand = UnityEngine.Random.Range(0, player1PossibleQTEKeys.Length);
+                NewQTE = player1PossibleQTEKeys[rand];
+            }
+            else if (playerType == PlayerType.PLAYER_2) {
+                rand = UnityEngine.Random.Range(0, player2PossibleQTEKeys.Length);
+                NewQTE = player2PossibleQTEKeys[rand];
+            }
+            else {
+                Debug.LogError("Infinite loop detected at UpdateQTE() - TaskStation");
+                return;
+            }
         }
 
         currentTargetQTE = NewQTE;
@@ -270,6 +305,7 @@ public class TaskStation : MonoBehaviour {
     }
 
 
+    //VERY BUGGY
     //NOTES:
     //Gets a bit finicky if a player leaves while another is already in.
     //-Also when both players are in but the second one in tries to interact!
@@ -277,6 +313,7 @@ public class TaskStation : MonoBehaviour {
     private void OnTriggerEnter(Collider other) {
         if (!targetPlayer && other.CompareTag("Player")) {
             targetPlayer = other.GetComponent<Player>();
+            targetPlayer.SetInTaskStationRange(true);
             playerInRange = true;
             interactionIndicator.SetActive(true);
         }
@@ -285,6 +322,10 @@ public class TaskStation : MonoBehaviour {
         if (targetPlayer && other.CompareTag("Player")) {
             var script = other.GetComponent<Player>();
             if (targetPlayer == script) {
+                if (interactionOngoing)
+                    EndInteraction();
+
+                targetPlayer.SetInTaskStationRange(false);
                 targetPlayer = null;
                 playerInRange = false;
                 interactionIndicator.SetActive(false);

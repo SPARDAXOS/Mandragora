@@ -117,6 +117,7 @@ MonoBehaviour:
   changeMaterialOn: {fileID: 80657961753095836}
   dissatisfaction: 0
   doDissatisfaction: 0
+  doEscapeHeld: 1
   state: 0
 --- !u!1001 &1405697963936289669
 PrefabInstance:

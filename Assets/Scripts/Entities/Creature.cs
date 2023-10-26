@@ -51,6 +51,7 @@ public class Creature : MonoBehaviour
     [Range (0, 1f)]
     [SerializeField] private float dissatisfaction;
     public bool doDissatisfaction;
+    public bool doEscapeHeld;
 
     private List<TaskStation.TaskType> queueTasks;
     private int numTasksAtStart;
@@ -321,12 +322,15 @@ public class Creature : MonoBehaviour
     }
     void HeldBehavior()
     {
+        if (!doEscapeHeld) 
+            return;
+
         float random = UnityEngine.Random.value;
 
         if(random < deltaHeldEscapeProbability && player)
         {
             player.DropHeldCreature();
-            ApplyImpulse(Vector3.up, 10f);
+            ApplyImpulse(Vector3.up + RandomDirection(), 5f);
         }
     }
 

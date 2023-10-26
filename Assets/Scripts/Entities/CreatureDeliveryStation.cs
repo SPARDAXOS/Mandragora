@@ -11,7 +11,7 @@ public class CreatureDeliveryStation : MonoBehaviour {
             if (!creature)
                 return;
 
-            if (!creature.IsSatisfied())
+            if (!creature.IsSatisfied() || creature.GetTutorialCreature())
                 return;
 
             creature.RegisterSatisfied();

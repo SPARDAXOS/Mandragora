@@ -1,5 +1,6 @@
 using Mandragora;
 using UnityEngine;
+using static UnityEngine.UI.Image;
 
 public class Player : MonoBehaviour {
 
@@ -24,22 +25,23 @@ public class Player : MonoBehaviour {
 
     private bool initialized = false;
     private bool isMoving = false;
+    private bool isInteractingHeld = false;
     private bool isInteractingTrigger = false;
     private bool isDashingTrigger = false;
-    private bool isInteractingHeld = false;
+    private bool isThrowingTrigger = false;
 
     private bool isKnockedback = false;
-    public bool isGrounded = false;
-    public bool isDashing = false;
-    public bool isStunned = false;
-    private bool isThrowingTrigger = false;
+    private bool isGrounded = false;
+    private bool isDashing = false;
+    private bool isStunned = false;
 
 
     public float currentSpeed = 0.0f;
     public float dashTimer = 0.0f;
+    public float dashCooldownTimer = 0.0f;
     public float stunTimer = 0.0f;
 
-    private Vector3 direction;
+    public Vector3 direction;
 
     private Vector3 normalBoxColliderSize;
     private Vector3 normalBoxColliderOffset;
@@ -97,7 +99,18 @@ public class Player : MonoBehaviour {
         normalBoxColliderSize = boxColliderComp.size;
         normalBoxColliderOffset = boxColliderComp.center;
     }
+    public void SetupStartingState() {
 
+        //More proper stop!
+        isKnockedback = false;
+        isDashing = false;
+        isStunned = false;
+
+        currentSpeed = 0.0f;
+        dashTimer = 0.0f;
+        dashCooldownTimer = 0.0f;
+        stunTimer = 0.0f;
+    }
 
 
     public void Tick() {
@@ -108,7 +121,7 @@ public class Player : MonoBehaviour {
 
 
         UpdateStunTimer();
-        UpdateDashTimer();
+        UpdateDashTimers();
         UpdateHeldCreature();
 
         CheckGrounded();
@@ -116,6 +129,7 @@ public class Player : MonoBehaviour {
         CheckDash();
         CheckPickup();
         CheckThrow();
+        CheckCollidingObject();
     }
     public void FixedTick() {
         if (!initialized)
@@ -181,7 +195,13 @@ public class Player : MonoBehaviour {
         activeControlScheme.throwAway.Disable();
     }
 
+
+
+
     private void CheckDash() {
+        if (isStunned || !isGrounded || dashCooldownTimer > 0.0f)
+            return;
+
         if (isDashingTrigger && !isDashing) {
             isDashing = true;
             rigidbodyComp.velocity = transform.forward * stats.dashSpeed;
@@ -195,7 +215,9 @@ public class Player : MonoBehaviour {
                 return;
             else {
                 Vector3 throwDirection = transform.forward;
+                throwDirection.x *= Mathf.Cos(Mathf.Deg2Rad * stats.throwHeightAngle);
                 throwDirection.y = Mathf.Sin(Mathf.Deg2Rad * stats.throwHeightAngle);
+                throwDirection.z *= Mathf.Cos(Mathf.Deg2Rad * stats.throwHeightAngle);
                 heldCreature.ApplyImpulse(throwDirection, stats.throwForce);
                 DropHeldCreature();
             }
@@ -273,16 +295,21 @@ public class Player : MonoBehaviour {
         isGrounded = Physics.BoxCast(startingPosition, Vector3.one / 2, -transform.up, transform.rotation, 1.0f);
     }
 
-    private void UpdateDashTimer() {
+    private void UpdateDashTimers() {
+
+        if (dashCooldownTimer > 0.0f) {
+            dashCooldownTimer -= Time.deltaTime;
+            if (dashCooldownTimer < 0.0f)
+                dashCooldownTimer = 0.0f;
+        }
+
         if (dashTimer > 0.0f) {
             dashTimer -= Time.deltaTime;
             if (dashTimer <= 0.0f) {
-                //StopDashing(-transform.forward);
-                //
-                dashTimer = 0.0f;
-                isDashing = false;
-                currentSpeed = stats.maxSpeed * stats.retainedSpeed;
-                Debug.Log("Dashing finished!");
+                StopDashing();
+                ApplyDashRetainedSpeed(transform.forward);
+                //currentSpeed = stats.maxSpeed * stats.retainedSpeed;
+                Debug.LogWarning("Dashing finished!");
             }
         }
     }
@@ -317,8 +344,10 @@ public class Player : MonoBehaviour {
                     continue;
                 }
                 if (isDashing) {
-                    Debug.Log("Dash interrupted by pickup!");
-                    StopDashing(transform.forward);
+                    Debug.LogWarning("Dash interrupted by pickup!");
+                    StopDashing();
+                    //Weird!
+                    ApplyDashRetainedSpeed(transform.forward);
                 }
 
                 PickupCreature(script);
@@ -329,7 +358,7 @@ public class Player : MonoBehaviour {
         if (!heldCreature)
             return;
 
-        //heldCreature.transform.position = Vector3.Lerp(heldCreature.transform.position, pickupPoint.transform.position, 0.01f);
+        //heldCreature.transform.position = Vector3.Lerp(heldCreature.transform.position, pickupPoint.transform.position, 1.0f);
         heldCreature.transform.position = pickupPoint.transform.position;
     }
 
@@ -356,7 +385,9 @@ public class Player : MonoBehaviour {
     }
 
 
-
+    public bool GetInTaskStationRange() {
+        return inTaskStationRange;
+    }
     public void SetInTaskStationRange(bool state) {
         inTaskStationRange = state;
     }
@@ -394,8 +425,6 @@ public class Player : MonoBehaviour {
             return;
 
         rigidbodyComp.velocity = Vector3.zero;
-
-        //rigidbodyComp.velocity = direction * force;
         ApplyImpulse(direction, force);
         isKnockedback = true;
     }
@@ -415,64 +444,90 @@ public class Player : MonoBehaviour {
             isStunned = true;
         }
     }
-    private void StopDashing(Vector3 retainedSpeedDirection) {
+    private void StopDashing() {
         isDashing = false;
         dashTimer = 0.0f;
+        dashCooldownTimer = stats.dashCooldown;
+    }
+    private void ApplyDashRetainedSpeed(Vector3 target) {
 
-        Vector3 directionToHit = retainedSpeedDirection - transform.position;
-        directionToHit.y = 0.0f;
-        direction = -directionToHit;
+        target.y = 0.0f; //Just in case
+        direction = target;
         currentSpeed = stats.maxSpeed * stats.retainedSpeed;
+
+
+
+        //Vector3 directionToHit = target - transform.position;
+        //directionToHit.y = 0.0f;
+        //direction = -directionToHit;
+        //currentSpeed = stats.maxSpeed * stats.retainedSpeed;
     }
 
+    private void CheckCollidingObject() {
+        Vector3 origin = transform.position;
+        origin.y += 0.01f;
 
-    private void OnCollisionStay(Collision collision) {
-        if (collision == null)
-            return;
+        float offsetForward = 0.1f;
+        origin.x -= offsetForward * transform.forward.x;
+        origin.z -= offsetForward * transform.forward.z;
 
-        if (collision.collider.CompareTag("Floor"))
-            return;
 
-        //Move stop dashing to func
-        if (isDashing) {
-            StopDashing(collision.GetContact(0).point);
+        //origin.x *= -transform.forward.x * offsetForward;
+        //origin.z *= -transform.forward.z * offsetForward;
 
-            Debug.Log("Adjusted direction while dash hit! - stay");
+        RaycastHit hit;
+        if (Physics.BoxCast(origin, normalBoxColliderSize / 2, transform.forward, out hit, transform.rotation, offsetForward)) {
+            Debug.LogWarning(hit.collider.name);
+            
+            if (isDashing) {
+                StopDashing();
+                Vector3 targetDirection = hit.point - transform.position;
+                targetDirection.Normalize();
+                ApplyDashRetainedSpeed(targetDirection);
+
+                Debug.LogWarning("Dash Stopped cause object!");
+            }
         }
     }
+
+
     private void OnCollisionEnter(Collision collision) {
 
         if (collision == null)
             return;
-
-
 
         if (collision.collider.CompareTag("Player")) {
             var script = collision.collider.GetComponent<Player>();
 
             Vector3 knockbackDirection = script.transform.position - transform.position;
             knockbackDirection.Normalize();
+
+            knockbackDirection.x *= Mathf.Cos(Mathf.Deg2Rad * stats.knockbackHeightAngle);
             knockbackDirection.y = Mathf.Sin(Mathf.Deg2Rad * stats.knockbackHeightAngle);
+            knockbackDirection.z *= Mathf.Cos(Mathf.Deg2Rad * stats.knockbackHeightAngle);
+
+
             if (isDashing) {
-                script.ApplyKnockback(knockbackDirection, (stats.knockbackForce / 2) * stats.knockbackMultiplier);
+                if (heldCreature) {
+                    heldCreature.ApplyImpulse(Vector3.up, stats.dashCreatureDropForce);
+                    DropHeldCreature();
+                }
+                StopDashing();
+                Vector3 targetDirection = collision.GetContact(0).point - transform.position;
+                targetDirection.Normalize();
+                ApplyDashRetainedSpeed(-targetDirection); //nOT REALLY NEEDED HERE!
+
                 ApplyStun(stats.stunDuration, false);
-                Debug.Log("Stunned!");
+                script.ApplyKnockback(knockbackDirection, (stats.knockbackForce / 2) * stats.knockbackMultiplier);
+                Debug.LogWarning("Dash Stopped cause hit player!");
             }
-            else
+            else {
+                if (heldCreature) {
+                    heldCreature.ApplyImpulse(Vector3.up, stats.knockbackCreatureDropForce);
+                    DropHeldCreature();
+                }
                 script.ApplyKnockback(knockbackDirection, stats.knockbackForce / 2);
-
-
-            if (heldCreature) {
-                DropHeldCreature();
-                //heldCreature.PutDown();
-                //heldCreature = null;
             }
-        }
-
-        if (isDashing) {
-            StopDashing(collision.GetContact(0).point);
-
-            Debug.Log("Adjusted direction while dash hit!");
         }
     }
 
@@ -490,7 +545,22 @@ public class Player : MonoBehaviour {
             Gizmos.DrawCube(boxcastOrigin, boxSize);
         }
 
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawCube(transform.position, Vector3.one);
+
+        Vector3 ownPos = transform.position;
+        Vector3 target = transform.position;
+        float offset = 1.0f;
+
+
+        ownPos.x = ownPos.x - (offset * transform.forward.x);
+        ownPos.z = ownPos.z - (offset * transform.forward.z);
+        target.x += (offset * transform.forward.x);
+        target.z += (offset * transform.forward.z);
+
+
+
+        Gizmos.color = Color.blue;
+        Gizmos.DrawCube(ownPos, Vector3.one);
+        Gizmos.color = Color.red;
+        Gizmos.DrawCube(target, Vector3.one);
     }
 }

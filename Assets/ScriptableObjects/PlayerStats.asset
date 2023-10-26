@@ -20,8 +20,13 @@ MonoBehaviour:
   gravityScale: 20
   knockbackForce: 30
   knockbackHeightAngle: 45
+  knockbackCreatureDropForce: 10
   dashSpeed: 30
   dashLength: 0.3
+  dashCooldown: 1
   retainedSpeed: 1
   knockbackMultiplier: 2
+  dashCreatureDropForce: 20
   stunDuration: 3.5
+  throwForce: 20
+  throwHeightAngle: 45

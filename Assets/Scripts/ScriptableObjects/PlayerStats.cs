@@ -26,4 +26,9 @@ public class PlayerStats : ScriptableObject
     [Range(1.0f, 2.0f)] public float knockbackMultiplier = 1.5f;
     [Range(1.0f, 10.0f)] public float stunDuration = 3.5f;
 
+    [Header("Throw")]
+    [Range(0.0f, 100.0f)] public float throwForce = 20.0f;
+    [Range(0.0f, 90.0f)] public float throwHeightAngle = 1.0f;
+
+
 }    

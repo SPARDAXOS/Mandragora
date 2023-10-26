@@ -88,7 +88,7 @@ GameObject:
   - component: {fileID: 207034011982338561}
   - component: {fileID: 1493748050754232123}
   - component: {fileID: 7151991024623617546}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: InteractionIndicator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -163,7 +163,7 @@ GameObject:
   - component: {fileID: 7380477764921690560}
   - component: {fileID: 7718461994379804213}
   - component: {fileID: 2916087266906670253}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Cursor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -238,7 +238,7 @@ GameObject:
   - component: {fileID: 1713477866900415510}
   - component: {fileID: 4434320408183709502}
   - component: {fileID: 7069832119865207259}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: NormalBarFill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -313,7 +313,7 @@ GameObject:
   - component: {fileID: 3512651373939949184}
   - component: {fileID: 7027567185377850185}
   - component: {fileID: 6654545209538861801}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: QTEBarFill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -388,7 +388,7 @@ GameObject:
   - component: {fileID: 8091761795694177886}
   - component: {fileID: 815357913218924301}
   - component: {fileID: 1432776758179884450}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: NormalBarFrame
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -465,7 +465,7 @@ GameObject:
   - component: {fileID: 8850512136106434750}
   - component: {fileID: 146383406042596780}
   - component: {fileID: 5058194331094758681}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: GUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -569,7 +569,7 @@ GameObject:
   - component: {fileID: 2756185960748192762}
   - component: {fileID: 1563416597184689377}
   - component: {fileID: 9164677108122334617}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: QTEIndicator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -705,7 +705,7 @@ GameObject:
   - component: {fileID: 2509184828538744808}
   - component: {fileID: 2748303444592079242}
   - component: {fileID: 4078048475619616298}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: QTEBarFrame
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -812,6 +812,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SparklePS
       objectReference: {fileID: 0}
+    - target: {fileID: 1723844256891619076, guid: 67e669aae8b547542b705421fdfd8060, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2069990262770328394, guid: 67e669aae8b547542b705421fdfd8060, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -914,6 +918,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: BathBubblePS
       objectReference: {fileID: 0}
+    - target: {fileID: 6688966736147834646, guid: 7a6ddfa5b5e0b57488385a557d95121f, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -975,6 +983,10 @@ PrefabInstance:
     - target: {fileID: 6433199439654782470, guid: fe903779dc4598a4d97c021e03fdf9ab, type: 3}
       propertyPath: m_Name
       value: Alchemy2_LowPoly_Latest
+      objectReference: {fileID: 0}
+    - target: {fileID: 6433199439654782470, guid: fe903779dc4598a4d97c021e03fdf9ab, type: 3}
+      propertyPath: m_Layer
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

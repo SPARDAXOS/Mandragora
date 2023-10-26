@@ -99,12 +99,12 @@ MonoBehaviour:
     m_Name: Throw Away
     m_Type: 0
     m_ExpectedControlType: 
-    m_Id: 7d7ad6ef-8fc1-4280-a3f6-69a82c005a67
+    m_Id: 946b7a83-681b-479d-925a-86237cfce1ab
     m_Processors: 
     m_Interactions: 
     m_SingletonActionBindings:
     - m_Name: 
-      m_Id: 5513bb7a-0889-4f09-8389-1e4d29c63510
+      m_Id: ee96664a-3060-4aa0-913e-8f978aae2984
       m_Path: <Keyboard>/q
       m_Interactions: 
       m_Processors: 

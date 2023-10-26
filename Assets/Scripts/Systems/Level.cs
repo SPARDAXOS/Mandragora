@@ -167,6 +167,7 @@ public class Level : MonoBehaviour {
         tutorialCreature.SetActive(true);
         tutorialCreature.SetupStartState();
         tutorialCreature.StopDissatisfaction();
+        tutorialCreature.SetTutorialCreature(true);
         Vector3 spawnPosition = GetRandomPointOnNavMesh();
         spawnPosition.y += spawnHeightOffset;
         tutorialCreature.transform.position = spawnPosition;

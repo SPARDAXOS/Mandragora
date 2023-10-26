@@ -325,12 +325,13 @@ public class Creature : MonoBehaviour
     {
         rigidbodyComp.velocity = Vector3.zero;
 
-        if (!doEscapeHeld) 
+        if (!doEscapeHeld || !player || player.GetInTaskStationRange()) 
             return;
 
         float random = UnityEngine.Random.value;
 
-        if(random < deltaHeldEscapeProbability && player)
+
+        if (random < deltaHeldEscapeProbability)
         {
             player.DropHeldCreature();
             ApplyImpulse(Vector3.up + RandomDirection(), 5f);
@@ -368,6 +369,7 @@ public class Creature : MonoBehaviour
         float breakDist = 0.5f * speed * stats.decelerationTime;
         float sqrDistToTarget = (targetPosition - transform.position).sqrMagnitude;
         bool isClose = sqrDistToTarget < breakDist * breakDist;
+
         float random = UnityEngine.Random.value;
         float probability = stats.restProbability;
         if (!isErratic) probability *= Time.fixedDeltaTime;
@@ -382,6 +384,7 @@ public class Creature : MonoBehaviour
                 ChangeState(CreatureState.REST);
             else if(sqrDistToTarget < turnRadius * turnRadius || isErratic)
                 FindNewValidTarget();
+            
             return;
         }
 

@@ -115,6 +115,7 @@ MonoBehaviour:
   dissatisfiedMaterial: {fileID: 2100000, guid: 4d3861c7f13eca542b69a4c01a4d6662, type: 2}
   changeMaterialOn: {fileID: 80657961753095836}
   dissatisfaction: 0
+  doDissatisfaction: 0
   state: 0
 --- !u!1001 &1405697963936289669
 PrefabInstance:

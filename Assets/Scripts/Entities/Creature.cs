@@ -101,7 +101,7 @@ public class Creature : MonoBehaviour
             return;
 
         UpdateStates();
-        
+        Debug.Log(rigidbodyComp.velocity.y);
     }
     public void Tick()
     {
@@ -118,6 +118,7 @@ public class Creature : MonoBehaviour
         queueTasks = taskList;
 
         direction = RandomDirection();
+        state = CreatureState.FALL;
         FindNewValidTarget();
 
         SetupParticleSystems();
@@ -266,8 +267,9 @@ public class Creature : MonoBehaviour
             case CreatureState.FALL:
                 FallBehavior();
                 break;
-
-                //Held?
+            case CreatureState.HELD:
+                HeldBehavior();
+                break;
         }
     }
     private void RunBehavior()
@@ -302,24 +304,29 @@ public class Creature : MonoBehaviour
     }
     void FallBehavior()
     {
-        /*if (transform.position.y < 1f)
-        {
-            ChangeState(CreatureState.REST);
-            return;
-        }*/
+        //rigidbodyComp.useGravity = true;
+        //UpdateGravity();
 
-        UpdateGravity();
+        // TEMP ANTI-SOFTLOCK
+        if(transform.position.y < -5f) transform.position = new Vector3(0f, 0.5f, 0f);
+    }
+    void HeldBehavior()
+    {
+        
     }
 
     void CheckFallState()
     {
+        float threshold = 0.01f;
         float yVelocity = rigidbodyComp.velocity.y;
-        if (yVelocity < -0.01)
+        if (yVelocity < -threshold)
         {
             ChangeState(CreatureState.FALL);
         }
-        else if (state == CreatureState.FALL)
+        else if (yVelocity < threshold && state == CreatureState.FALL)
+        {
             ChangeState(CreatureState.REST);
+        }
     }
 
     private Vector3 RandomDirection()
@@ -406,6 +413,7 @@ public class Creature : MonoBehaviour
     private void UpdateGravity() {
         rigidbodyComp.velocity += new Vector3(0.0f, -stats.gravityScale * Time.fixedDeltaTime, 0.0f);
     }
+
     private void UpdateDirection()
     {
         targetDirection = (targetPosition - transform.position).normalized;
@@ -445,18 +453,13 @@ public class Creature : MonoBehaviour
     }
     public void PutDown()
     {
-        ChangeState(CreatureState.RUN);
+        ChangeState(CreatureState.FALL);
         colliderComp.enabled = true;
         isHeld = false;
-        rigidbodyComp.velocity = Vector3.zero;
-
-        ApplyImpulse(Vector3.up, 10);
     }
     public void ApplyImpulse(Vector3 direction, float force) {
-        state = CreatureState.FALL;
-        rigidbodyComp.velocity += direction * force;
+        rigidbodyComp.velocity = direction * force;
     }
-
 
     public void RegisterSatisfied() {
         SetActive(false);

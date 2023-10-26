@@ -325,12 +325,17 @@ public class Creature : MonoBehaviour
     {
         rigidbodyComp.velocity = Vector3.zero;
 
-        if (!doEscapeHeld) 
+        if (!doEscapeHeld || !player) 
             return;
 
         float random = UnityEngine.Random.value;
 
-        if(random < deltaHeldEscapeProbability && player)
+        if (player)
+        {
+            
+        }
+
+        if (random < deltaHeldEscapeProbability)
         {
             player.DropHeldCreature();
             ApplyImpulse(Vector3.up + RandomDirection(), 5f);

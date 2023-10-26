@@ -108,7 +108,7 @@ MonoBehaviour:
     viewRange: 10
     maxRestDuration: 1
     restProbability: 0.05
-    escapeHeldProbability: 0.05
+    escapeHeldProbability: 0.1
     timeUntilDissatisfied: 120
   drawAIGizmos: 1
   taskList: 0100000002000000
@@ -117,7 +117,7 @@ MonoBehaviour:
   changeMaterialOn: {fileID: 80657961753095836}
   dissatisfaction: 0
   doDissatisfaction: 0
-  doEscapeHeld: 0
+  doEscapeHeld: 1
   isErratic: 0
   state: 0
 --- !u!1001 &1405697963936289669

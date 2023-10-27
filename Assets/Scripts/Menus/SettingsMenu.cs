@@ -108,7 +108,7 @@ public class SettingsMenu : MonoBehaviour {
         supportedResolutions = Screen.resolutions;
         List<string> options = new List<string>(supportedResolutions.Length);
         foreach (var resolution in supportedResolutions)
-            options.Add(resolution.width + "X" + resolution.height + "\t" + resolution.refreshRateRatio + "Hz");
+            options.Add(resolution.width + "X" + resolution.height + "  " + ((int)resolution.refreshRateRatio.value).ToString() + "Hz");
 
         resolutionDropdown.ClearOptions();
         resolutionDropdown.AddOptions(options);

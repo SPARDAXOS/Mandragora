@@ -36,4 +36,4 @@ MonoBehaviour:
   - name: CustomizationMenu
     resource: {fileID: 5994602781563316002, guid: 23716ed9973c655409da8677b60155c3, type: 3}
   - name: CreditsMenu
-    resource: {fileID: 3886916768297354923, guid: 01bd13c0d83023e4f91c2eb667f53b6b, type: 3}
+    resource: {fileID: 3886916768297354923, guid: de4ffd309fb5e9f48917abcce831e876, type: 3}

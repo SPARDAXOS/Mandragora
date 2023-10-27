@@ -74,6 +74,8 @@ public class Player : MonoBehaviour {
     private MeshRenderer meshRendererComp = null;
     private Material mainMaterial;
 
+    private PhysicMaterial physicsMaterial = null;
+
     public void Initialize(PlayerType type, PlayerControlScheme controlScheme, GameInstance gameInstance, SoundManager soundManager) {
         if (initialized)
             return;
@@ -101,9 +103,11 @@ public class Player : MonoBehaviour {
         if (!rigidbodyComp)
             GameInstance.Abort("Failed to get Rigidbody component on " + gameObject.name);
 
+
         boxColliderComp = GetComponent<BoxCollider>();
         if (!boxColliderComp)
             GameInstance.Abort("Failed to get BoxCollider component on " + gameObject.name);
+        physicsMaterial = boxColliderComp.material;
 
         normalBoxColliderSize = boxColliderComp.size;
         normalBoxColliderOffset = boxColliderComp.center;
@@ -126,8 +130,6 @@ public class Player : MonoBehaviour {
         if (!initialized)
             return;
 
-        rigidbodyComp.useGravity = !stats.customGravity;
-
 
         UpdateStunTimer();
         UpdateDashTimers();
@@ -149,8 +151,7 @@ public class Player : MonoBehaviour {
 
 
         UpdateRotation();
-        if (stats.customGravity)
-            UpdateGravity();
+        UpdateGravity();
 
 
         if (isKnockedback) {
@@ -192,6 +193,16 @@ public class Player : MonoBehaviour {
         activeControlScheme.movement.Disable();
         activeControlScheme.dash.Disable();
     }
+    public void EnableTaskStationInputState() {
+        activeControlScheme.movement.Enable();
+        activeControlScheme.dash.Enable();
+        activeControlScheme.throwAway.Enable();
+    }
+    public void DisableTaskStationInputState() {
+        activeControlScheme.movement.Disable();
+        activeControlScheme.dash.Disable();
+        activeControlScheme.throwAway.Disable();
+    }
 
     public void EnableInteractionInput() {
         activeControlScheme.movement.Enable();
@@ -212,9 +223,6 @@ public class Player : MonoBehaviour {
 
         Vector3 knockbackDirection = target.transform.position - transform.position;
         knockbackDirection.Normalize();
-
-
-
 
         if (isDashing) {
             if (heldCreature) {
@@ -402,9 +410,15 @@ public class Player : MonoBehaviour {
             = Vector3.RotateTowards(transform.forward, direction, stats.turnRate * Time.fixedDeltaTime, 0.0f);
     }
     private void UpdateGravity() {
-        if (isGrounded)
-            return;
+        rigidbodyComp.useGravity = !stats.customGravity;
+        if (!stats.customGravity)
+            physicsMaterial.bounciness = stats.normalGravityBounciness;
+        else
+            physicsMaterial.bounciness = stats.customGravityBounciness;
 
+        if (isGrounded || !stats.customGravity)
+            return;
+        
         float gravity = stats.gravityScale * Time.fixedDeltaTime;
         rigidbodyComp.velocity += new Vector3(0.0f, -gravity, 0.0f);
     }

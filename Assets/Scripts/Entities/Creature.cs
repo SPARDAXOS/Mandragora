@@ -2,34 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[Serializable]
-public struct CreatureStats
-{
-    [Header("Movement")]
-    [Tooltip("Units per second")]
-    public float maxSpeed;
-    public float accelerationTime;
-    public float decelerationTime;
-    public float gravityScale;
-    [Tooltip("Degrees per second.")]
-    public float turnRate;
-
-    [Header("Behavior")]
-    //List<TaskType> taskList
-    [Range(0, 1f)]
-    public float shyness;
-    public float viewRange;
-    public float maxRestDuration;
-    [Range(0, 1f)]
-    public float restProbability;
-    [Tooltip("Probability each second of escaping the held state each second.")]
-    [Range(0, 1f)]
-    public float escapeHeldProbability;
-    [Tooltip("Time in seconds from the initial number of tasks.")]
-    [Range(0, 120f)]
-    public float timeUntilDissatisfied;
-}
-
 [RequireComponent(typeof(Rigidbody))]
 public class Creature : MonoBehaviour
 {
@@ -43,16 +15,14 @@ public class Creature : MonoBehaviour
     }
 
     [SerializeField] private CreatureStats stats;
-    [SerializeField] private bool drawAIGizmos;
-    [SerializeField] private List<TaskStation.TaskType> taskList;
     [SerializeField] private Material satisfiedMaterial, dissatisfiedMaterial;
     [SerializeField] private GameObject changeMaterialOn;
-    private SkinnedMeshRenderer meshRenderer;
     [Range (0, 1f)]
     [SerializeField] private float dissatisfaction;
-    public bool doDissatisfaction;
-    public bool doEscapeHeld;
-    [SerializeField] bool isErratic;
+    [SerializeField] private bool doDissatisfaction;
+    [SerializeField] private bool doEscapeHeld;
+    [SerializeField] private bool drawAIGizmos;
+    [SerializeField] private List<TaskStation.TaskType> taskList;
 
     private List<TaskStation.TaskType> queueTasks;
     private int numTasksAtStart;
@@ -70,14 +40,15 @@ public class Creature : MonoBehaviour
     private float decelerationIncrement;
 
     private Vector3 targetPosition;
+    private bool willRestAtTarget;
     private Vector3 direction = Vector3.forward;
     private Vector3 targetDirection = Vector3.forward;
     private float speed;
     private bool isMoving = false;
     private Vector3 velocity = Vector3.zero;
 
-    float restTimeElapsed = 0;
-    float restDuration = 0;
+    private float restTimeElapsed = 0;
+    private float restDuration = 0;
 
     private Rigidbody rigidbodyComp = null;
     private Collider colliderComp = null;
@@ -85,6 +56,7 @@ public class Creature : MonoBehaviour
     private ParticleSystem stinkPS = null;
     private ParticleSystem cryPS = null;
     private ParticleSystem runDustPS = null;
+    private SkinnedMeshRenderer meshRenderer = null;
     private Level levelScript;
 
     public void Initialize(Level level)
@@ -179,6 +151,8 @@ public class Creature : MonoBehaviour
         return false;
     }
 
+
+
     private void GetDissatisfactionMultiplier()
     {
         dissatisfactionMultiplier = Mathf.Sqrt((float)taskList.Count / numTasksAtStart);
@@ -189,10 +163,17 @@ public class Creature : MonoBehaviour
     }
     private void UpdateSatisfaction()
     {
+
         dissatisfaction += timeIncrement * Time.deltaTime;
 
         if (dissatisfaction > 1f)
             levelScript.RegisterCreatureMaximumDisatisfied();
+
+        if (IsSatisfied())
+        {
+            dissatisfaction = 0;
+            doDissatisfaction = false;
+        }
 
         UpdateMaterials();
     }
@@ -208,14 +189,10 @@ public class Creature : MonoBehaviour
     }
     void UpdateMaterials()
     {
-        if(IsSatisfied()) 
-        {
-            meshRenderer.material = satisfiedMaterial;
-            return;
-        }
-
         meshRenderer.material.Lerp(satisfiedMaterial, dissatisfiedMaterial, dissatisfaction);
     }
+
+
 
     public bool GetActive()
     {
@@ -226,6 +203,8 @@ public class Creature : MonoBehaviour
         active = state;
         gameObject.SetActive(active);
     }
+
+
 
     void CheckRunDust()
     {
@@ -261,6 +240,8 @@ public class Creature : MonoBehaviour
                 break;
         }
     }
+
+
 
     private void UpdateStates()
     {
@@ -319,7 +300,7 @@ public class Creature : MonoBehaviour
         //UpdateGravity();
 
         // TEMP ANTI-SOFTLOCK
-        if(transform.position.y < -5f) transform.position = new Vector3(0f, 0.5f, 0f);
+        if(transform.position.y < -5f) transform.position = new Vector3(0f, 5f, 0f);
     }
     void HeldBehavior()
     {
@@ -370,28 +351,25 @@ public class Creature : MonoBehaviour
         float sqrDistToTarget = (targetPosition - transform.position).sqrMagnitude;
         bool isClose = sqrDistToTarget < breakDist * breakDist;
 
-        float random = UnityEngine.Random.value;
-        float probability = stats.restProbability;
-        if (!isErratic) probability *= Time.fixedDeltaTime;
+        float turnRadius = 0.5f * speed / ( 2 * Mathf.PI * (stats.turnRate / 360f));
 
-        bool willRest = random <= probability;
-
-        float turnRadius = speed * 2 * Mathf.PI * (stats.turnRate / 360f);
-
-        if (isClose)
+        if (willRestAtTarget && sqrDistToTarget < breakDist * breakDist)
         {
-            if (willRest)
-                ChangeState(CreatureState.REST);
-            else if(sqrDistToTarget < turnRadius * turnRadius || isErratic)
-                FindNewValidTarget();
-            
+            Debug.Log("I am close and I will rest.");
+            ChangeState(CreatureState.REST);
+            return;
+        }
+        else if(sqrDistToTarget < turnRadius * turnRadius)
+        {
+            Debug.Log("I am close and I will run somewhere else.");
+            FindNewValidTarget();
             return;
         }
 
         if (pathObstructed)
-            FindNewValidTarget();
+            FindNewValidTarget(false);
     }
-    void FindNewValidTarget()
+    void FindNewValidTarget(bool interruptable = true)
     {
         int retryLimit = 50;
         int retryIndex = 0;
@@ -400,11 +378,13 @@ public class Creature : MonoBehaviour
         {
             retryIndex++;
             Vector3 candidateTarget = CandidateTarget();
-            if (!CastToTarget(candidateTarget, true))
+            if (!CastToTarget(candidateTarget))
                 break;
         }
+        if(interruptable)
+            willRestAtTarget = UnityEngine.Random.value <= stats.restProbability;
     }
-    bool CastToTarget(Vector3 target, bool assignTarget)
+    bool CastToTarget(Vector3 target, bool assignTarget = true)
     {
         if (!Physics.CheckSphere(target, 0.5f))
             return false;
@@ -449,9 +429,6 @@ public class Creature : MonoBehaviour
             if (speed < 0f)
                 speed = 0f;
         }
-    }
-    private void UpdateGravity() {
-        rigidbodyComp.velocity += new Vector3(0.0f, -stats.gravityScale * Time.fixedDeltaTime, 0.0f);
     }
 
     private void UpdateDirection()
@@ -517,7 +494,7 @@ public class Creature : MonoBehaviour
         return tutorialCreature;
     }
 
-    private void OnDrawGizmos()
+    private void OnDrawGizmosSelected()
     {
         if (drawAIGizmos)
         {

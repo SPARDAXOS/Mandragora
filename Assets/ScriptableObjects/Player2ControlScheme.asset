@@ -88,7 +88,7 @@ MonoBehaviour:
     m_SingletonActionBindings:
     - m_Name: 
       m_Id: bc3a3bd1-8bc4-4e63-83fa-d6b247b95bdb
-      m_Path: <Keyboard>/numpad2
+      m_Path: <Keyboard>/numpad0
       m_Interactions: 
       m_Processors: 
       m_Groups: 
@@ -105,7 +105,7 @@ MonoBehaviour:
     m_SingletonActionBindings:
     - m_Name: 
       m_Id: 4d5739c5-4626-4db0-b958-d17b0c594b7a
-      m_Path: <Keyboard>/numpad0
+      m_Path: <Keyboard>/numpad2
       m_Interactions: 
       m_Processors: 
       m_Groups: 

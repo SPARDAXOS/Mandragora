@@ -13,9 +13,14 @@ public class PlayerStats : ScriptableObject
     [Range(0.0f, 1.0f)] public float reverseRetainedSpeed = 1.0f;
     [Range(0.0f, 1.0f)] public float speedRetainedOnHit = 1.0f;
 
-    [Header("Knockback")]
+    [Header("Gravity")]
     public bool customGravity = false;
     [Range(0.0f, 100.0f)] public float gravityScale = 1.0f;
+    [Range(0.0f, 1.0f)] public float customGravityBounciness = 0.0f;
+    [Range(0.0f, 1.0f)] public float normalGravityBounciness = 1.0f;
+
+
+    [Header("Knockback")]
     [Range(0.0f, 100.0f)] public float knockbackForce = 20.0f;
     [Range(0.0f, 90.0f)] public float knockbackHeightAngle = 1.0f;
     [Range(0.0f, 100.0f)] public float knockbackCreatureDropForce = 5.0f;

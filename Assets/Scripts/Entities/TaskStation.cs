@@ -217,7 +217,7 @@ public class TaskStation : MonoBehaviour {
         playerType = targetPlayer.GetPlayerType();
         EnableInteraction();
         EnableParticleSystem();
-        targetPlayer.DisableMovement();
+        targetPlayer.EnableTaskStationInputState();
         interactionIndicator.SetActive(false);
     }
     private void EndInteraction() {
@@ -225,7 +225,7 @@ public class TaskStation : MonoBehaviour {
         playerType = PlayerType.NONE;
         DisableInteraction();
         DisableParticleSystem();
-        targetPlayer.EnableMovement();
+        targetPlayer.DisableTaskStationInputState();
     }
 
 

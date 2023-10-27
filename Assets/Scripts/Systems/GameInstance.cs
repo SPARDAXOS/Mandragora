@@ -74,7 +74,7 @@ public class GameInstance : MonoBehaviour {
     private SoundManager soundManagerScript = null;
     private TutorialSequencer tutorialSequencerScript = null;
     private UIMainMenu mainMenuScript = null;
-    private UISettingsMenu settingsMenuScript = null;
+    private SettingsMenu settingsMenuScript = null;
     private UIPauseMenu pauseMenuScript = null;
     private UILoseMenu loseMenuScript = null;
     private UIWinMenu winMenuScript = null;
@@ -167,7 +167,7 @@ public class GameInstance : MonoBehaviour {
             Abort("Failed to find SettingsMenu resource");
         else {
             settingsMenu = Instantiate(entitiesResources["SettingsMenu"]);
-            settingsMenuScript = settingsMenu.GetComponent<UISettingsMenu>();
+            settingsMenuScript = settingsMenu.GetComponent<SettingsMenu>();
             settingsMenuScript.Initialize(this, soundManagerScript);
             settingsMenu.SetActive(false);
         }

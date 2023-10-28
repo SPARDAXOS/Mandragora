@@ -29,7 +29,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalScale: {x: 0.33333334, y: 0.33333334, z: 0.33333334}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 414251978122280507}
@@ -99,10 +99,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stats: {fileID: 11400000, guid: 7e6a4c96a7c5dba43a046f9994e0f3b6, type: 2}
+  randomizeDissatisfactionRate: {x: 0.5, y: 2}
   satisfiedMaterial: {fileID: 2100000, guid: a90a943932679e44587087b20903f0e6, type: 2}
   dissatisfiedMaterial: {fileID: 2100000, guid: 4d3861c7f13eca542b69a4c01a4d6662, type: 2}
   changeMaterialOn: {fileID: 80657961753095836}
   dissatisfaction: 0
+  scaleWhenDissatisfied: 2
   doDissatisfaction: 0
   doEscapeHeld: 0
   drawAIGizmos: 1

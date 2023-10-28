@@ -105,11 +105,12 @@ public class Creature : MonoBehaviour
         queueTasks = taskList;
         tutorialCreature = false;
 
-        dissatisfaction = 0;
         speed = 0;
         direction = RandomDirection();
         state = CreatureState.FALL;
         transform.localScale = initialScale * Vector3.one;
+        StartDissatisfaction();
+        SetTutorialCreature(false);
         FindNewValidTarget();
 
         SetupParticleSystems();

@@ -521,23 +521,26 @@ public class Player : MonoBehaviour {
         Vector3 boxExtent = new Vector3(pickupCheckBoxSize / 2.0f, pickupCheckBoxSize / 2.0f, pickupCheckBoxSize / 2.0f);
 
         var HitResults = Physics.BoxCastAll(boxcastOrigin, boxExtent, transform.forward, transform.rotation, 0.0f, pickupMask.value);
-        if (HitResults != null) {
+        if (HitResults != null)
             foreach (var entry in HitResults) {
                 var script = entry.collider.GetComponent<Creature>();
                 if (!script) {
                     Debug.LogError("Attempted to pickup invalid Creature that did not own creature script!");
                     continue;
                 }
+
                 if (isDashing) {
                     Debug.LogWarning("Dash interrupted by pickup!");
                     StopDashing();
                     //Weird!
                     ApplyDashRetainedSpeed(transform.forward);
                 }
-
-                PickupCreature(script);
+                if (!script.GetHeldState()) {
+                    PickupCreature(script);
+                    Debug.Log("Called pickup on " + script.name);
+                    return;
+                }
             }
-        }
     }
     private void UpdateHeldCreature() {
         if (!heldCreature)

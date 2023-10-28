@@ -484,10 +484,6 @@ public class Creature : MonoBehaviour
     {
         return isHeld;
     }
-    public void SetHeldState(bool state)
-    {
-        isHeld = state;
-    }
 
     public void ApplyImpulse(Vector3 direction, float force) {
         rigidbodyComp.velocity = direction * force;

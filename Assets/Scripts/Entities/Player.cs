@@ -17,8 +17,8 @@ public class Player : MonoBehaviour {
     [SerializeField] private float pickupCheckBoxSize = 1.0f;
     [SerializeField] private Vector3 pickupCheckOffset;
     [SerializeField] private LayerMask pickupMask;
+    [SerializeField] private Vector3 pickupBoxColliderCenter;
     [SerializeField] private Vector3 pickupBoxColliderSize;
-    [SerializeField] private Vector3 pickupBoxColliderOffset;
 
     [Header("Navigation")]
     [SerializeField] private float pathCheckOffset = 0.1f;
@@ -30,10 +30,10 @@ public class Player : MonoBehaviour {
 
     private PlayerType playerType = PlayerType.NONE;
 
-    private bool initialized = false;
+    public bool initialized = false;
     private bool isMoving = false;
     private bool isInteractingHeld = false;
-    private bool isInteractingTrigger = false;
+    public bool isInteractingTrigger = false;
     private bool isDashingTrigger = false;
     private bool isThrowingTrigger = false;
 
@@ -41,8 +41,8 @@ public class Player : MonoBehaviour {
     private bool isGrounded = false;
     private bool isDashing = false;
     private bool isStunned = false;
-
-    private bool pathBlocked = false;
+    private bool isPathBlocked = false;
+    public bool isInteractingWithTaskStation = false;
 
 
     public float currentSpeed = 0.0f;
@@ -53,11 +53,15 @@ public class Player : MonoBehaviour {
     public Vector3 direction;
 
     private Vector3 normalBoxColliderSize;
-    private Vector3 normalBoxColliderOffset;
+    private Vector3 normalBoxColliderCenter;
 
-    private bool inTaskStationRange = false;
+    public bool inTaskStationRange = false;
+    public TaskStation interactingTaskStation = null;
 
     private GameObject pickupPoint = null;
+    public Creature heldCreature = null;
+
+
 
     private PlayerControlScheme activeControlScheme = null;
 
@@ -67,7 +71,6 @@ public class Player : MonoBehaviour {
 
     private ParticleSystem runDustPS = null;
 
-    private Creature heldCreature = null;
 
     private Rigidbody rigidbodyComp = null;
     private BoxCollider boxColliderComp = null;
@@ -110,7 +113,7 @@ public class Player : MonoBehaviour {
         physicsMaterial = boxColliderComp.material;
 
         normalBoxColliderSize = boxColliderComp.size;
-        normalBoxColliderOffset = boxColliderComp.center;
+        normalBoxColliderCenter = boxColliderComp.center;
     }
     public void SetupStartingState() {
 
@@ -136,6 +139,9 @@ public class Player : MonoBehaviour {
         UpdateHeldCreature();
 
         UpdateInput();
+
+        CheckTaskStatioInteraction();
+
         CheckGrounded();
         CheckPath();
         CheckMovement();
@@ -194,14 +200,14 @@ public class Player : MonoBehaviour {
         activeControlScheme.dash.Disable();
     }
     public void EnableTaskStationInputState() {
-        activeControlScheme.movement.Enable();
-        activeControlScheme.dash.Enable();
-        activeControlScheme.throwAway.Enable();
-    }
-    public void DisableTaskStationInputState() {
         activeControlScheme.movement.Disable();
         activeControlScheme.dash.Disable();
         activeControlScheme.throwAway.Disable();
+    }
+    public void DisableTaskStationInputState() {
+        activeControlScheme.movement.Enable();
+        activeControlScheme.dash.Enable();
+        activeControlScheme.throwAway.Enable();
     }
 
     public void EnableInteractionInput() {
@@ -269,7 +275,7 @@ public class Player : MonoBehaviour {
         if (isThrowingTrigger) {
             if (!heldCreature)
                 return;
-            else {
+            else if (!isInteractingWithTaskStation){
                 Vector3 throwDirection = transform.forward;
                 throwDirection.x *= Mathf.Cos(Mathf.Deg2Rad * stats.throwHeightAngle);
                 throwDirection.y = Mathf.Sin(Mathf.Deg2Rad * stats.throwHeightAngle);
@@ -280,11 +286,14 @@ public class Player : MonoBehaviour {
         }
     }
     private void CheckPickup() {
+        //Here
         if (isInteractingTrigger) {
             if (!heldCreature)
                 Pickup();
-            else if (heldCreature && !inTaskStationRange)
+            else if (heldCreature && !inTaskStationRange) {
+                Debug.Log("Drop!");
                 DropHeldCreature();
+            }
         }
     }
 
@@ -295,10 +304,18 @@ public class Player : MonoBehaviour {
     }
     private void CheckPath() {
 
-
-        //Compensate the center of the colliders too!!
-
         Vector3 origin = transform.position;
+        if (heldCreature) {
+            origin.y += pickupBoxColliderCenter.y;
+            origin.x -= pickupBoxColliderCenter.x * transform.forward.x;
+            origin.z -= pickupBoxColliderCenter.z * transform.forward.z;
+        }
+        else {
+            origin.y += normalBoxColliderCenter.y;
+            origin.x -= normalBoxColliderCenter.x * transform.forward.x;
+            origin.z -= normalBoxColliderCenter.z * transform.forward.z;
+        }
+
         origin.y += 0.01f;
         origin.x -= pathCheckOffset * transform.forward.x;
         origin.z -= pathCheckOffset * transform.forward.z;
@@ -311,8 +328,9 @@ public class Player : MonoBehaviour {
 
         RaycastHit hit;
         if (Physics.BoxCast(origin, halfExtent, transform.forward, out hit, transform.rotation, pathCheckOffset * 2)) {
+            Debug.Log("TOUCH! " + hit.collider.name);
             if (hit.collider.CompareTag("Player") || hit.collider.CompareTag("Creature")) {
-                pathBlocked = false;
+                isPathBlocked = false;
                 return;
             }
             else {
@@ -331,11 +349,11 @@ public class Player : MonoBehaviour {
                     ApplyKnockback(bounceDirection, stats.objectBouceOffForce); //ALWAYS USE THIS INSTEAD OF THE IMPULSE ONE!
                                                                                 //ApplyImpulse(bounceDirection, stats.bounceOffForce);
                 }
-                pathBlocked = true;
+                isPathBlocked = true;
             }
         }
         else
-            pathBlocked = false;
+            isPathBlocked = false;
     }
     private void CheckReverse(Vector2 newDirection) {
         Vector2 currentDirection = new Vector2(direction.x, direction.z);
@@ -345,6 +363,48 @@ public class Player : MonoBehaviour {
 
         }
     }
+
+
+    //Handles toggling interaction start and finish
+    public void SetInteractingWithTaskStationState(TaskStation target, bool state) {
+        if (!target) {
+            Debug.LogError("Null taskstation sent to SetInteractingWithTaskStationState - Should always send valid ref here for check");
+            return;
+        }
+
+        if (!state && isInteractingWithTaskStation) {
+            if (interactingTaskStation == target) { 
+                isInteractingWithTaskStation = false;
+                return;
+            }
+        }
+        else if (state && !isInteractingWithTaskStation) {
+            isInteractingWithTaskStation = true;
+            return;
+        }
+
+        Debug.LogError("ERROR! This is not meant to be reached!");
+    }
+    //Handles checking if task station is in range
+    public void SetInTaskStationRange(TaskStation target, bool state) {
+
+        interactingTaskStation = target;
+        inTaskStationRange = state;
+    }
+    public bool GetInTaskStationRange() { //(???
+        return inTaskStationRange;
+    }
+    //Checks if player starts interaction with task station in range!
+    private void CheckTaskStatioInteraction() {
+        if (!inTaskStationRange || !interactingTaskStation || isInteractingWithTaskStation)
+            return;
+
+        if (!interactingTaskStation.IsInteractionOngoing() && isInteractingTrigger) {
+            interactingTaskStation.Interact(this);
+            Debug.Log("I interacted! should be true - " + isInteractingWithTaskStation);
+        }
+    }
+
 
 
     private void CheckPause() {
@@ -357,7 +417,7 @@ public class Player : MonoBehaviour {
             CheckReverse(input);
 
             direction = new Vector3(input.x, 0.0f, input.y);
-            if (!pathBlocked)
+            if (!isPathBlocked)
                 Accelerate();
         }
         else if (currentSpeed > 0.0f)
@@ -396,11 +456,8 @@ public class Player : MonoBehaviour {
     }
     private void UpdateMovement() {
         //WORKS BUT QUESTIONABLE!
-        if (pathBlocked) {
-            //rigidbodyComp.velocity = Vector3.zero;
+        if (isPathBlocked)
             currentSpeed *= stats.speedRetainedOnHit;
-            //return;
-        }
 
         Vector3 velocity = direction * currentSpeed * Time.fixedDeltaTime;
         rigidbodyComp.velocity = new Vector3(velocity.x, rigidbodyComp.velocity.y, velocity.z);
@@ -437,7 +494,7 @@ public class Player : MonoBehaviour {
             if (dashTimer <= 0.0f) {
                 StopDashing();
                 ApplyDashRetainedSpeed(transform.forward);
-                Debug.LogWarning("Dashing finished!");
+                Debug.Log("Dashing finished!");
             }
         }
     }
@@ -513,19 +570,6 @@ public class Player : MonoBehaviour {
     public PlayerType GetPlayerType() {
         return playerType;
     }
-    public bool GetInTaskStationRange() {
-        return inTaskStationRange;
-    }
-
-
-    public void SetInTaskStationRange(bool state) {
-        inTaskStationRange = state;
-    }
-
-
-
-
-
     public Creature GetHeldCreature() {
         return heldCreature;
     }
@@ -536,7 +580,7 @@ public class Player : MonoBehaviour {
         heldCreature = target;
         heldCreature.PickUp(this);
         boxColliderComp.size = pickupBoxColliderSize;
-        boxColliderComp.center = pickupBoxColliderOffset;
+        boxColliderComp.center = pickupBoxColliderCenter;
     }
     public void DropHeldCreature() {
         if (!heldCreature)
@@ -546,7 +590,7 @@ public class Player : MonoBehaviour {
         heldCreature.PutDown();
         heldCreature = null;
         boxColliderComp.size = normalBoxColliderSize;
-        boxColliderComp.center = normalBoxColliderOffset;
+        boxColliderComp.center = normalBoxColliderCenter;
     }
 
 
@@ -611,15 +655,34 @@ public class Player : MonoBehaviour {
         }
 
         if (showPathCheck) {
+
+
             Vector3 start = transform.position;
             Vector3 target = transform.position;
-      
+
+            if (heldCreature) {
+                start.y += pickupBoxColliderCenter.y;
+                start.x -= pickupBoxColliderCenter.x * transform.forward.x;
+                start.z -= pickupBoxColliderCenter.z * transform.right.z;
+
+                target.y += pickupBoxColliderCenter.y;
+                target.x += pickupBoxColliderCenter.x * transform.forward.x;
+                target.z += pickupBoxColliderCenter.z * transform.right.z;
+            }
+            else {
+                start.y += normalBoxColliderCenter.y;
+                start.x -= normalBoxColliderCenter.x * transform.forward.x;
+                start.z -= normalBoxColliderCenter.z * transform.forward.z;
+
+                target.y += normalBoxColliderCenter.y;
+                target.x += normalBoxColliderCenter.x * transform.forward.x;
+                target.z += normalBoxColliderCenter.z * transform.forward.z;
+            }
+            //print them
             start.x -= pathCheckOffset * transform.forward.x;
             start.z -= pathCheckOffset * transform.forward.z;
             target.x += pathCheckOffset * transform.forward.x;
             target.z += pathCheckOffset * transform.forward.z;
-
-            //Compensate the center of the colliders too!!
 
 
             Vector3 Extent;

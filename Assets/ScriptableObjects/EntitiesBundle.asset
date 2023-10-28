@@ -30,9 +30,9 @@ MonoBehaviour:
   - name: SettingsMenu
     resource: {fileID: 8872255131819657447, guid: 2095a7cc2489217449823dcf970f9df0, type: 3}
   - name: WinMenu
-    resource: {fileID: 3992107309455478605, guid: 1d1f7c481fcb8914095f5380a3113698, type: 3}
+    resource: {fileID: 2810162893729456800, guid: d54e791c3f257eb47959574cb5664915, type: 3}
   - name: LoseMenu
-    resource: {fileID: 5994602781563316002, guid: 23716ed9973c655409da8677b60155c3, type: 3}
+    resource: {fileID: 4699597322159817384, guid: 23716ed9973c655409da8677b60155c3, type: 3}
   - name: CustomizationMenu
     resource: {fileID: 5994602781563316002, guid: 23716ed9973c655409da8677b60155c3, type: 3}
   - name: CreditsMenu

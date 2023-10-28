@@ -106,8 +106,12 @@ MonoBehaviour:
   mashIncreaseRate: 5.86
   holdIncreaseRate: 1
   player1PossibleQTEKeys: 7700000061000000730000006400000065000000
-  player2PossibleQTEKeys: 1101000014010000130100001201000001010000
-  QTECount: 5
+  player2PossibleQTEKeys: 11010000140100001301000012010000
+  QTECount: 6
+  persistentParticles: 1
+  targetPlayer: {fileID: 0}
+  playersInRange: 
+  interactionOngoing: 0
 --- !u!65 &7547347357484397901
 BoxCollider:
   m_ObjectHideFlags: 0

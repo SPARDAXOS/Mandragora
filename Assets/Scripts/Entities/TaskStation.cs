@@ -1,4 +1,5 @@
 using Mandragora;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -37,6 +38,10 @@ public class TaskStation : MonoBehaviour {
     [SerializeField] private KeyCode[] player2PossibleQTEKeys;
     [Range(1, 10)][SerializeField] private uint QTECount = 5;
 
+    [Space(10)]
+    [Header("Settings")]
+    [SerializeField] private bool persistentParticles = true;
+
 
 
     private bool initialized = false;
@@ -44,13 +49,13 @@ public class TaskStation : MonoBehaviour {
     private PlayerType playerType = PlayerType.NONE;
 
     private MainCamera cameraScript = null;
-    private Player targetPlayer = null;
-    private bool playerInRange = false;
+    public Player targetPlayer = null;
+    public List<bool> playersInRange = new List<bool>();
 
-    private bool interactionOngoing = false;
+    public bool interactionOngoing = false;
 
-    private string lastInputedKey = null;
-    private KeyCode currentTargetQTE = KeyCode.None;
+    public string lastInputedKey = null;
+    public KeyCode currentTargetQTE = KeyCode.None;
     private uint currentQTECount = 0;
 
     private bool QTEBarTrigger = false;
@@ -74,26 +79,32 @@ public class TaskStation : MonoBehaviour {
 
 
 
+    void OnGUI() {
+        if (!interactionOngoing)
+            return;
 
+        Event eventRef = Event.current;
+        if (eventRef.isKey)
+            lastInputedKey = eventRef.keyCode.ToString().ToLower();
+    }
     public void Initialize(MainCamera camera) {
         if (initialized)
             return;
 
         cameraScript = camera;
         SetupReferences();
+        if (persistentParticles)
+            EnableParticleSystem();
+
         initialized = true;
     }
     public void Tick() {
         if (!initialized)
             return;
 
-        if (playerInRange)
-            UpdateIndicatorsRotation();
-
+        UpdateIndicator();
         if (interactionOngoing)
             UpdateInteraction();
-        else if (playerInRange && targetPlayer)
-            CheckInput();
     }
     private void SetupReferences() {
         GUI = transform.Find("GUI").gameObject;
@@ -148,6 +159,18 @@ public class TaskStation : MonoBehaviour {
         else if (actionType == ActionType.QTE_BAR)
             UpdateTimedClickInteraction();
     }
+    private void UpdateIndicator() {
+        if (playersInRange.Count > 0) {
+            if (!interactionOngoing)
+                interactionIndicator.SetActive(true);
+            else
+                interactionIndicator.SetActive(false);
+
+            UpdateIndicatorsRotation();
+        }
+        else
+            interactionIndicator.SetActive(false);
+    }
     private void UpdateIndicatorsRotation() {
         Quaternion RotationTowardsCamera = Quaternion.LookRotation(cameraScript.transform.forward, cameraScript.transform.up);
         interactionIndicator.transform.rotation = RotationTowardsCamera;
@@ -155,6 +178,8 @@ public class TaskStation : MonoBehaviour {
         QTEIndicator.transform.rotation         = RotationTowardsCamera;
         QTEBarFrame.transform.rotation          = RotationTowardsCamera;
     }
+
+
 
 
 
@@ -177,13 +202,13 @@ public class TaskStation : MonoBehaviour {
         }
     }
     private void UpdateQTEInteraction() {
-        lastInputedKey = Input.inputString;
         if (lastInputedKey == currentTargetQTE.ToString().ToLower()) {
             currentQTECount++;
             normalBar.fillAmount += 1.0f / QTECount;
             if (currentQTECount == QTECount) {
                 normalBar.fillAmount = 1.0f;
                 currentQTECount = 0;
+
                 CompleteInteraction();
             }
             else
@@ -196,36 +221,54 @@ public class TaskStation : MonoBehaviour {
     }
 
     private void CompleteInteraction() {
-        EndInteraction();
+        targetPlayer.GetHeldCreature().CompleteTask(taskType);
+        DisableInteractionState();
         sparklePS.Play();
-        targetPlayer.GetHeldCreature().CompleteTask(taskType); //This crashed! //FIX THIS HERE!!!!!!! IDK HOW IT CRASHED!
     }
 
 
-    private void CheckInput() {
-        Creature creature = targetPlayer.GetHeldCreature();
+    public bool IsInteractionOngoing() {
+        return interactionOngoing;
+    }
+    public bool Interact(Player user) {
+        if (interactionOngoing)
+            return false;
+
+        Creature creature = user.GetHeldCreature();
         if (!creature)
-            return;
+            return false;
         if (!creature.DoesRequireTask(taskType))
-            return;
+            return false;
 
-        if (targetPlayer.IsInteractingTrigger())
-            StartInteraction();
+        Debug.Log("Interaction started! ");
+
+        targetPlayer = user;
+        EnableInteractionState();
+        return true;
     }
-    private void StartInteraction() {
+    private void EnableInteractionState() {
         interactionOngoing = true;
         playerType = targetPlayer.GetPlayerType();
-        EnableInteraction();
-        EnableParticleSystem();
+        EnableInteractionGUI();
+
+        if (!persistentParticles)
+            EnableParticleSystem();
+
+        targetPlayer.SetInteractingWithTaskStationState(this, true);
         targetPlayer.EnableTaskStationInputState();
         interactionIndicator.SetActive(false);
     }
-    private void EndInteraction() {
+    private void DisableInteractionState() {
         interactionOngoing = false;
         playerType = PlayerType.NONE;
-        DisableInteraction();
-        DisableParticleSystem();
+        DisableInteractionGUI();
+
+        if (!persistentParticles)
+            DisableParticleSystem();
+
+        targetPlayer.SetInteractingWithTaskStationState(this, false);
         targetPlayer.DisableTaskStationInputState();
+        targetPlayer = null;
     }
 
 
@@ -247,7 +290,7 @@ public class TaskStation : MonoBehaviour {
         //Sleeping
     }
 
-    private void EnableInteraction() {
+    private void EnableInteractionGUI() {
         if (actionType == ActionType.MASH || actionType == ActionType.HOLD) {
             normalBarFrame.SetActive(true);
             normalBar.fillAmount = 0.0f;
@@ -256,6 +299,8 @@ public class TaskStation : MonoBehaviour {
             normalBarFrame.SetActive(true);
             QTEIndicator.SetActive(true);
             normalBar.fillAmount = 0.0f;
+            currentQTECount = 0;
+            lastInputedKey = null;
             UpdateQTE();
         }
         else if (actionType == ActionType.QTE_BAR) {
@@ -264,7 +309,7 @@ public class TaskStation : MonoBehaviour {
             QTEBarTrigger = false;
         }
     }
-    private void DisableInteraction() {
+    private void DisableInteractionGUI() {
         if (actionType == ActionType.MASH || actionType == ActionType.HOLD)
             normalBarFrame.SetActive(false);
         else if (actionType == ActionType.QTE) {
@@ -298,38 +343,40 @@ public class TaskStation : MonoBehaviour {
         }
 
         currentTargetQTE = NewQTE;
-        QTEIndicatorText.text = currentTargetQTE.ToString();
+        if (currentTargetQTE == KeyCode.LeftArrow)
+            QTEIndicatorText.text = "\u2190";
+        else if (currentTargetQTE == KeyCode.RightArrow)
+            QTEIndicatorText.text = "\u2192";
+        else if (currentTargetQTE == KeyCode.UpArrow)
+            QTEIndicatorText.text = "\u2191";
+        else if (currentTargetQTE == KeyCode.DownArrow)
+            QTEIndicatorText.text = "\u2193";
+        else
+            QTEIndicatorText.text = currentTargetQTE.ToString();
     }
     public void ToggleQTEBarTrigger() {
         QTEBarTrigger ^= true;
     }
 
 
-    //VERY BUGGY
-    //NOTES:
-    //Gets a bit finicky if a player leaves while another is already in.
-    //-Also when both players are in but the second one in tries to interact!
-    //TODO: Rework this to at the very least the first to click gets to start it!
+
+
     private void OnTriggerEnter(Collider other) {
-        if (!targetPlayer && other.CompareTag("Player")) {
-            targetPlayer = other.GetComponent<Player>();
-            targetPlayer.SetInTaskStationRange(true);
-            playerInRange = true;
-            interactionIndicator.SetActive(true);
+        if (other.CompareTag("Player")) {
+            var script = other.GetComponent<Player>();
+            script.SetInTaskStationRange(this, true);
+            playersInRange.Add(true);
         }
     }
     private void OnTriggerExit(Collider other) {
-        if (targetPlayer && other.CompareTag("Player")) {
+        if (other.CompareTag("Player")) {
             var script = other.GetComponent<Player>();
-            if (targetPlayer == script) {
-                if (interactionOngoing)
-                    EndInteraction();
+            if (targetPlayer == script)
+                DisableInteractionState();
 
-                targetPlayer.SetInTaskStationRange(false);
-                targetPlayer = null;
-                playerInRange = false;
-                interactionIndicator.SetActive(false);
-            }
+            script.SetInTaskStationRange(null, false);
+            if (playersInRange.Count > 0)
+                playersInRange.RemoveAt(0);
         }
     }
 }

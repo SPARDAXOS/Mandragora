@@ -304,9 +304,15 @@ public class Creature : MonoBehaviour
     }
     void HeldBehavior()
     {
+        if (!player)
+        {
+            PutDown();
+            return;
+        }
+
         rigidbodyComp.velocity = Vector3.zero;
 
-        if (!doEscapeHeld || !player || player.GetInTaskStationRange()) 
+        if (!doEscapeHeld || player.GetInTaskStationRange()) 
             return;
 
         float random = UnityEngine.Random.value;
@@ -347,21 +353,18 @@ public class Creature : MonoBehaviour
     {
         bool pathObstructed = CastToTarget(targetPosition, false);
 
-        float breakDist = 0.5f * speed * stats.decelerationTime;
         float sqrDistToTarget = (targetPosition - transform.position).sqrMagnitude;
-        bool isClose = sqrDistToTarget < breakDist * breakDist;
 
+        float breakDist = 0.5f * speed * stats.decelerationTime;
         float turnRadius = 0.5f * speed / ( 2 * Mathf.PI * (stats.turnRate / 360f));
 
         if (willRestAtTarget && sqrDistToTarget < breakDist * breakDist)
         {
-            Debug.Log("I am close and I will rest.");
             ChangeState(CreatureState.REST);
             return;
         }
         else if(sqrDistToTarget < turnRadius * turnRadius)
         {
-            Debug.Log("I am close and I will run somewhere else.");
             FindNewValidTarget();
             return;
         }

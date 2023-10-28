@@ -71,26 +71,31 @@ public class SettingsMenu : MonoBehaviour {
         initialize = true;
     }
     private void SetupReference() {
-        MasterSlider = transform.Find("MasterSlider").GetComponent<Slider>();
-        SFXSlider = transform.Find("SFXSlider").GetComponent<Slider>();
-        MusicSlider = transform.Find("MusicSlider").GetComponent<Slider>();
 
-        resolutionDropdown = transform.Find("ResolutionDropdown").GetComponent<TMP_Dropdown>();
-        windowModeDropdown = transform.Find("WindowModeDropdown").GetComponent<TMP_Dropdown>();
+        var Display = transform.Find("Display");
+        var Audio = transform.Find("Audio");
+        var Quality = transform.Find("Quality");
 
-        vsyncDropdown = transform.Find("VsyncDropdown").GetComponent<TMP_Dropdown>();
-        fpsLimitDropdown = transform.Find("FPSLimitDropdown").GetComponent<TMP_Dropdown>();
+        MasterSlider = Audio.Find("MasterSlider").GetComponent<Slider>();
+        SFXSlider = Audio.Find("SFXSlider").GetComponent<Slider>();
+        MusicSlider = Audio.Find("MusicSlider").GetComponent<Slider>();
 
-        antiAliasingDropdown = transform.Find("AntiAliasingDropdown").GetComponent<TMP_Dropdown>();
-        textureQualityDropdown = transform.Find("TextureQualityDropdown").GetComponent<TMP_Dropdown>();
+        resolutionDropdown = Display.Find("ResolutionDropdown").GetComponent<TMP_Dropdown>();
+        windowModeDropdown = Display.Find("WindowModeDropdown").GetComponent<TMP_Dropdown>();
 
-        anisotropicFilteringDropdown = transform.Find("AnisotropicFilteringDropdown").GetComponent<TMP_Dropdown>();
-        pixelLightCountDropdown = transform.Find("PixelLightCountDropdown").GetComponent<TMP_Dropdown>();
+        vsyncDropdown = Display.Find("VsyncDropdown").GetComponent<TMP_Dropdown>();
+        fpsLimitDropdown = Display.Find("FPSLimitDropdown").GetComponent<TMP_Dropdown>();
 
-        shadowQualityDropdown = transform.Find("ShadowQualityDropdown").GetComponent<TMP_Dropdown>();
-        shadowResolutionDropdown = transform.Find("ShadowResolutionDropdown").GetComponent<TMP_Dropdown>();
+        antiAliasingDropdown = Quality.Find("AntiAliasingDropdown").GetComponent<TMP_Dropdown>();
+        textureQualityDropdown = Quality.Find("TextureQualityDropdown").GetComponent<TMP_Dropdown>();
 
-        softParticlesToggle = transform.Find("SoftParticlesToggle").GetComponent<Toggle>();
+        anisotropicFilteringDropdown = Quality.Find("AnisotropicFilteringDropdown").GetComponent<TMP_Dropdown>();
+        pixelLightCountDropdown = Quality.Find("PixelLightCountDropdown").GetComponent<TMP_Dropdown>();
+
+        shadowQualityDropdown = Quality.Find("ShadowQualityDropdown").GetComponent<TMP_Dropdown>();
+        shadowResolutionDropdown = Quality.Find("ShadowResolutionDropdown").GetComponent<TMP_Dropdown>();
+
+        softParticlesToggle = Quality.Find("SoftParticlesToggle").GetComponent<Toggle>();
     }
     private void UpdateData() {
         //Updates All GUI - Updates only visuals

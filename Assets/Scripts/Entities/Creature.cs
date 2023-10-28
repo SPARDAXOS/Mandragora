@@ -146,6 +146,10 @@ public class Creature : MonoBehaviour
                 Debug.Log("Removed!");
                 taskList.RemoveAt(i);
                 SetParticleSystemState(completedTask, false);
+
+                transform.position += 1.5f * Vector3.up;
+                ApplyImpulse(-player.transform.forward + Vector3.up, 5f);
+                player.DropHeldCreature();
             }
         }
     }

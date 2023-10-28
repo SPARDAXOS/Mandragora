@@ -304,6 +304,12 @@ public class Creature : MonoBehaviour
     }
     void HeldBehavior()
     {
+        if (!player)
+        {
+            PutDown();
+            return;
+        }
+
 
         rigidbodyComp.velocity = Vector3.zero;
 
@@ -474,6 +480,15 @@ public class Creature : MonoBehaviour
         isHeld = false;
         player = null;
     }
+    public bool GetHeldState()
+    {
+        return isHeld;
+    }
+    public void SetHeldState(bool state)
+    {
+        isHeld = state;
+    }
+
     public void ApplyImpulse(Vector3 direction, float force) {
         rigidbodyComp.velocity = direction * force;
     }

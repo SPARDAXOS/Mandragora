@@ -165,7 +165,7 @@ public class Level : MonoBehaviour {
         tutorialCreature.SetActive(true);
         tutorialCreature.SetupStartState();
         tutorialCreature.StopDissatisfaction();
-        tutorialCreature.SetTutorialCreature(true);
+        tutorialCreature.SetTutorialCreature(true); //THIS!!!!! Need to control it for tutorial of delivering creatures!
         Vector3 spawnPosition = GetRandomPointOnNavMesh();
         spawnPosition.y += spawnHeightOffset;
         tutorialCreature.transform.position = spawnPosition;

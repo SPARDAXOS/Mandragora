@@ -304,15 +304,10 @@ public class Creature : MonoBehaviour
     }
     void HeldBehavior()
     {
-        if (!player)
-        {
-            PutDown();
-            return;
-        }
 
         rigidbodyComp.velocity = Vector3.zero;
 
-        if (!doEscapeHeld || player.GetInTaskStationRange()) 
+        if (!doEscapeHeld || !player || player.GetInTaskStationRange()) 
             return;
 
         float random = UnityEngine.Random.value;

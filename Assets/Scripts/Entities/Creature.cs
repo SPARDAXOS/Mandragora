@@ -15,17 +15,18 @@ public class Creature : MonoBehaviour
     }
 
     [SerializeField] private CreatureStats stats;
+    [SerializeField] private Vector2 randomizeDissatisfactionRate = new Vector2(0.5f, 2f);
     [SerializeField] private Material satisfiedMaterial, dissatisfiedMaterial;
     [SerializeField] private GameObject changeMaterialOn;
     [Range (0, 1f)]
-    [SerializeField] private float dissatisfaction;
+    [SerializeField] private float dissatisfaction = 0;
+    [SerializeField] private float scaleWhenDissatisfied = 3;
     [SerializeField] private bool doDissatisfaction;
-    [SerializeField] private bool doEscapeHeld;
+    [SerializeField] private bool doEscapeHeld = false;
     [SerializeField] private bool drawAIGizmos;
     [SerializeField] private List<TaskStation.TaskType> taskList;
 
     private List<TaskStation.TaskType> queueTasks;
-    private int numTasksAtStart;
 
     private bool initialized = false;
     private bool active;
@@ -36,6 +37,7 @@ public class Creature : MonoBehaviour
 
     private float dissatisfactionMultiplier = 1f;
     private float timeIncrement;
+    private float initialScale = 1;
     private float accelerationIncrement;
     private float decelerationIncrement;
 
@@ -52,11 +54,11 @@ public class Creature : MonoBehaviour
 
     private Rigidbody rigidbodyComp = null;
     private Collider colliderComp = null;
+    private SkinnedMeshRenderer meshRendererComp = null;
     private Player player = null;
     private ParticleSystem stinkPS = null;
     private ParticleSystem cryPS = null;
     private ParticleSystem runDustPS = null;
-    private SkinnedMeshRenderer meshRenderer = null;
     private Level levelScript;
 
     public void Initialize(Level level)
@@ -64,10 +66,11 @@ public class Creature : MonoBehaviour
         if (initialized) 
             return;
 
-        this.levelScript = level;
+        levelScript = level;
 
         SetupReferences();
 
+        initialScale = transform.localScale.x;
         timeIncrement = (1f / stats.timeUntilDissatisfied);
         CalculateEscapeProbability();
 
@@ -95,15 +98,18 @@ public class Creature : MonoBehaviour
     /// <summary>
     /// Use this to set how your entity should be at the start of the game.
     /// </summary>
-    public void SetupStartState() {
-
+    public void SetupStartState() 
+    {
+        GetDissatisfactionMultiplier();
         StartDissatisfaction();
         queueTasks = taskList;
         tutorialCreature = false;
 
+        dissatisfaction = 0;
         speed = 0;
         direction = RandomDirection();
         state = CreatureState.FALL;
+        transform.localScale = initialScale * Vector3.one;
         FindNewValidTarget();
 
         SetupParticleSystems();
@@ -116,7 +122,7 @@ public class Creature : MonoBehaviour
         stinkPS = transform.Find("StinkPS").GetComponent<ParticleSystem>();
         cryPS = transform.Find("CryPS").GetComponent<ParticleSystem>();
         runDustPS = transform.Find("RunDustPS").GetComponent<ParticleSystem>();
-        meshRenderer = changeMaterialOn.GetComponent<SkinnedMeshRenderer>();
+        meshRendererComp = changeMaterialOn.GetComponent<SkinnedMeshRenderer>();
     }
 
     public void ClearAllTasks() {
@@ -139,7 +145,6 @@ public class Creature : MonoBehaviour
                 Debug.Log("Removed!");
                 taskList.RemoveAt(i);
                 SetParticleSystemState(completedTask, false);
-                GetDissatisfactionMultiplier();
             }
         }
     }
@@ -153,21 +158,14 @@ public class Creature : MonoBehaviour
 
 
 
-    private void GetDissatisfactionMultiplier()
-    {
-        dissatisfactionMultiplier = Mathf.Sqrt((float)taskList.Count / numTasksAtStart);
-    }
     public bool IsSatisfied()
     {
         return taskList.Count == 0;
     }
     private void UpdateSatisfaction()
     {
+        dissatisfaction += dissatisfactionMultiplier * timeIncrement * Time.deltaTime;
 
-        dissatisfaction += timeIncrement * Time.deltaTime;
-
-        if (dissatisfaction > 1f)
-            levelScript.RegisterCreatureMaximumDisatisfied();
 
         if (IsSatisfied())
         {
@@ -175,7 +173,11 @@ public class Creature : MonoBehaviour
             doDissatisfaction = false;
         }
 
+        else if (dissatisfaction >= 1f)
+            levelScript.RegisterCreatureMaximumDisatisfied();
+
         UpdateMaterials();
+        UpdateScale();
     }
     public void StartDissatisfaction()
     {
@@ -189,10 +191,17 @@ public class Creature : MonoBehaviour
     }
     void UpdateMaterials()
     {
-        meshRenderer.material.Lerp(satisfiedMaterial, dissatisfiedMaterial, dissatisfaction);
+        meshRendererComp.material.Lerp(satisfiedMaterial, dissatisfiedMaterial, dissatisfaction);
     }
-
-
+    void UpdateScale()
+    {
+        transform.localScale = (initialScale * (1f + dissatisfaction * dissatisfaction * (scaleWhenDissatisfied - 1f))) * Vector3.one;
+    }
+    void GetDissatisfactionMultiplier()
+    {
+        float random = UnityEngine.Random.value * (randomizeDissatisfactionRate.y - randomizeDissatisfactionRate.x) + randomizeDissatisfactionRate.x;
+        dissatisfactionMultiplier = random / randomizeDissatisfactionRate.y;
+    }
 
     public bool GetActive()
     {
@@ -275,6 +284,8 @@ public class Creature : MonoBehaviour
     }
     private void RestBehavior()
     {
+        UpdateDirection();
+        UpdateRotation();
         UpdateMovement();
         Decelerate();
         CheckRunDust();
@@ -304,12 +315,11 @@ public class Creature : MonoBehaviour
     }
     void HeldBehavior()
     {
-        if (!player)
+        /*if (!player)
         {
             PutDown();
             return;
-        }
-
+        }*/
 
         rigidbodyComp.velocity = Vector3.zero;
 

@@ -3,6 +3,7 @@ using Mandragora;
 using UnityEditor;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
+using Unity.VisualScripting;
 
 namespace Initialization {
     public class Initialization {
@@ -73,12 +74,12 @@ public class GameInstance : MonoBehaviour {
     private MainCamera cameraScript = null;
     private SoundManager soundManagerScript = null;
     private TutorialSequencer tutorialSequencerScript = null;
-    private UIMainMenu mainMenuScript = null;
+    private MainMenu mainMenuScript = null;
     private SettingsMenu settingsMenuScript = null;
     private UIPauseMenu pauseMenuScript = null;
     private UILoseMenu loseMenuScript = null;
     private UIWinMenu winMenuScript = null;
-    private UICreditsMenu creditsMenuScript = null;
+    private CreditsMenu creditsMenuScript = null;
 
 
 
@@ -150,7 +151,7 @@ public class GameInstance : MonoBehaviour {
         else {
             tutorialSequencer = Instantiate(entitiesResources["TutorialSequencer"]);
             tutorialSequencerScript = tutorialSequencer.GetComponent<TutorialSequencer>();
-            tutorialSequencerScript.Initialize();
+            tutorialSequencerScript.Initialize(soundManagerScript);
         }
 
         
@@ -158,8 +159,8 @@ public class GameInstance : MonoBehaviour {
             Abort("Failed to find MainMenu resource");
         else {
             mainMenu = Instantiate(entitiesResources["MainMenu"]);
-            mainMenuScript = mainMenu.GetComponent<UIMainMenu>();
-            mainMenuScript.Initialize(this);
+            mainMenuScript = mainMenu.GetComponent<MainMenu>();
+            mainMenuScript.Initialize(this, soundManagerScript);
             mainMenu.SetActive(false);
         }
 
@@ -194,8 +195,8 @@ public class GameInstance : MonoBehaviour {
             Abort("Failed to find CreditsMenu resource");
         else {
             creditsMenu = Instantiate(entitiesResources["CreditsMenu"]);
-            creditsMenuScript = creditsMenu.GetComponent<UICreditsMenu>();
-            creditsMenuScript.Initialize(this);
+            creditsMenuScript = creditsMenu.GetComponent<CreditsMenu>();
+            creditsMenuScript.Initialize(this, soundManagerScript);
             creditsMenu.SetActive(false);
         }
 
@@ -252,7 +253,7 @@ public class GameInstance : MonoBehaviour {
         else {
             currentLevel = Instantiate(levelsResources["Level1"]);
             currentLevelScript = currentLevel.GetComponent<Level>();
-            currentLevelScript.Initialize(this);
+            currentLevelScript.Initialize(this, soundManagerScript);
         }
     }
 
@@ -308,7 +309,7 @@ public class GameInstance : MonoBehaviour {
         SetCursorState(true);
         HideAllMenus();
 
-        soundManagerScript.PlayTrack("TestTrack1", true);
+        soundManagerScript.PlayTrack("MainMenu", true);
         mainMenu.SetActive(true);
     }
     private void SetupSettingsMenuState() {
@@ -363,8 +364,7 @@ public class GameInstance : MonoBehaviour {
         player2.SetActive(true);
         player1Script.EnableInput();
         player2Script.EnableInput();
-        soundManagerScript.PlayTrack("TestTrack2", true);
-        currentGameState = GameState.PLAYING;     
+        currentGameState = GameState.PLAYING;
         StartGame();
     }
 
@@ -389,11 +389,14 @@ public class GameInstance : MonoBehaviour {
     public void LevelFinished(GameResults results) {
         Debug.Log("Game is over with results " + results.ToString());
 
-        if (results == GameResults.WIN)
+        if (results == GameResults.WIN) {
+            soundManagerScript.PlaySFX("YouWin", cameraScript.transform.position);
             SetGameState(GameState.WIN_MENU);
-        else if (results == GameResults.LOSE)
+        }
+        else if (results == GameResults.LOSE) {
+            soundManagerScript.PlaySFX("YouLose", cameraScript.transform.position);
             SetGameState(GameState.LOSE_MENU);
-        soundManagerScript.PlayTrack("TestTrack1", true);
+        }
         gameStarted = false;
     }
     private void StartGame() {

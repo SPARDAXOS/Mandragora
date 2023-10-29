@@ -287,6 +287,7 @@ public class SettingsMenu : MonoBehaviour {
             gameInstance.PauseGame(); //???
         else
             gameInstance.SetGameState(GameInstance.GameState.MAIN_MENU);
+        soundManager.PlaySFX("NextMenu", gameInstance.GetCameraScript().transform.position);
     }
 
 

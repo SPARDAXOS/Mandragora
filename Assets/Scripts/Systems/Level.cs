@@ -24,6 +24,7 @@ public class Level : MonoBehaviour {
     float lowerNavMeshEdge = 0.0f;
 
     private GameInstance gameInstance = null;
+    private SoundManager soundManager = null;
 
     private NavMeshSurface navMesh = null;
 
@@ -38,10 +39,11 @@ public class Level : MonoBehaviour {
     private Creature tutorialCreature = null;
 
 
-    public void Initialize(GameInstance instance) {
+    public void Initialize(GameInstance instance, SoundManager soundManager) {
         if (initialize)
             return;
 
+        this.soundManager = soundManager;
         gameInstance = instance;
         SetupReferences();
         CreateCreaturesPool();
@@ -169,6 +171,7 @@ public class Level : MonoBehaviour {
         Vector3 spawnPosition = GetRandomPointOnNavMesh();
         spawnPosition.y += spawnHeightOffset;
         tutorialCreature.transform.position = spawnPosition;
+        soundManager.PlayTrack("Tutorial", true);
         return tutorialCreature;
     }
 
@@ -181,6 +184,7 @@ public class Level : MonoBehaviour {
         }
         RandomizeCreatureSpawns();
         currentSatisfiedCreatures = 0;
+        soundManager.PlayTrack("Gameplay", true);
     }
     public void GameOver() {
 

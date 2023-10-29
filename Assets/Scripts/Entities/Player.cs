@@ -304,7 +304,10 @@ public class Player : MonoBehaviour {
     private void CheckGrounded() {
         Vector3 startingPosition = transform.position;
         startingPosition.y += 1;
-        isGrounded = Physics.BoxCast(startingPosition, Vector3.one / 2, -transform.up, transform.rotation, 1.0f);
+        bool results = Physics.BoxCast(startingPosition, Vector3.one / 2, -transform.up, transform.rotation, 1.0f);
+        if (!isGrounded && results)
+            soundManager.PlaySFX("Landing", transform.position);
+        isGrounded = results;
     }
     private void CheckPath() {
         Vector3 origin = transform.position;
@@ -342,8 +345,8 @@ public class Player : MonoBehaviour {
                     bounceDirection.x *= Mathf.Cos(Mathf.Deg2Rad * stats.objectBounceOffAngle);
                     bounceDirection.y = Mathf.Sin(Mathf.Deg2Rad * stats.objectBounceOffAngle);
                     bounceDirection.z *= Mathf.Cos(Mathf.Deg2Rad * stats.objectBounceOffAngle);
-                    ApplyKnockback(bounceDirection, stats.objectBouceOffForce); //ALWAYS USE THIS INSTEAD OF THE IMPULSE ONE!
-                                                                                //ApplyImpulse(bounceDirection, stats.bounceOffForce);
+                    ApplyKnockback(bounceDirection, stats.objectBouceOffForce);
+                    soundManager.PlaySFX("BounceOffObject", transform.position);                                                  
                 }
                 isPathBlocked = true;
             }
@@ -510,7 +513,7 @@ public class Player : MonoBehaviour {
     }
 
     private void UpdateAnimations() {
-        if (isMoving)
+        if (isMoving && isGrounded)
             animatorComp.SetBool("isMoving", true);
         else
             animatorComp.SetBool("isMoving", false);
@@ -615,6 +618,7 @@ public class Player : MonoBehaviour {
 
         if (stunTimer > 0.0f) {
             DisableInteractionInput();
+            soundManager.PlaySFX("Stunned", transform.position);
             //Start VFX
             isStunned = true;
         }

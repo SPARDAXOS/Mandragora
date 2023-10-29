@@ -61,17 +61,18 @@ public class TutorialSequencer : MonoBehaviour {
     private Player player2Script = null;
 
     private GameInstance gameInstance = null;
+    private SoundManager soundManager = null;
     private Level targetLevel = null;
     public Creature tutorialCreature = null;
 
     private Tutorials currentTutorial = Tutorials.NONE;
 
 
-    public void Initialize() {
+    public void Initialize(SoundManager soundManager) {
         if (initialized) 
             return;
 
-
+        this.soundManager = soundManager;
         queuedTutorials = tutorials;
         SetupReferences();
         HideAllTutorials();
@@ -302,7 +303,7 @@ public class TutorialSequencer : MonoBehaviour {
             Debug.Log("Tutorial is over! List at least is empty!");
             return;
         }
-
+        soundManager.PlaySFX("NextTutorial", gameInstance.GetCameraScript().transform.position); //Make better solution
         currentTutorial = queuedTutorials[0];
     }
     public bool IsTutorialRunning() {

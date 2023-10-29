@@ -46,7 +46,7 @@ public class Creature : MonoBehaviour
     private Vector3 direction = Vector3.forward;
     private Vector3 targetDirection = Vector3.forward;
     private float speed;
-    private bool isMoving = false;
+    public bool isMoving = false;
     private Vector3 velocity = Vector3.zero;
 
     private float restTimeElapsed = 0;
@@ -54,6 +54,7 @@ public class Creature : MonoBehaviour
 
     private Rigidbody rigidbodyComp = null;
     private Collider colliderComp = null;
+    private Animator animatorComp = null;
     private SkinnedMeshRenderer meshRendererComp = null;
     private Player player = null;
     private ParticleSystem stinkPS = null;
@@ -120,6 +121,7 @@ public class Creature : MonoBehaviour
     {
         rigidbodyComp   = GetComponent<Rigidbody>();
         colliderComp = GetComponent<Collider>();
+        animatorComp = transform.Find("Mesh").GetComponent<Animator>();
         stinkPS = transform.Find("StinkPS").GetComponent<ParticleSystem>();
         cryPS = transform.Find("CryPS").GetComponent<ParticleSystem>();
         runDustPS = transform.Find("RunDustPS").GetComponent<ParticleSystem>();
@@ -143,7 +145,6 @@ public class Creature : MonoBehaviour
             TaskStation.TaskType task = taskList[i];
             if (task == completedTask)
             {
-                Debug.Log("Removed!");
                 taskList.RemoveAt(i);
                 SetParticleSystemState(completedTask, false);
 
@@ -208,6 +209,7 @@ public class Creature : MonoBehaviour
         dissatisfactionMultiplier = random / randomizeDissatisfactionRate.y;
     }
 
+
     public bool GetActive()
     {
         return active;
@@ -218,8 +220,12 @@ public class Creature : MonoBehaviour
         gameObject.SetActive(active);
     }
 
-
-
+    private void CheckRunningAnimation() {
+        if (isMoving && !animatorComp.GetBool("isMoving"))
+            animatorComp.SetBool("isMoving", true);
+        else if (!isMoving && animatorComp.GetBool("isMoving"))
+            animatorComp.SetBool("isMoving", false);
+    }
     void CheckRunDust()
     {
         if (isMoving && !runDustPS.isPlaying) 
@@ -286,6 +292,7 @@ public class Creature : MonoBehaviour
         UpdateRotation();
         UpdateMovement();
         CheckRunDust();
+        CheckRunningAnimation();
     }
     private void RestBehavior()
     {
@@ -294,6 +301,7 @@ public class Creature : MonoBehaviour
         UpdateMovement();
         Decelerate();
         CheckRunDust();
+        CheckRunningAnimation();
 
         if (restTimeElapsed == 0)
         {
@@ -325,6 +333,13 @@ public class Creature : MonoBehaviour
             PutDown();
             return;
         }*/
+
+        //Patched in.
+        if (isMoving) {
+            animatorComp.SetBool("isMoving", false);
+            isMoving = false;
+        }
+
 
         rigidbodyComp.velocity = Vector3.zero;
 

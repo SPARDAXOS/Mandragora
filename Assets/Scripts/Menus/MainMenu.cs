@@ -16,15 +16,15 @@ public class MainMenu : MonoBehaviour {
     }
 
     public void StartButton() {
-        soundManager.PlaySFX("NextMenu", gameInstance.GetCameraScript().transform.position);
+        soundManager.PlaySFX("NextMenu", Vector3.zero, true);
         gameInstance.SetGameState(GameInstance.GameState.PLAYING);
     }
     public void SettingsButton() {
-        soundManager.PlaySFX("NextMenu", gameInstance.GetCameraScript().transform.position);
+        soundManager.PlaySFX("NextMenu", Vector3.zero, true);
         gameInstance.SetGameState(GameInstance.GameState.SETTINGS_MENU);
     }
     public void CreditsButton() {
-        soundManager.PlaySFX("NextMenu", gameInstance.GetCameraScript().transform.position);
+        soundManager.PlaySFX("NextMenu", Vector3.zero, true);
         gameInstance.SetGameState(GameInstance.GameState.CREDITS_MENU);
     }
     public void QuitButton() {

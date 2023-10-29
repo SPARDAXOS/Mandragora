@@ -98,7 +98,7 @@ public class Level : MonoBehaviour {
                 Debug.LogWarning("TaskStations does not contain any children!");
             else {
                 foreach (var entry in taskStations)
-                    entry.Initialize(gameInstance.GetCameraScript());
+                    entry.Initialize(gameInstance.GetCameraScript(), soundManager);
             }
         }
     }
@@ -147,7 +147,7 @@ public class Level : MonoBehaviour {
     }
 
 
-    public void RegisterCreatureMaximumDisatisfied() {
+    public void RegisterCreatureDesatisfied() {
         gameInstance.LevelFinished(GameInstance.GameResults.LOSE);
     }
     public void RegisterSatisfiedCreature() {
@@ -161,6 +161,8 @@ public class Level : MonoBehaviour {
     public Creature StartTutorial() {
         if (tutorialCreature)
             return tutorialCreature;
+
+        currentSatisfiedCreatures = 0;
 
         tutorialCreature = creatures[0];
         tutorialCreature.ClearAllTasks();

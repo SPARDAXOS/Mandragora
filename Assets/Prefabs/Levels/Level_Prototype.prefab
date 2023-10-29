@@ -2446,7 +2446,7 @@ GameObject:
   - component: {fileID: 7838646876851414486}
   - component: {fileID: 5819107718666195497}
   m_Layer: 2
-  m_Name: Level
+  m_Name: Level_Prototype
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2712,6 +2712,10 @@ PrefabInstance:
       propertyPath: holdIncreaseRate
       value: 0.218
       objectReference: {fileID: 0}
+    - target: {fileID: 7327453599668854676, guid: 2c902f953e46e46439908ca4d44dd30e, type: 3}
+      propertyPath: sfxInterruptable
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2780,7 +2784,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7327453599668854676, guid: 2c902f953e46e46439908ca4d44dd30e, type: 3}
       propertyPath: actionType
-      value: 3
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7327453599668854676, guid: 2c902f953e46e46439908ca4d44dd30e, type: 3}
       propertyPath: holdIncreaseRate
@@ -3451,6 +3455,10 @@ PrefabInstance:
     - target: {fileID: 6496003265933644122, guid: 398892eb9cf1ee141847a0d933fedffe, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7327453599668854676, guid: 398892eb9cf1ee141847a0d933fedffe, type: 3}
+      propertyPath: actionType
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

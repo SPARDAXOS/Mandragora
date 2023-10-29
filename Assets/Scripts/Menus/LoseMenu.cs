@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UILoseMenu : MonoBehaviour
+public class LoseMenu : MonoBehaviour
 {
     private bool initialize = false;
     private GameInstance gameInstance = null;

@@ -41,6 +41,7 @@ public class TaskStation : MonoBehaviour {
     [Space(10)]
     [Header("Settings")]
     [SerializeField] private bool persistentParticles = true;
+    [SerializeField] private bool sfxInterruptable = false;
 
 
 
@@ -48,7 +49,8 @@ public class TaskStation : MonoBehaviour {
 
     private PlayerType playerType = PlayerType.NONE;
 
-    private MainCamera cameraScript = null;
+    private MainCamera mainCamera = null;
+    private SoundManager soundManager = null;
     public Player targetPlayer = null;
     public List<bool> playersInRange = new List<bool>();
 
@@ -87,11 +89,12 @@ public class TaskStation : MonoBehaviour {
         if (eventRef.isKey)
             lastInputedKey = eventRef.keyCode.ToString().ToLower();
     }
-    public void Initialize(MainCamera camera) {
+    public void Initialize(MainCamera camera, SoundManager soundManager) {
         if (initialized)
             return;
 
-        cameraScript = camera;
+        this.soundManager = soundManager;
+        mainCamera = camera;
         SetupReferences();
         if (persistentParticles)
             EnableParticleSystem();
@@ -172,7 +175,7 @@ public class TaskStation : MonoBehaviour {
             interactionIndicator.SetActive(false);
     }
     private void UpdateIndicatorsRotation() {
-        Quaternion RotationTowardsCamera = Quaternion.LookRotation(cameraScript.transform.forward, cameraScript.transform.up);
+        Quaternion RotationTowardsCamera = Quaternion.LookRotation(mainCamera.transform.forward, mainCamera.transform.up);
         interactionIndicator.transform.rotation = RotationTowardsCamera;
         normalBarFrame.transform.rotation       = RotationTowardsCamera;
         QTEIndicator.transform.rotation         = RotationTowardsCamera;
@@ -185,6 +188,7 @@ public class TaskStation : MonoBehaviour {
 
     private void UpdateMashInteraction() {
         if (targetPlayer.IsInteractingTrigger()) {
+            PlaySFX();
             normalBar.fillAmount += mashIncreaseRate * Time.deltaTime;
             if (normalBar.fillAmount >= 1.0f) {
                 normalBar.fillAmount = 1.0f;
@@ -194,6 +198,7 @@ public class TaskStation : MonoBehaviour {
     }
     private void UpdateHoldInteraction() {
         if (targetPlayer.IsInteractingHeld()) {
+            PlaySFX();
             normalBar.fillAmount += holdIncreaseRate * Time.deltaTime;
             if (normalBar.fillAmount >= 1.0f) {
                 normalBar.fillAmount = 1.0f;
@@ -205,6 +210,7 @@ public class TaskStation : MonoBehaviour {
         if (lastInputedKey == currentTargetQTE.ToString().ToLower()) {
             currentQTECount++;
             normalBar.fillAmount += 1.0f / QTECount;
+            PlaySFX();
             if (currentQTECount == QTECount) {
                 normalBar.fillAmount = 1.0f;
                 currentQTECount = 0;
@@ -216,8 +222,40 @@ public class TaskStation : MonoBehaviour {
         }
     }
     private void UpdateTimedClickInteraction() {
-        if (QTEBarTrigger && targetPlayer.IsInteractingTrigger())
+        if (QTEBarTrigger && targetPlayer.IsInteractingTrigger()) {
+            PlaySFX();
             CompleteInteraction();
+        }
+    }
+
+    private void PlaySFX() {
+        if (taskType == TaskType.NONE)
+            return;
+
+        if (taskType == TaskType.BATHING) {
+            if (!sfxInterruptable)
+                soundManager.PlaySFX("CreatureBath", transform.position, false, false, gameObject);
+            else
+                soundManager.PlaySFX("CreatureBath", transform.position);
+        }
+        else if (taskType == TaskType.FEEDING) {
+            if (!sfxInterruptable)
+                soundManager.PlaySFX("CreatureEat", transform.position, false, false, gameObject);
+            else
+                soundManager.PlaySFX("CreatureEat", transform.position);
+        }
+        else if (taskType == TaskType.HEALING) {
+            if (!sfxInterruptable)
+                soundManager.PlaySFX("CreatureHeal", transform.position, false, false, gameObject);
+            else
+                soundManager.PlaySFX("CreatureHeal", transform.position);
+        }
+        else if (taskType == TaskType.SLEEPING) {
+            if (!sfxInterruptable)
+                soundManager.PlaySFX("CreatureSleep", transform.position, false, false, gameObject);
+            else
+                soundManager.PlaySFX("CreatureSleep", transform.position);
+        }
     }
 
     private void CompleteInteraction() {

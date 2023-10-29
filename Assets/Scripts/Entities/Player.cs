@@ -284,6 +284,7 @@ public class Player : MonoBehaviour {
                 throwDirection.x *= Mathf.Cos(Mathf.Deg2Rad * stats.throwHeightAngle);
                 throwDirection.y = Mathf.Sin(Mathf.Deg2Rad * stats.throwHeightAngle);
                 throwDirection.z *= Mathf.Cos(Mathf.Deg2Rad * stats.throwHeightAngle);
+                soundManager.PlaySFX("CreatureThrow", transform.position);
                 heldCreature.ApplyImpulse(throwDirection, stats.throwForce);
                 DropHeldCreature();
             }

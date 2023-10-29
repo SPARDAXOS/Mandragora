@@ -250,7 +250,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3166623503464500111, guid: a8ddb9c018a651d46aaf23a467cc2ac7, type: 3}
       propertyPath: m_Name
-      value: OnionCreature
+      value: Mesh
       objectReference: {fileID: 0}
     - target: {fileID: 3166623503464500111, guid: a8ddb9c018a651d46aaf23a467cc2ac7, type: 3}
       propertyPath: m_IsActive

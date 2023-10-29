@@ -160,7 +160,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 8295459705419122581, guid: 897dd40fbb045f14e8132ea1827d34cf, type: 3}
       propertyPath: m_Name
-      value: Witch
+      value: Mesh
       objectReference: {fileID: 0}
     - target: {fileID: 8670753137715485999, guid: 897dd40fbb045f14e8132ea1827d34cf, type: 3}
       propertyPath: m_LocalScale.x

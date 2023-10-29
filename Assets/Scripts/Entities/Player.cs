@@ -74,6 +74,7 @@ public class Player : MonoBehaviour {
 
     private Rigidbody rigidbodyComp = null;
     private BoxCollider boxColliderComp = null;
+    private Animator animatorComp = null;
     private MeshRenderer meshRendererComp = null;
     private Material mainMaterial;
 
@@ -106,6 +107,9 @@ public class Player : MonoBehaviour {
         if (!rigidbodyComp)
             GameInstance.Abort("Failed to get Rigidbody component on " + gameObject.name);
 
+        animatorComp = transform.Find("Mesh").GetComponent<Animator>();
+        if (!animatorComp)
+            GameInstance.Abort("Failed to get Animator component on " + gameObject.name);
 
         boxColliderComp = GetComponent<BoxCollider>();
         if (!boxColliderComp)
@@ -139,7 +143,7 @@ public class Player : MonoBehaviour {
         UpdateHeldCreature();
 
         UpdateInput();
-
+        UpdateAnimations();
         CheckTaskStatioInteraction();
 
         CheckGrounded();
@@ -503,6 +507,13 @@ public class Player : MonoBehaviour {
         }
         else
             isStunned = false;
+    }
+
+    private void UpdateAnimations() {
+        if (isMoving)
+            animatorComp.SetBool("isMoving", true);
+        else
+            animatorComp.SetBool("isMoving", false);
     }
 
     private void Pickup() {

@@ -19,9 +19,9 @@ MonoBehaviour:
   reverseRetainedSpeed: 0.1
   speedRetainedOnHit: 0.9
   customGravity: 0
-  gravityScale: 45.6
-  customGravityBounciness: 0
-  normalGravityBounciness: 1
+  gravityScale: 10
+  customGravityBounciness: 0.5
+  normalGravityBounciness: 0.7
   knockbackForce: 15
   knockbackHeightAngle: 32.3
   knockbackCreatureDropForce: 10

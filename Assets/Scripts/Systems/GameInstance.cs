@@ -71,13 +71,13 @@ public class GameInstance : MonoBehaviour {
 
     private Player player1Script = null;
     private Player player2Script = null;
-    private MainCamera cameraScript = null;
+    private MainCamera mainCameraScript = null;
     private SoundManager soundManagerScript = null;
     private TutorialSequencer tutorialSequencerScript = null;
     private MainMenu mainMenuScript = null;
     private SettingsMenu settingsMenuScript = null;
-    private UIPauseMenu pauseMenuScript = null;
-    private UILoseMenu loseMenuScript = null;
+    private PauseMenu pauseMenuScript = null;
+    private LoseMenu loseMenuScript = null;
     private UIWinMenu winMenuScript = null;
     private CreditsMenu creditsMenuScript = null;
 
@@ -151,7 +151,7 @@ public class GameInstance : MonoBehaviour {
         else {
             tutorialSequencer = Instantiate(entitiesResources["TutorialSequencer"]);
             tutorialSequencerScript = tutorialSequencer.GetComponent<TutorialSequencer>();
-            tutorialSequencerScript.Initialize(soundManagerScript);
+            tutorialSequencerScript.Initialize(this, soundManagerScript);
         }
 
         
@@ -186,7 +186,7 @@ public class GameInstance : MonoBehaviour {
             Abort("Failed to find LoseMenu resource");
         else {
             loseMenu = Instantiate(entitiesResources["LoseMenu"]);
-            loseMenuScript = loseMenu.GetComponent<UILoseMenu>();
+            loseMenuScript = loseMenu.GetComponent<LoseMenu>();
             loseMenuScript.Initialize(this);
             loseMenu.SetActive(false);
         }
@@ -204,7 +204,7 @@ public class GameInstance : MonoBehaviour {
             Abort("Failed to find PauseMenu resource");
         else {
             pauseMenu = Instantiate(entitiesResources["PauseMenu"]);
-            pauseMenuScript = pauseMenu.GetComponent<UIPauseMenu>();
+            pauseMenuScript = pauseMenu.GetComponent<PauseMenu>();
             pauseMenuScript.Initialize(this);
             pauseMenu.SetActive(false);
         }
@@ -234,10 +234,11 @@ public class GameInstance : MonoBehaviour {
             Abort("Failed to find MainCamera resource");
         else {
             mainCamera = Instantiate(entitiesResources["MainCamera"]);
-            cameraScript = mainCamera.GetComponent<MainCamera>();
-            cameraScript.Initialize();
-            cameraScript.AddTarget(player1);
-            cameraScript.AddTarget(player2);
+            mainCameraScript = mainCamera.GetComponent<MainCamera>();
+            mainCameraScript.Initialize();
+            mainCameraScript.AddTarget(player1);
+            mainCameraScript.AddTarget(player2);
+            soundManagerScript.SetMainCamera(mainCameraScript);
         }
 
         if (!entitiesResources["EventSystem"])
@@ -269,7 +270,7 @@ public class GameInstance : MonoBehaviour {
     private void UpdateFixedPlayingState() {
         player1Script.FixedTick();
         player2Script.FixedTick();
-        cameraScript.FixedTick();
+        mainCameraScript.FixedTick();
         currentLevelScript.FixedTick();
     }
 
@@ -390,11 +391,11 @@ public class GameInstance : MonoBehaviour {
         Debug.Log("Game is over with results " + results.ToString());
 
         if (results == GameResults.WIN) {
-            soundManagerScript.PlaySFX("YouWin", cameraScript.transform.position);
+            soundManagerScript.PlaySFX("YouWin", Vector3.zero, true);
             SetGameState(GameState.WIN_MENU);
         }
         else if (results == GameResults.LOSE) {
-            soundManagerScript.PlaySFX("YouLose", cameraScript.transform.position);
+            soundManagerScript.PlaySFX("YouLose", Vector3.zero, true);
             SetGameState(GameState.LOSE_MENU);
         }
         gameStarted = false;
@@ -403,7 +404,7 @@ public class GameInstance : MonoBehaviour {
         gameStarted = true;
 
         if (playTutorials)
-            tutorialSequencerScript.StartTutorial(this, currentLevelScript);
+            tutorialSequencerScript.StartTutorial(currentLevelScript);
         else
             currentLevelScript.StartLevel();
     }
@@ -441,6 +442,6 @@ public class GameInstance : MonoBehaviour {
 
 
     public MainCamera GetCameraScript() {
-        return cameraScript;
+        return mainCameraScript;
     }
 }

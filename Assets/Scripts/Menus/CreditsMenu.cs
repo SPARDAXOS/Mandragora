@@ -14,7 +14,7 @@ public class CreditsMenu : MonoBehaviour {
     }
 
     public void ReturnButton() {
-        soundManager.PlaySFX("NextMenu", gameInstance.GetCameraScript().transform.position);
+        soundManager.PlaySFX("NextMenu", Vector3.zero, true);
         gameInstance.SetGameState(GameInstance.GameState.MAIN_MENU);
     }
 }

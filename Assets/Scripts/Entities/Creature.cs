@@ -110,7 +110,6 @@ public class Creature : MonoBehaviour
         direction = RandomDirection();
         state = CreatureState.FALL;
         transform.localScale = initialScale * Vector3.one;
-        StartDissatisfaction();
         SetTutorialCreature(false);
         FindNewValidTarget();
 
@@ -180,7 +179,7 @@ public class Creature : MonoBehaviour
         }
 
         else if (dissatisfaction >= 1f)
-            levelScript.RegisterCreatureMaximumDisatisfied();
+            levelScript.RegisterCreatureDesatisfied();
 
         UpdateMaterials();
         UpdateScale();

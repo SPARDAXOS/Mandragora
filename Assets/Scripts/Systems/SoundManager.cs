@@ -2,12 +2,20 @@ using UnityEngine;
 using Mandragora;
 using System.Collections.Generic;
 using System;
+using UnityEngine.Experimental.AI;
+using static UnityEngine.EventSystems.EventTrigger;
 
 public class SoundManager : MonoBehaviour {
+    private struct SFXRequest {
+        public string key;
+        public GameObject owner;
+        public SoundUnit unit;
+    }
     private enum ClipType {
         SFX,
         TRACK
     }
+
 
     [Header("Bundles")]
     [SerializeField] private SoundsBundle sfxBundle;
@@ -40,10 +48,13 @@ public class SoundManager : MonoBehaviour {
     private bool fadingOut = false;
     private SoundEntry? fadeTargetTrack;
 
+    private MainCamera mainCamera = null;
+
     private GameObject soundUnitResource = null;
     private AudioSource trackAudioSource = null;
 
     private List<SoundUnit> soundUnits = new List<SoundUnit>();
+    private List<SFXRequest> SFXRequests = new List<SFXRequest>();
 
 
     public void Initialize() {
@@ -60,12 +71,17 @@ public class SoundManager : MonoBehaviour {
         if (!initialized)
             return;
 
+        UpdateSFXRequests();
+
         if (fadingIn)
             UpdateTrackFadeIn();
         else if (fadingOut)
             UpdateTrackFadeOut();
         else
             UpdateTrackVolume();
+    }
+    public void SetMainCamera(MainCamera mainCamera) {
+        this.mainCamera = mainCamera;
     }
 
 
@@ -85,10 +101,18 @@ public class SoundManager : MonoBehaviour {
     }
 
 
-    public bool PlaySFX(string key, Vector3 position) {
+    public bool PlaySFX(string key, Vector3 position, bool worldwide = false, bool newUnit = true, GameObject owner = null) {
         if (!canPlaySFX) {
             Debug.LogError("Unable to play sfx \n SoundManager does not contain an SFX bundle!");
             return false;
+        }
+
+        if (!newUnit) {
+            SFXRequest? request = FindSFXRequest(owner, key);
+            if (request != null) {
+                Debug.Log("SFX with key " + key + " is still playing!");
+                return false;
+            }
         }
 
         SoundEntry? TargetSoundEntry = FindClip(key, ClipType.SFX);
@@ -103,7 +127,18 @@ public class SoundManager : MonoBehaviour {
             return false;
         }
 
+        
         float volume = masterVolume * sfxVolume * TargetSoundEntry.Value.volume;
+        if (worldwide && mainCamera) {
+            if (!newUnit)
+                AddSFXRequest(owner, key, soundUnit);
+            return soundUnit.Play((SoundEntry)TargetSoundEntry, mainCamera.transform.position, volume);
+        }
+        else if (worldwide && !mainCamera)
+            Debug.LogWarning("Unable to play clip " + key + " worldwide due to missing MainCamera reference!");
+
+        if (!newUnit)
+            AddSFXRequest(owner, key, soundUnit);
         return soundUnit.Play((SoundEntry)TargetSoundEntry, position, volume);
     }
     public bool PlayTrack(string key, bool fade = false) {
@@ -178,8 +213,6 @@ public class SoundManager : MonoBehaviour {
     public float GetSFXVolume() {
         return sfxVolume;
     }
-
-
     public void SetMasterVolume(float volume) {
         masterVolume = volume;
     }
@@ -216,6 +249,14 @@ public class SoundManager : MonoBehaviour {
 
         return null;
     }
+    private Nullable<SFXRequest> FindSFXRequest(GameObject owner, string key) {
+        foreach(var entry in SFXRequests) {
+            if (entry.key == key && entry.owner == owner)
+                return entry;
+        }
+
+        return null;
+    }
     private SoundUnit GetAvailableSoundUnit() {
         if (soundUnits.Count == 0)
             return AddSoundUnit();
@@ -239,6 +280,14 @@ public class SoundManager : MonoBehaviour {
         script.Initialize();
         soundUnits.Add(script);
         return script;
+    }
+    private void AddSFXRequest(GameObject owner, string key, SoundUnit unit) {
+        var newSFXRequest = new SFXRequest {
+            unit = unit,
+            key = key,
+            owner = owner
+        };
+        SFXRequests.Add(newSFXRequest);
     }
 
 
@@ -288,5 +337,16 @@ public class SoundManager : MonoBehaviour {
             return;
 
         trackAudioSource.volume = masterVolume * musicVolume * currentTrackEntryVolume;
+    }
+    private void UpdateSFXRequests() {
+        List<SFXRequest> requests = new List<SFXRequest>();
+        foreach (var entry in SFXRequests) {
+            if (!entry.unit.IsPlaying())
+                requests.Add(entry);
+        }
+
+        foreach(var request in requests) {
+            SFXRequests.Remove(request);
+        }
     }
 }

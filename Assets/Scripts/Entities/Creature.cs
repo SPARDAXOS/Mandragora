@@ -260,17 +260,17 @@ public class Creature : MonoBehaviour
         {
             case TaskStation.TaskType.FEEDING:
                 {
-                    if (state)
+                    if (state && !cryPS.isPlaying)
                         cryPS.Play();
-                    else
+                    else if (!state && cryPS.isPlaying)
                         cryPS.Stop();
                 }
                 break;
             case TaskStation.TaskType.BATHING:
                 {
-                    if (state)
+                    if (state && !stinkPS.isPlaying)
                         stinkPS.Play();
-                    else 
+                    else if (!state && stinkPS.isPlaying)
                         stinkPS.Stop();
                 }
                 break;

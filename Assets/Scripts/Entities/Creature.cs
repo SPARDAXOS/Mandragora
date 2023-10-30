@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 [RequireComponent(typeof(Rigidbody))]
 public class Creature : MonoBehaviour
@@ -112,7 +113,6 @@ public class Creature : MonoBehaviour
         transform.localScale = initialScale * Vector3.one;
         SetTutorialCreature(false);
         FindNewValidTarget();
-
         SetupParticleSystems();
     }
 
@@ -160,8 +160,6 @@ public class Creature : MonoBehaviour
         }
         return false;
     }
-
-
 
     public bool IsSatisfied()
     {

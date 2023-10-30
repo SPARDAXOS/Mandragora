@@ -37,11 +37,11 @@ public class Player : MonoBehaviour {
     private bool isDashingTrigger = false;
     private bool isThrowingTrigger = false;
 
-    private bool isKnockedback = false;
-    private bool isGrounded = false;
+    public bool isKnockedback = false;
+    public bool isGrounded = false;
     private bool isDashing = false;
     private bool isStunned = false;
-    private bool isPathBlocked = false;
+    public bool isPathBlocked = false;
     public bool isInteractingWithTaskStation = false;
 
 
@@ -619,7 +619,7 @@ public class Player : MonoBehaviour {
 
         if (stunTimer > 0.0f) {
             DisableInteractionInput();
-            soundManager.PlaySFX("Stunned", transform.position);
+
             //Start VFX
             isStunned = true;
         }
@@ -644,8 +644,10 @@ public class Player : MonoBehaviour {
 
         if (collision.collider.CompareTag("Player")) {
             var script = collision.collider.GetComponent<Player>();
-            if (script)
+            if (script) {
+                soundManager.PlaySFX("PlayerBounce", transform.position);
                 CheckKnockback(script, collision.GetContact(0).point);
+            }
         }
     }
 

@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entries:
   - key: MainMenu
-    clip: {fileID: 8300000, guid: 06707221c62053e45b3be5c73c8925e4, type: 3}
-    volume: 0.2
+    clip: {fileID: 8300000, guid: 4306cf479551a624495dcaf67bfcce4d, type: 3}
+    volume: 0.4
     maxPitch: 1
     minPitch: 1
   - key: Gameplay
@@ -24,7 +24,7 @@ MonoBehaviour:
     maxPitch: 1
     minPitch: 1
   - key: Tutorial
-    clip: {fileID: 8300000, guid: 427b99133c8f5e64aa110f15c0178615, type: 3}
-    volume: 0.7
+    clip: {fileID: 8300000, guid: ff1b565112f81f04e88fd6a97d8623dd, type: 3}
+    volume: 0.3
     maxPitch: 1
     minPitch: 1

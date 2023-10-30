@@ -18,7 +18,7 @@ MonoBehaviour:
     volume: 1.66
     maxPitch: 0.7
     minPitch: 1.3
-  - key: Stunned
+  - key: PlayerBounce
     clip: {fileID: 8300000, guid: 79bb7693d84271045972bd817f322c37, type: 3}
     volume: 1.66
     maxPitch: 0.7
@@ -40,11 +40,36 @@ MonoBehaviour:
     minPitch: 1.2
   - key: Landing
     clip: {fileID: 8300000, guid: 41a55ebe061689b4fa30f23c0df34451, type: 3}
-    volume: 1
-    maxPitch: 0.8
+    volume: 0.8
+    maxPitch: 1
     minPitch: 1.4
   - key: CreatureThrow
-    clip: {fileID: 8300000, guid: 17973c5a430d56449915254a44843f32, type: 3}
+    clip: {fileID: 8300000, guid: b6421ee14ea31024898458e0876d7988, type: 3}
     volume: 1
     maxPitch: 1
     minPitch: 1.4
+  - key: YouWin
+    clip: {fileID: 8300000, guid: 6aa64e7f841ad1b48b0adbbb3b3a2f77, type: 3}
+    volume: 1
+    maxPitch: 1
+    minPitch: 1
+  - key: YouLose
+    clip: {fileID: 8300000, guid: 9ff516be10223fd498b1155448304e58, type: 3}
+    volume: 1
+    maxPitch: 1
+    minPitch: 1
+  - key: CreatureEat
+    clip: {fileID: 8300000, guid: 5fbd6c89534b6e04fa576af413b29c72, type: 3}
+    volume: 1
+    maxPitch: 1
+    minPitch: 1.4
+  - key: CreatureBath
+    clip: {fileID: 8300000, guid: 5e6e9525b0f3ee047a02462c581323c6, type: 3}
+    volume: 0.4
+    maxPitch: 0.8
+    minPitch: 1.6
+  - key: CreatureHeal
+    clip: {fileID: 8300000, guid: 5ed0f7f560ca5ec4f823d20290623013, type: 3}
+    volume: 1
+    maxPitch: 0.8
+    minPitch: 1.2

@@ -108,8 +108,9 @@ MonoBehaviour:
   doDissatisfaction: 0
   doEscapeHeld: 0
   drawAIGizmos: 1
-  taskList: 0100000002000000
+  taskList: 
   state: 0
+  isMoving: 0
 --- !u!1001 &1405697963936289669
 PrefabInstance:
   m_ObjectHideFlags: 0

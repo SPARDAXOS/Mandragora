@@ -109,8 +109,27 @@ public class TaskStation : MonoBehaviour {
         if (interactionOngoing)
             UpdateInteraction();
     }
-    public void SetupStartState() {
-        //Reset interaction stuff with player.
+    public void ResetState() {
+        playersInRange.Clear();
+        interactionOngoing = false;
+        playerType = PlayerType.NONE;
+        DisableInteractionGUI();
+
+        if (!persistentParticles)
+            DisableParticleSystem();
+
+        targetPlayer = null;
+
+        //Mash/Hold
+        normalBar.fillAmount = 0.0f;
+
+        //QTE
+        lastInputedKey = null;
+        currentTargetQTE = KeyCode.None;
+        currentQTECount = 0;
+
+        //Timed QTE
+        QTEBarTrigger = false;
     }
     private void SetupReferences() {
         GUI = transform.Find("GUI").gameObject;

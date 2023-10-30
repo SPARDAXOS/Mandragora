@@ -1,7 +1,6 @@
 using UnityEngine;
 
-public class PauseMenu : MonoBehaviour
-{
+public class PauseMenu : MonoBehaviour {
     private bool initialize = false;
     private GameInstance gameInstance = null;
 
@@ -21,7 +20,6 @@ public class PauseMenu : MonoBehaviour
         gameInstance.SetGameState(GameInstance.GameState.SETTINGS_MENU);
     }
     public void QuitButton() {
-        //END GAME
-        gameInstance.SetGameState(GameInstance.GameState.MAIN_MENU);
+        gameInstance.QuitGame();
     }
 }

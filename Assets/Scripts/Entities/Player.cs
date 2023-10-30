@@ -130,6 +130,9 @@ public class Player : MonoBehaviour {
         dashTimer = 0.0f;
         dashCooldownTimer = 0.0f;
         stunTimer = 0.0f;
+
+        //Reset interaction state
+        //Reset held creature stuff
     }
 
 

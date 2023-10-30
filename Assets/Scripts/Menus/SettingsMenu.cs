@@ -6,6 +6,62 @@ using UnityEngine.UI;
 
 public class SettingsMenu : MonoBehaviour {
 
+    //NOTE: Map the unity values to these and create arrays of these. Then map the drop down options to these.
+
+    public enum WindowMode {
+        BORDERLESS_FULLSCREEN = FullScreenMode.FullScreenWindow,
+        WINDOWED = FullScreenMode.Windowed,
+        EXCLUSIVE_FULLSCREEN = FullScreenMode.ExclusiveFullScreen,
+        MAXIMIZED_WINDOWED = FullScreenMode.MaximizedWindow
+    }
+    public enum Vsync {
+        OFF = 0,
+        ON = 1,
+        FRAME_2 = 2,
+        FRAME_3 = 3,
+        FRAME_4 = 4
+    }
+    public enum FPSLimit {
+        OFF = -1,
+        LIMIT_30 = 30,
+        LIMIT_60 = 60,
+        LIMIT_144 = 144
+    }
+    public enum AntiAliasing {
+        NO_MSAA = 0,
+        MULTISAMPLING_X2 = 2,
+        MULTISAMPLING_X4 = 4,
+        MULTISAMPLING_X8 = 8
+    }
+    public enum TextureQuality {
+        HIGH = 0,
+        MEDIUM = 1,
+        LOW = 2
+    }
+    public enum AnisotropicFiltering {
+        DISABLE = UnityEngine.AnisotropicFiltering.Disable,
+        ENABLE = UnityEngine.AnisotropicFiltering.Enable,
+        FORCE_ENABLE = UnityEngine.AnisotropicFiltering.ForceEnable
+    }
+    public enum PixelLightCount {
+        OFF = 0,
+        LOW = 1,
+        MEDIUM = 2,
+        HIGH = 3,
+        ULTRA = 4
+    }
+    public enum ShadowQuality {
+        DISABLE = UnityEngine.ShadowQuality.Disable,
+        HARD_ONLY = UnityEngine.ShadowQuality.HardOnly,
+        HARD_AND_SOFT = UnityEngine.ShadowQuality.All
+    }
+    public enum ShadowResolution {
+        ULTRA = UnityEngine.ShadowResolution.VeryHigh,
+        HIGH = UnityEngine.ShadowResolution.High,
+        MEDIUM = UnityEngine.ShadowResolution.Medium,
+        LOW = UnityEngine.ShadowResolution.Low
+    }
+
     private bool initialize = false;
 
 
@@ -16,15 +72,17 @@ public class SettingsMenu : MonoBehaviour {
     private int[] fpsLimitOptions = new int[4];
     private int[] antiAliasingOptions = new int[4];
     private int[] textureQualityOptions = new int[3];
-    private AnisotropicFiltering[] anisotropicFilteringOptions = new AnisotropicFiltering[3];
+    private UnityEngine.AnisotropicFiltering[] anisotropicFilteringOptions = new UnityEngine.AnisotropicFiltering[3];
     private int[] pixelLightCountOptions = new int[5];
-    private ShadowQuality[] shadowQualityOptions = new ShadowQuality[3];
-    private ShadowResolution[] shadowResolutionOptions = new ShadowResolution[4]; 
+    private UnityEngine.ShadowQuality[] shadowQualityOptions = new UnityEngine.ShadowQuality[3];
+    private UnityEngine.ShadowResolution[] shadowResolutionOptions = new UnityEngine.ShadowResolution[4]; 
 
     private FullScreenMode currentFullScreenMode = FullScreenMode.FullScreenWindow; //Update this in initial setup!
 
     private GameInstance gameInstance = null;
     private SoundManager soundManager = null;
+
+    private GameSettings gameSettings = null;
 
     private Slider MasterSlider;
     private Slider SFXSlider;
@@ -45,7 +103,7 @@ public class SettingsMenu : MonoBehaviour {
 
 
 
-    public void Initialize(GameInstance gameInstance, SoundManager soundManager) {
+    public void Initialize(GameInstance gameInstance, SoundManager soundManager, GameSettings gameSettings, bool applySettings) {
         if (initialize)
             return;
 
@@ -53,6 +111,7 @@ public class SettingsMenu : MonoBehaviour {
 
         this.gameInstance = gameInstance;
         this.soundManager = soundManager;
+        this.gameSettings = gameSettings;
 
         SetupReference();
         SetupResolutionOptions();
@@ -107,6 +166,15 @@ public class SettingsMenu : MonoBehaviour {
     }
     private void UpdateGUI() {
 
+        //Resolution
+        var resolution = Screen.currentResolution;
+        for (uint i = 0; i < supportedResolutions.Length; i++) {
+            var entry = supportedResolutions[i];
+            if (entry.width == resolution.width && entry.height == resolution.height && entry.refreshRateRatio.value == resolution.refreshRateRatio.value)
+                resolutionDropdown.value = (int)i;
+        }
+
+        //WindowMode
     }
 
     private void SetupResolutionOptions() {
@@ -123,6 +191,8 @@ public class SettingsMenu : MonoBehaviour {
         modes.Add("Borderless Fullscreen");
         modes.Add("Windowed");
 
+
+        //This would need some work
 #if UNITY_STANDALONE_WIN
         windowModeOptions = new FullScreenMode[3];
         modes.Add("Exclusive Fullscreen");
@@ -198,9 +268,9 @@ public class SettingsMenu : MonoBehaviour {
         options.Add("Enable");
         options.Add("ForceEnable");
 
-        anisotropicFilteringOptions[0] = AnisotropicFiltering.Disable;
-        anisotropicFilteringOptions[1] = AnisotropicFiltering.Enable;
-        anisotropicFilteringOptions[2] = AnisotropicFiltering.ForceEnable;
+        anisotropicFilteringOptions[0] = UnityEngine.AnisotropicFiltering.Disable;
+        anisotropicFilteringOptions[1] = UnityEngine.AnisotropicFiltering.Enable;
+        anisotropicFilteringOptions[2] = UnityEngine.AnisotropicFiltering.ForceEnable;
 
         anisotropicFilteringDropdown.ClearOptions();
         anisotropicFilteringDropdown.AddOptions(options);
@@ -244,9 +314,9 @@ public class SettingsMenu : MonoBehaviour {
         options.Add("HardOnly");
         options.Add("All");
 
-        shadowQualityOptions[0] = ShadowQuality.Disable;
-        shadowQualityOptions[1] = ShadowQuality.HardOnly;
-        shadowQualityOptions[2] = ShadowQuality.All;
+        shadowQualityOptions[0] = UnityEngine.ShadowQuality.Disable;
+        shadowQualityOptions[1] = UnityEngine.ShadowQuality.HardOnly;
+        shadowQualityOptions[2] = UnityEngine.ShadowQuality.All;
 
         shadowQualityDropdown.ClearOptions();
         shadowQualityDropdown.AddOptions(options);
@@ -259,10 +329,10 @@ public class SettingsMenu : MonoBehaviour {
         options.Add("Medium");
         options.Add("Low");
 
-        shadowResolutionOptions[0] = ShadowResolution.VeryHigh;
-        shadowResolutionOptions[1] = ShadowResolution.High;
-        shadowResolutionOptions[2] = ShadowResolution.Medium;
-        shadowResolutionOptions[3] = ShadowResolution.Low;
+        shadowResolutionOptions[0] = UnityEngine.ShadowResolution.VeryHigh;
+        shadowResolutionOptions[1] = UnityEngine.ShadowResolution.High;
+        shadowResolutionOptions[2] = UnityEngine.ShadowResolution.Medium;
+        shadowResolutionOptions[3] = UnityEngine.ShadowResolution.Low;
 
         shadowResolutionDropdown.ClearOptions();
         shadowResolutionDropdown.AddOptions(options);

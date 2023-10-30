@@ -46,6 +46,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entitiesBundle: {fileID: 11400000, guid: 69c106c49dca700438c4b3bf22384b69, type: 2}
   levelsBundle: {fileID: 11400000, guid: 26945b0305d55654e96aad91e8ae5997, type: 2}
+  gameSettings: {fileID: 11400000, guid: 76764e78cab79944c8df175c9642e1eb, type: 2}
   player1ControlScheme: {fileID: 11400000, guid: c8571a4dc279c79409265de61e23c8ba, type: 2}
   player2ControlScheme: {fileID: 11400000, guid: ab22c9cb5ecda9c449b57b56b7c03d51, type: 2}
   playTutorials: 0

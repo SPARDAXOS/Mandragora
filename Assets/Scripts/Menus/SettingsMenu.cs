@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.UI;
+using static SettingsMenu;
 
 public class SettingsMenu : MonoBehaviour {
 
@@ -76,12 +77,9 @@ public class SettingsMenu : MonoBehaviour {
     private ShadowQuality[] shadowQualityOptions = new ShadowQuality[3];
     private ShadowResolution[] shadowResolutionOptions = new ShadowResolution[4]; 
 
-    private WindowMode currentFullScreenMode = WindowMode.BORDERLESS_FULLSCREEN; //Update this in initial setup!
-
+    private GameSettings gameSettings = null;
     private GameInstance gameInstance = null;
     private SoundManager soundManager = null;
-
-    private GameSettings gameSettings = null;
 
     private Slider MasterSlider;
     private Slider SFXSlider;
@@ -102,15 +100,15 @@ public class SettingsMenu : MonoBehaviour {
 
 
 
-    public void Initialize(GameInstance gameInstance, SoundManager soundManager, GameSettings gameSettings, bool firstInitialization) {
+    public void Initialize(GameInstance gameInstance, SoundManager soundManager, GameSettings gameSettings) {
         if (initialize)
             return;
 
         //TODO: Take SO of all settings!
 
+        this.gameSettings = gameSettings;
         this.gameInstance = gameInstance;
         this.soundManager = soundManager;
-        this.gameSettings = gameSettings;
 
         SetupReference();
         SetupResolutionOptions();
@@ -124,14 +122,23 @@ public class SettingsMenu : MonoBehaviour {
         SetupShadowQualityOptions();
         SetupShadowResolutionOptions();
 
-        if (firstInitialization)
-            ApplyGameSettings(gameSettings);
-        else
-            UpdateGUI();
 
-        //Flow
-        //If first time, Take GameSettings apply them from it then update gui from current settings.
-        //If not first, just update GUI using Unity current settings
+        int firstInitializationResults = PlayerPrefs.GetInt("FirstInitialization", -1);
+        if (firstInitializationResults == -1) {
+            PlayerPrefs.SetInt("FirstInitialization", 1);
+            ApplyGameSettings();
+            Debug.Log("Player prefs created new entry - Loaded settings from SO");
+        }
+        else if (firstInitializationResults == 1) {
+            //LoadFromIt
+            Debug.Log("Player prefs found an old entry - Loaded from player prefs!");
+            ApplyGameSettingsFromPlayerPrefs();
+        }
+        else
+            GameInstance.Abort("Undefined Behavior by player prefs retrieving FirstInitialization");
+
+
+        UpdateGUI();
         initialize = true;
     }
     private void SetupReference() {
@@ -161,14 +168,9 @@ public class SettingsMenu : MonoBehaviour {
 
         softParticlesToggle = Quality.Find("SoftParticlesToggle").GetComponent<Toggle>();
     }
-    private void UpdateData() {
-        //Updates All GUI - Updates only visuals
-        //Update All Settings - actually sets them!
-    }
     private void UpdateGUI() {
 
-        //Always take from Unity
-
+        //Display
         //Resolution
         var resolution = Screen.currentResolution;
         for (uint i = 0; i < supportedResolutions.Length; i++) {
@@ -178,24 +180,296 @@ public class SettingsMenu : MonoBehaviour {
         }
 
         //WindowMode
-        
+        var windowMode = Screen.fullScreenMode;
+        for (uint i = 0; i < windowModeOptions.Length; i++) {
+            if (windowMode == (UnityEngine.FullScreenMode)windowModeOptions[i]) {
+                Debug.Log("It found WindowMode " + windowModeOptions[i] + " to be equal to unitys " + windowMode);
+                windowModeDropdown.value = (int)i;
+            }
+        }
+
+        //Vysnc
+        var vsync = QualitySettings.vSyncCount;
+        for (uint i = 0; i < vsyncOptions.Length; i++) {
+            if (vsync == (int)vsyncOptions[i]) {
+                Debug.Log("It found Vsync " + vsyncOptions[i] + " to be equal to unitys " + vsync);
+                vsyncDropdown.value = (int)i;
+            }
+        }
+
+        //FPS Limit
+        var fpsLimit = Application.targetFrameRate;
+        for (uint i = 0; i < fpsLimitOptions.Length; i++) {
+            if (fpsLimit == (int)fpsLimitOptions[i]) {
+                Debug.Log("It found FPSLimit " + fpsLimitOptions[i] + " to be equal to unitys " + fpsLimit);
+                fpsLimitDropdown.value = (int)i;
+            }
+        }
 
 
-        //Audio
+        //Quality
+        //Anti Aliasing
+        var antiAliasing = QualitySettings.antiAliasing;
+        for (uint i = 0; i < antiAliasingOptions.Length; i++) {
+            if (antiAliasing == (int)antiAliasingOptions[i]) {
+                Debug.Log("It found AntiAliasing" + antiAliasingOptions[i] + " to be equal to unitys " + antiAliasing);
+                antiAliasingDropdown.value = (int)i;
+            }
+        }
+
+        //Anisotropic Filtering
+        var anisotropicFiltering = QualitySettings.anisotropicFiltering;
+        for (uint i = 0; i < anisotropicFilteringOptions.Length; i++) {
+            if (anisotropicFiltering == (UnityEngine.AnisotropicFiltering)anisotropicFilteringOptions[i]) {
+                Debug.Log("It found AnisotropicFiltering" + anisotropicFilteringOptions[i] + " to be equal to unitys " + anisotropicFiltering);
+                anisotropicFilteringDropdown.value = (int)i;
+            }
+        }
+
+        //Texture Quality
+        var textureQuality = QualitySettings.globalTextureMipmapLimit;
+        for (uint i = 0; i < textureQualityOptions.Length; i++) {
+            if (textureQuality == (int)textureQualityOptions[i]) {
+                Debug.Log("It found TextureQuality " + textureQualityOptions[i] + " to be equal to unitys " + textureQuality);
+                textureQualityDropdown.value = (int)i;
+            }
+        }
+
+        //Pixel Light Count
+        var pixelLightCount = QualitySettings.pixelLightCount;
+        for (uint i = 0; i < pixelLightCountOptions.Length; i++) {
+            if (pixelLightCount == (int)pixelLightCountOptions[i]) {
+                Debug.Log("It found PixelLightCount " + pixelLightCountOptions[i] + " to be equal to unitys " + pixelLightCount);
+                pixelLightCountDropdown.value = (int)i;
+            }
+        }
+
+        //ShadowQuality
+        var shadowQuality = QualitySettings.shadows;
+        for (uint i = 0; i < shadowQualityOptions.Length; i++) {
+            if (shadowQuality == (UnityEngine.ShadowQuality)shadowQualityOptions[i]) {
+                Debug.Log("It found ShadowQuality " + shadowQualityOptions[i] + " to be equal to unitys " + shadowQuality);
+                shadowQualityDropdown.value = (int)i;
+            }
+        }
+
+        //ShadowResolution
+        var shadowResolution = QualitySettings.shadowResolution;
+        for (uint i = 0; i < shadowResolutionOptions.Length; i++) {
+            if (shadowResolution == (UnityEngine.ShadowResolution)shadowResolutionOptions[i]) {
+                Debug.Log("It found ShadowResolution " + shadowResolutionOptions[i] + " to be equal to unitys " + shadowResolution);
+                shadowResolutionDropdown.value = (int)i;
+            }
+        }
+
+        //Soft Particles
+        var softParticles = QualitySettings.softParticles;
+        softParticlesToggle.isOn = softParticles;
+        Debug.Log("Soft particle is " + softParticles);
+
+        //Audio - These are giving wierd values in the middle!
         MasterSlider.value = soundManager.GetMasterVolume();
         SFXSlider.value = soundManager.GetSFXVolume();
         MusicSlider.value = soundManager.GetMusicVolume();
-
     }
-    private void UpdateGUI(GameSettings gameSettings) {
-        //Remember what i had in mind. 
-        //I think one updates from the so and other from actual game settings.
-        //Doesnt seem needed...
+    private void ApplyGameSettings() {
 
-    }
-    private void ApplyGameSettings(GameSettings gameSettngs) {
+        //Any negative indexed enum will crash this.
+        //Display
 
+        //Save index in options not the enums index
+
+        //WindowMode
+        Screen.fullScreenMode = (UnityEngine.FullScreenMode)gameSettings.windowMode;
+        for (uint i = 0; i < windowModeOptions.Length; i++) {
+            if (windowModeOptions[(int)i] == gameSettings.windowMode) {
+                Debug.Log("WINDOW MODE OK!");
+                PlayerPrefs.SetInt("WindowMode", (int)i);
+            }
+        }
+
+        //Resolution
+        var highestResolution = supportedResolutions[supportedResolutions.Length - 1];
+        Screen.SetResolution(highestResolution.width, highestResolution.height, Screen.fullScreenMode, highestResolution.refreshRateRatio);
+        //HAVENT DONE THIS
+
+        //Vysnc
+        QualitySettings.vSyncCount = (int)gameSettings.vsync;
+        for (uint i = 0; i < vsyncOptions.Length; i++) {
+            if (vsyncOptions[(int)i] == gameSettings.vsync) {
+                Debug.Log("VSYNC MODE OK!");
+                PlayerPrefs.SetInt("Vsync", (int)i);
+            }
+        }
+
+
+        //FPS Limit
+        Application.targetFrameRate = (int)gameSettings.fpsLimit;
+        for (uint i = 0; i < fpsLimitOptions.Length; i++) {
+            if (fpsLimitOptions[(int)i] == gameSettings.fpsLimit) {
+                Debug.Log("FPSLIMIT MODE OK!");
+                PlayerPrefs.SetInt("FPSLimit", (int)i);
+            }
+        }
+
+
+        //Quality
+        //Anti Aliasing
+        QualitySettings.antiAliasing = (int)gameSettings.antiAliasing;
+        for (uint i = 0; i < antiAliasingOptions.Length; i++) {
+            if (antiAliasingOptions[(int)i] == gameSettings.antiAliasing) {
+                Debug.Log("AntiAliasing MODE OK!");
+                PlayerPrefs.SetInt("AntiAliasing", (int)i);
+            }
+        }
+
+        //Anisotropic Filtering
+        QualitySettings.anisotropicFiltering = (UnityEngine.AnisotropicFiltering)gameSettings.anisotropicFiltering;
+        for (uint i = 0; i < anisotropicFilteringOptions.Length; i++) {
+            if (anisotropicFilteringOptions[(int)i] == gameSettings.anisotropicFiltering) {
+                Debug.Log("AnisotropicFiltering MODE OK!");
+                PlayerPrefs.SetInt("AnisotropicFiltering", (int)i);
+            }
+        }
+
+
+        //Texture Quality
+        QualitySettings.globalTextureMipmapLimit = (int)gameSettings.textureQuality;
+        for (uint i = 0; i < textureQualityOptions.Length; i++) {
+            if (textureQualityOptions[(int)i] == gameSettings.textureQuality) {
+                Debug.Log("TextureQuality MODE OK!");
+                PlayerPrefs.SetInt("TextureQuality", (int)i);
+            }
+        }
+
+
+        //Pixel Light Count
+        QualitySettings.pixelLightCount = (int)gameSettings.pixelLightCount;
+        for (uint i = 0; i < pixelLightCountOptions.Length; i++) {
+            if (pixelLightCountOptions[(int)i] == gameSettings.pixelLightCount) {
+                Debug.Log("PixelLightCount MODE OK!");
+                PlayerPrefs.SetInt("PixelLightCount", (int)i);
+            }
+        }
+
+
+        //ShadowQuality
+        QualitySettings.shadows = (UnityEngine.ShadowQuality)gameSettings.shadowQuality;
+        for (uint i = 0; i < shadowQualityOptions.Length; i++) {
+            if (shadowQualityOptions[(int)i] == gameSettings.shadowQuality) {
+                Debug.Log("ShadowQuality MODE OK!");
+                PlayerPrefs.SetInt("ShadowQuality", (int)i);
+            }
+        }
+
+
+        //ShadowResolution
+        QualitySettings.shadowResolution = (UnityEngine.ShadowResolution)gameSettings.shadowResolution;
+        for (uint i = 0; i < shadowResolutionOptions.Length; i++) {
+            if (shadowResolutionOptions[(int)i] == gameSettings.shadowResolution) {
+                Debug.Log("ShadowResolution MODE OK!");
+                PlayerPrefs.SetInt("ShadowResolution", (int)i);
+            }
+        }
+
+
+        //Soft Particles
+        QualitySettings.softParticles = gameSettings.softParticles;
+        if (QualitySettings.softParticles)
+            PlayerPrefs.SetInt("SoftParticles", 1);
+        else if (!QualitySettings.softParticles)
+            PlayerPrefs.SetInt("SoftParticles", 0);
+
+
+        //Audio
+        soundManager.SetMasterVolume(gameSettings.masterVolume);
+        soundManager.SetMusicVolume(gameSettings.musicVolume);
+        soundManager.SetSFXVolume(gameSettings.sfxVolume);
+
+        PlayerPrefs.SetFloat("MasterVolume", gameSettings.masterVolume);
+        PlayerPrefs.SetFloat("MusicVolume", gameSettings.musicVolume);
+        PlayerPrefs.SetFloat("SFXVolume", gameSettings.sfxVolume);
     }
+    private void ApplyGameSettingsFromPlayerPrefs() {
+        //Display
+
+        //Window
+        int windowMode = PlayerPrefs.GetInt("WindowMode", -1);
+        Debug.Log("WindowMode : " + windowMode);
+        Screen.fullScreenMode = (UnityEngine.FullScreenMode)windowModeOptions[windowMode];
+        
+        //Vysnc
+        int vsync = PlayerPrefs.GetInt("Vsync", -1);
+        Debug.Log("Vsync : " + vsync);
+        QualitySettings.vSyncCount = (int)vsyncOptions[vsync];
+
+        //FPS Limit
+        int fpsLimit = PlayerPrefs.GetInt("FPSLimit", -1);
+        Debug.Log("FPSLimit : " + fpsLimit);
+        Application.targetFrameRate = (int)fpsLimitOptions[fpsLimit];
+
+        //Quality
+        //Anti Aliasing
+        int antiAliasing = PlayerPrefs.GetInt("AntiAliasing", -1);
+        Debug.Log("AntiAliasing : " + antiAliasing);
+        QualitySettings.antiAliasing = (int)antiAliasingOptions[antiAliasing];
+
+        //Anisotropic Filtering
+        var anisotropicFiltering = PlayerPrefs.GetInt("AnisotropicFiltering", -1);
+        Debug.Log("anisotropicFiltering : " + anisotropicFiltering);
+        QualitySettings.anisotropicFiltering = (UnityEngine.AnisotropicFiltering)anisotropicFilteringOptions[anisotropicFiltering];
+
+        //Texture Quality
+        int textureQuality = PlayerPrefs.GetInt("TextureQuality", -1);
+        Debug.Log("TextureQuality : " + textureQuality);
+        QualitySettings.globalTextureMipmapLimit = (int)textureQualityOptions[textureQuality];
+
+
+        //Pixel Light Count
+        int pixelLightCount = PlayerPrefs.GetInt("PixelLightCount", -1);
+        Debug.Log("pIXELlIGHTcoUNT : " + pixelLightCount);
+        QualitySettings.pixelLightCount = (int)pixelLightCountOptions[pixelLightCount];
+
+
+        //ShadowQuality
+        var shadowQuality = PlayerPrefs.GetInt("ShadowQuality", -1);
+        Debug.Log("ShadowQuality : " + shadowQuality);
+        QualitySettings.shadows = (UnityEngine.ShadowQuality)shadowQualityOptions[shadowQuality];
+
+
+        //ShadowResolution
+        var shadowResolution = PlayerPrefs.GetInt("ShadowResolution", -1);
+        Debug.Log("ShadowResolution : " + shadowResolution);
+        QualitySettings.shadowResolution = (UnityEngine.ShadowResolution)shadowResolutionOptions[shadowResolution];
+
+
+        //Soft Particles
+        int softParticles;
+        softParticles = PlayerPrefs.GetInt("SoftParticles", -1);
+        if (softParticles == 0)
+            QualitySettings.softParticles = false;
+        else if (softParticles == 1)
+            QualitySettings.softParticles = true;
+        else
+            Debug.LogError("Got -1 at soft particles!");
+
+
+
+        //Audio
+
+        float masterVolume = PlayerPrefs.GetFloat("MasterVolume", 0.0f);
+        float musicVolume = PlayerPrefs.GetFloat("MusicVolume", 0.0f);
+        float sfxVolume = PlayerPrefs.GetFloat("SFXVolume", 0.0f);
+
+        Debug.Log("Master Volume - " + masterVolume);
+        Debug.Log("Music Volume - " + musicVolume);
+        Debug.Log("SFX Volume - " + sfxVolume);
+
+        soundManager.SetMasterVolume(masterVolume);
+        soundManager.SetMusicVolume(musicVolume);
+        soundManager.SetSFXVolume(sfxVolume);
+    }
+
 
     private void SetupResolutionOptions() {
         supportedResolutions = Screen.resolutions;
@@ -390,12 +664,14 @@ public class SettingsMenu : MonoBehaviour {
 
         Debug.Log(windowModeOptions[value].ToString());
         Screen.fullScreenMode = (UnityEngine.FullScreenMode)windowModeOptions[value];
+
+        PlayerPrefs.SetInt("WindowMode", value);
     }
     public void UpdateResolution() {
         int value = resolutionDropdown.value;
         Assert.IsFalse(value > supportedResolutions.Length - 1 || value < 0);
         var results = supportedResolutions[value];
-        Screen.SetResolution(results.width, results.height, (UnityEngine.FullScreenMode)currentFullScreenMode, results.refreshRateRatio);
+        Screen.SetResolution(results.width, results.height, Screen.fullScreenMode, results.refreshRateRatio);
         Debug.Log(results.ToString());
     }
     public void UpdateVsync() {
@@ -405,6 +681,8 @@ public class SettingsMenu : MonoBehaviour {
 
         Debug.Log((int)vsyncOptions[value]);
         QualitySettings.vSyncCount = (int)vsyncOptions[value];
+
+        PlayerPrefs.SetInt("Vsync", value);
     }
     public void UpdateFPSLimit() {
         int value = fpsLimitDropdown.value;
@@ -413,6 +691,8 @@ public class SettingsMenu : MonoBehaviour {
 
         Debug.Log((int)fpsLimitOptions[value]);
         Application.targetFrameRate = (int)fpsLimitOptions[value];
+
+        PlayerPrefs.SetInt("FPSLimit", value);
     }
 
     //Quality
@@ -422,6 +702,8 @@ public class SettingsMenu : MonoBehaviour {
             return;
         Debug.Log((int)antiAliasingOptions[value]);
         QualitySettings.antiAliasing = (int)antiAliasingOptions[value];
+
+        PlayerPrefs.SetInt("AntiAliasing", value);
     }
     public void UpdateTextureQuality() {
         int value = textureQualityDropdown.value;
@@ -431,6 +713,8 @@ public class SettingsMenu : MonoBehaviour {
 
         Debug.Log((int)textureQualityOptions[value]);
         QualitySettings.globalTextureMipmapLimit = (int)textureQualityOptions[value];
+
+        PlayerPrefs.SetInt("TextureQuality", value);
     }
     public void UpdateAnisotropicFiltering() {
         int value = anisotropicFilteringDropdown.value;
@@ -439,6 +723,8 @@ public class SettingsMenu : MonoBehaviour {
 
         Debug.Log((UnityEngine.AnisotropicFiltering)anisotropicFilteringOptions[value]);
         QualitySettings.anisotropicFiltering = (UnityEngine.AnisotropicFiltering)anisotropicFilteringOptions[value];
+
+        PlayerPrefs.SetInt("AnisotropicFiltering", value);
     }
     public void UpdatePixelLightCount() {
         int value = pixelLightCountDropdown.value;
@@ -447,6 +733,8 @@ public class SettingsMenu : MonoBehaviour {
 
         Debug.Log((int)pixelLightCountOptions[value]);
         QualitySettings.pixelLightCount = (int)pixelLightCountOptions[value];
+
+        PlayerPrefs.SetInt("PixelLightCount", value);
     }
     public void UpdateShadowQuality() {
         int value = shadowQualityDropdown.value;
@@ -455,6 +743,8 @@ public class SettingsMenu : MonoBehaviour {
 
         Debug.Log((UnityEngine.ShadowQuality)shadowQualityOptions[value]);
         QualitySettings.shadows = (UnityEngine.ShadowQuality)shadowQualityOptions[value];
+
+        PlayerPrefs.SetInt("ShadowQuality", value);
     }
     public void UpdateShadowResolution() {
         int value = shadowResolutionDropdown.value;
@@ -463,24 +753,39 @@ public class SettingsMenu : MonoBehaviour {
 
         Debug.Log((UnityEngine.ShadowResolution)shadowResolutionOptions[value]);
         QualitySettings.shadowResolution = (UnityEngine.ShadowResolution)shadowResolutionOptions[value];
+
+
+        PlayerPrefs.SetInt("ShadowResolution", value);
     }
     public void ToggleSoftParticles() {
         bool value = softParticlesToggle.isOn;
         Debug.Log("Soft Particles: " + value);
         QualitySettings.softParticles = value;
+
+        if (QualitySettings.softParticles)
+            PlayerPrefs.SetInt("SoftParticles", 1);
+        else if (!QualitySettings.softParticles)
+            PlayerPrefs.SetInt("SoftParticles", 0);
     }
     
+
     //Sound
     public void SetMasterSlider() {
         if (initialize)
             soundManager.SetMasterVolume(MasterSlider.value);
+
+        PlayerPrefs.SetFloat("MasterVolume", MasterSlider.value);
     }
     public void SetSFXSlider() {
         if (initialize)
             soundManager.SetSFXVolume(SFXSlider.value);
+
+        PlayerPrefs.SetFloat("SFXVolume", SFXSlider.value);
     }
     public void SetMusicSlider() {
         if (initialize)
             soundManager.SetMusicVolume(MusicSlider.value);
+
+        PlayerPrefs.SetFloat("MusicVolume", MusicSlider.value);
     }
 }

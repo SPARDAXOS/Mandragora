@@ -170,7 +170,7 @@ public class GameInstance : MonoBehaviour {
         else {
             settingsMenu = Instantiate(entitiesResources["SettingsMenu"]);
             settingsMenuScript = settingsMenu.GetComponent<SettingsMenu>();
-            settingsMenuScript.Initialize(this, soundManagerScript, gameSettings, true); //Here!
+            settingsMenuScript.Initialize(this, soundManagerScript, gameSettings);
             settingsMenu.SetActive(false);
         }
 

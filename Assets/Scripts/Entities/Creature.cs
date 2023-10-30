@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using UnityEditor;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 [RequireComponent(typeof(Rigidbody))]
 public class Creature : MonoBehaviour
@@ -27,7 +29,6 @@ public class Creature : MonoBehaviour
     [SerializeField] private bool drawAIGizmos;
     [SerializeField] private List<TaskStation.TaskType> taskList;
 
-    private List<TaskStation.TaskType> queueTasks;
 
     private bool initialized = false;
     private bool active;
@@ -104,7 +105,6 @@ public class Creature : MonoBehaviour
     {
         GetDissatisfactionMultiplier();
         StartDissatisfaction();
-        queueTasks = taskList;
         tutorialCreature = false;
 
         speed = 0;
@@ -113,6 +113,8 @@ public class Creature : MonoBehaviour
         transform.localScale = initialScale * Vector3.one;
         SetTutorialCreature(false);
         FindNewValidTarget();
+
+        RandomizeTasks();
         SetupParticleSystems();
     }
 
@@ -160,6 +162,23 @@ public class Creature : MonoBehaviour
         }
         return false;
     }
+    private void RandomizeTasks()
+    {
+        var allTasksArray = Enum.GetValues(typeof(TaskStation.TaskType));
+        List<TaskStation.TaskType> availableTasks = new List<TaskStation.TaskType>();
+        availableTasks.AddRange((IEnumerable<TaskStation.TaskType>)allTasksArray);
+
+        int amountOfTasks = UnityEngine.Random.Range(1, allTasksArray.Length);
+
+        taskList.Clear();
+        while (taskList.Count != amountOfTasks)
+        {
+            int randomTask = UnityEngine.Random.Range(1, availableTasks.Count);
+            AddTask(availableTasks[randomTask]);
+            availableTasks.RemoveAt(randomTask);
+        }
+    }
+
 
     public bool IsSatisfied()
     {
@@ -243,7 +262,7 @@ public class Creature : MonoBehaviour
                 {
                     if (state && !cryPS.isPlaying)
                         cryPS.Play();
-                    else if (cryPS.isPlaying)
+                    else if (!state && cryPS.isPlaying)
                         cryPS.Stop();
                 }
                 break;
@@ -251,7 +270,7 @@ public class Creature : MonoBehaviour
                 {
                     if (state && !stinkPS.isPlaying)
                         stinkPS.Play();
-                    else if (stinkPS.isPlaying)
+                    else if (!state && stinkPS.isPlaying)
                         stinkPS.Stop();
                 }
                 break;
@@ -417,13 +436,14 @@ public class Creature : MonoBehaviour
     }
     bool CastToTarget(Vector3 target, bool assignTarget = true)
     {
-        if (!Physics.CheckSphere(target, 0.5f))
+        float scale = transform.localScale.x;
+        if (!Physics.CheckSphere(target, scale))
             return false;
 
         Vector3 origin = transform.position;
         Vector3 direction = target - transform.position;
         colliderComp.enabled = false;
-        bool output = Physics.SphereCast(new Ray(origin, direction), 0.5f, stats.viewRange);
+        bool output = Physics.SphereCast(new Ray(origin, direction), scale * 0.9f, stats.viewRange);
         colliderComp.enabled = true;
         if (!output && assignTarget) targetPosition = target;
         return output;

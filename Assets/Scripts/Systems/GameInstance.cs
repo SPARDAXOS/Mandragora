@@ -38,6 +38,7 @@ public class GameInstance : MonoBehaviour {
 
     [SerializeField] private ResourcesBundle entitiesBundle;
     [SerializeField] private ResourcesBundle levelsBundle;
+    [SerializeField] private GameSettings gameSettings;
     [SerializeField] private PlayerControlScheme player1ControlScheme;
     [SerializeField] private PlayerControlScheme player2ControlScheme;
     [SerializeField] private bool playTutorials = false;
@@ -169,7 +170,7 @@ public class GameInstance : MonoBehaviour {
         else {
             settingsMenu = Instantiate(entitiesResources["SettingsMenu"]);
             settingsMenuScript = settingsMenu.GetComponent<SettingsMenu>();
-            settingsMenuScript.Initialize(this, soundManagerScript);
+            settingsMenuScript.Initialize(this, soundManagerScript, gameSettings, true); //Here!
             settingsMenu.SetActive(false);
         }
 

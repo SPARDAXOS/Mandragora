@@ -23,7 +23,7 @@ public class GameSettings : ScriptableObject {
     [SerializeField] public SettingsMenu.ShadowResolution shadowResolution = SettingsMenu.ShadowResolution.ULTRA;
 
 
-    [Header("Sound")]
+[Header("Sound")]
     [Range(0.0f, 1.0f)][SerializeField] public float masterVolume = 1.0f;
     [Range(0.0f, 1.0f)][SerializeField] public float musicVolume = 1.0f;
     [Range(0.0f, 1.0f)][SerializeField] public float sfxVolume = 1.0f;

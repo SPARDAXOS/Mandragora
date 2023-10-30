@@ -62,22 +62,21 @@ public class SettingsMenu : MonoBehaviour {
         LOW = UnityEngine.ShadowResolution.Low
     }
 
+
     private bool initialize = false;
 
-
-
     private Resolution[] supportedResolutions = null;
-    private FullScreenMode[] windowModeOptions = null;
-    private int[] vsyncOptions = new int[5];
-    private int[] fpsLimitOptions = new int[4];
-    private int[] antiAliasingOptions = new int[4];
-    private int[] textureQualityOptions = new int[3];
-    private UnityEngine.AnisotropicFiltering[] anisotropicFilteringOptions = new UnityEngine.AnisotropicFiltering[3];
-    private int[] pixelLightCountOptions = new int[5];
-    private UnityEngine.ShadowQuality[] shadowQualityOptions = new UnityEngine.ShadowQuality[3];
-    private UnityEngine.ShadowResolution[] shadowResolutionOptions = new UnityEngine.ShadowResolution[4]; 
+    private WindowMode[] windowModeOptions = null;
+    private Vsync[] vsyncOptions = new Vsync[5];
+    private FPSLimit[] fpsLimitOptions = new FPSLimit[4];
+    private AntiAliasing[] antiAliasingOptions = new AntiAliasing[4];
+    private TextureQuality[] textureQualityOptions = new TextureQuality[3];
+    private AnisotropicFiltering[] anisotropicFilteringOptions = new AnisotropicFiltering[3];
+    private PixelLightCount[] pixelLightCountOptions = new PixelLightCount[5];
+    private ShadowQuality[] shadowQualityOptions = new ShadowQuality[3];
+    private ShadowResolution[] shadowResolutionOptions = new ShadowResolution[4]; 
 
-    private FullScreenMode currentFullScreenMode = FullScreenMode.FullScreenWindow; //Update this in initial setup!
+    private WindowMode currentFullScreenMode = WindowMode.BORDERLESS_FULLSCREEN; //Update this in initial setup!
 
     private GameInstance gameInstance = null;
     private SoundManager soundManager = null;
@@ -103,7 +102,7 @@ public class SettingsMenu : MonoBehaviour {
 
 
 
-    public void Initialize(GameInstance gameInstance, SoundManager soundManager, GameSettings gameSettings, bool applySettings) {
+    public void Initialize(GameInstance gameInstance, SoundManager soundManager, GameSettings gameSettings, bool firstInitialization) {
         if (initialize)
             return;
 
@@ -125,8 +124,14 @@ public class SettingsMenu : MonoBehaviour {
         SetupShadowQualityOptions();
         SetupShadowResolutionOptions();
 
-        UpdateData();
-        UpdateGUI();
+        if (firstInitialization)
+            ApplyGameSettings(gameSettings);
+        else
+            UpdateGUI();
+
+        //Flow
+        //If first time, Take GameSettings apply them from it then update gui from current settings.
+        //If not first, just update GUI using Unity current settings
         initialize = true;
     }
     private void SetupReference() {
@@ -159,12 +164,10 @@ public class SettingsMenu : MonoBehaviour {
     private void UpdateData() {
         //Updates All GUI - Updates only visuals
         //Update All Settings - actually sets them!
-
-        MasterSlider.value = soundManager.GetMasterVolume();
-        SFXSlider.value = soundManager.GetSFXVolume();
-        MusicSlider.value = soundManager.GetMusicVolume();
     }
     private void UpdateGUI() {
+
+        //Always take from Unity
 
         //Resolution
         var resolution = Screen.currentResolution;
@@ -175,6 +178,23 @@ public class SettingsMenu : MonoBehaviour {
         }
 
         //WindowMode
+        
+
+
+        //Audio
+        MasterSlider.value = soundManager.GetMasterVolume();
+        SFXSlider.value = soundManager.GetSFXVolume();
+        MusicSlider.value = soundManager.GetMusicVolume();
+
+    }
+    private void UpdateGUI(GameSettings gameSettings) {
+        //Remember what i had in mind. 
+        //I think one updates from the so and other from actual game settings.
+        //Doesnt seem needed...
+
+    }
+    private void ApplyGameSettings(GameSettings gameSettngs) {
+
     }
 
     private void SetupResolutionOptions() {
@@ -192,21 +212,22 @@ public class SettingsMenu : MonoBehaviour {
         modes.Add("Windowed");
 
 
-        //This would need some work
 #if UNITY_STANDALONE_WIN
-        windowModeOptions = new FullScreenMode[3];
+        windowModeOptions = new WindowMode[3];
         modes.Add("Exclusive Fullscreen");
-        windowModeOptions[2] = FullScreenMode.ExclusiveFullScreen;
+        windowModeOptions[2] = WindowMode.EXCLUSIVE_FULLSCREEN;
+
 #elif UNITY_STANDALONE_OSX
-        windowModeOptions = new FullScreenMode[3];
+        windowModeOptions = new WindowMode[3];
         modes.Add("Maximized Window");
-        windowModeOptions[2] = FullScreenMode.MaximizedWindow;
+        windowModeOptions[2] = WindowMode.MAXIMIZED_WINDOWED;
+
 #else
-        windowModeOptions = new FullScreenMode[2];
+        windowModeOptions = new WindowMode[2];
 #endif
 
-        windowModeOptions[0] = FullScreenMode.FullScreenWindow;
-        windowModeOptions[1] = FullScreenMode.Windowed;
+        windowModeOptions[0] = WindowMode.BORDERLESS_FULLSCREEN;
+        windowModeOptions[1] = WindowMode.WINDOWED;
 
         windowModeDropdown.ClearOptions();
         windowModeDropdown.AddOptions(modes);
@@ -220,11 +241,11 @@ public class SettingsMenu : MonoBehaviour {
         options.Add("3 Frames");
         options.Add("4 Frames");
 
-        vsyncOptions[0] = 0;
-        vsyncOptions[1] = 1;
-        vsyncOptions[2] = 2;
-        vsyncOptions[3] = 3;
-        vsyncOptions[4] = 4;
+        vsyncOptions[0] = Vsync.OFF;
+        vsyncOptions[1] = Vsync.ON;
+        vsyncOptions[2] = Vsync.FRAME_2;
+        vsyncOptions[3] = Vsync.FRAME_3;
+        vsyncOptions[4] = Vsync.FRAME_4;
 
         vsyncDropdown.ClearOptions();
         vsyncDropdown.AddOptions(options);
@@ -237,10 +258,10 @@ public class SettingsMenu : MonoBehaviour {
         options.Add("60");
         options.Add("144");
 
-        fpsLimitOptions[0] = -1;
-        fpsLimitOptions[1] = 30;
-        fpsLimitOptions[2] = 60;
-        fpsLimitOptions[3] = 144;
+        fpsLimitOptions[0] = FPSLimit.OFF;
+        fpsLimitOptions[1] = FPSLimit.LIMIT_30;
+        fpsLimitOptions[2] = FPSLimit.LIMIT_60;
+        fpsLimitOptions[3] = FPSLimit.LIMIT_144;
 
         fpsLimitDropdown.ClearOptions();
         fpsLimitDropdown.AddOptions(options);
@@ -253,10 +274,10 @@ public class SettingsMenu : MonoBehaviour {
         options.Add("4X");
         options.Add("8X");
 
-        antiAliasingOptions[0] = 0;
-        antiAliasingOptions[1] = 2;
-        antiAliasingOptions[2] = 4;
-        antiAliasingOptions[3] = 8;
+        antiAliasingOptions[0] = AntiAliasing.NO_MSAA;
+        antiAliasingOptions[1] = AntiAliasing.MULTISAMPLING_X2;
+        antiAliasingOptions[2] = AntiAliasing.MULTISAMPLING_X4;
+        antiAliasingOptions[3] = AntiAliasing.MULTISAMPLING_X8;
 
         antiAliasingDropdown.ClearOptions();
         antiAliasingDropdown.AddOptions(options);
@@ -268,9 +289,9 @@ public class SettingsMenu : MonoBehaviour {
         options.Add("Enable");
         options.Add("ForceEnable");
 
-        anisotropicFilteringOptions[0] = UnityEngine.AnisotropicFiltering.Disable;
-        anisotropicFilteringOptions[1] = UnityEngine.AnisotropicFiltering.Enable;
-        anisotropicFilteringOptions[2] = UnityEngine.AnisotropicFiltering.ForceEnable;
+        anisotropicFilteringOptions[0] = AnisotropicFiltering.DISABLE;
+        anisotropicFilteringOptions[1] = AnisotropicFiltering.ENABLE;
+        anisotropicFilteringOptions[2] = AnisotropicFiltering.FORCE_ENABLE;
 
         anisotropicFilteringDropdown.ClearOptions();
         anisotropicFilteringDropdown.AddOptions(options);
@@ -282,9 +303,9 @@ public class SettingsMenu : MonoBehaviour {
         options.Add("Medium");
         options.Add("Low");
 
-        textureQualityOptions[0] = 0;
-        textureQualityOptions[1] = 1;
-        textureQualityOptions[2] = 2;
+        textureQualityOptions[0] = TextureQuality.HIGH;
+        textureQualityOptions[1] = TextureQuality.MEDIUM;
+        textureQualityOptions[2] = TextureQuality.LOW;
 
         textureQualityDropdown.ClearOptions();
         textureQualityDropdown.AddOptions(options);
@@ -298,11 +319,11 @@ public class SettingsMenu : MonoBehaviour {
         options.Add("High");
         options.Add("Ultra");
 
-        pixelLightCountOptions[0] = 0;
-        pixelLightCountOptions[1] = 1;
-        pixelLightCountOptions[2] = 2;
-        pixelLightCountOptions[3] = 3;
-        pixelLightCountOptions[4] = 4;
+        pixelLightCountOptions[0] = PixelLightCount.OFF;
+        pixelLightCountOptions[1] = PixelLightCount.LOW;
+        pixelLightCountOptions[2] = PixelLightCount.MEDIUM;
+        pixelLightCountOptions[3] = PixelLightCount.HIGH;
+        pixelLightCountOptions[4] = PixelLightCount.ULTRA;
 
         pixelLightCountDropdown.ClearOptions();
         pixelLightCountDropdown.AddOptions(options);
@@ -314,9 +335,9 @@ public class SettingsMenu : MonoBehaviour {
         options.Add("HardOnly");
         options.Add("All");
 
-        shadowQualityOptions[0] = UnityEngine.ShadowQuality.Disable;
-        shadowQualityOptions[1] = UnityEngine.ShadowQuality.HardOnly;
-        shadowQualityOptions[2] = UnityEngine.ShadowQuality.All;
+        shadowQualityOptions[0] = ShadowQuality.DISABLE;
+        shadowQualityOptions[1] = ShadowQuality.HARD_ONLY;
+        shadowQualityOptions[2] = ShadowQuality.HARD_AND_SOFT;
 
         shadowQualityDropdown.ClearOptions();
         shadowQualityDropdown.AddOptions(options);
@@ -329,10 +350,10 @@ public class SettingsMenu : MonoBehaviour {
         options.Add("Medium");
         options.Add("Low");
 
-        shadowResolutionOptions[0] = UnityEngine.ShadowResolution.VeryHigh;
-        shadowResolutionOptions[1] = UnityEngine.ShadowResolution.High;
-        shadowResolutionOptions[2] = UnityEngine.ShadowResolution.Medium;
-        shadowResolutionOptions[3] = UnityEngine.ShadowResolution.Low;
+        shadowResolutionOptions[0] = ShadowResolution.ULTRA;
+        shadowResolutionOptions[1] = ShadowResolution.HIGH;
+        shadowResolutionOptions[2] = ShadowResolution.MEDIUM;
+        shadowResolutionOptions[3] = ShadowResolution.LOW;
 
         shadowResolutionDropdown.ClearOptions();
         shadowResolutionDropdown.AddOptions(options);
@@ -368,29 +389,30 @@ public class SettingsMenu : MonoBehaviour {
             return;
 
         Debug.Log(windowModeOptions[value].ToString());
-        Screen.fullScreenMode = windowModeOptions[value];
+        Screen.fullScreenMode = (UnityEngine.FullScreenMode)windowModeOptions[value];
     }
     public void UpdateResolution() {
         int value = resolutionDropdown.value;
         Assert.IsFalse(value > supportedResolutions.Length - 1 || value < 0);
         var results = supportedResolutions[value];
-        Screen.SetResolution(results.width, results.height, currentFullScreenMode, results.refreshRateRatio);
+        Screen.SetResolution(results.width, results.height, (UnityEngine.FullScreenMode)currentFullScreenMode, results.refreshRateRatio);
         Debug.Log(results.ToString());
     }
     public void UpdateVsync() {
         int value = vsyncDropdown.value;
         if (!ValidateUserInput(0, vsyncOptions.Length - 1, value, "UpdateVsync"))
             return;
-        Debug.Log(vsyncOptions[value].ToString());
-        QualitySettings.vSyncCount = vsyncOptions[value]; //Redundant but is for consistency's sake.
+
+        Debug.Log((int)vsyncOptions[value]);
+        QualitySettings.vSyncCount = (int)vsyncOptions[value];
     }
     public void UpdateFPSLimit() {
         int value = fpsLimitDropdown.value;
         if (!ValidateUserInput(0, fpsLimitOptions.Length - 1, value, "UpdateFPSLimit"))
             return;
 
-        Debug.Log(fpsLimitOptions[value].ToString());
-        Application.targetFrameRate = fpsLimitOptions[value];
+        Debug.Log((int)fpsLimitOptions[value]);
+        Application.targetFrameRate = (int)fpsLimitOptions[value];
     }
 
     //Quality
@@ -398,49 +420,49 @@ public class SettingsMenu : MonoBehaviour {
         int value = antiAliasingDropdown.value;
         if (!ValidateUserInput(0, antiAliasingOptions.Length - 1, value, "UpdateAntiAliasing"))
             return;
-        Debug.Log(antiAliasingOptions[value].ToString());
-        QualitySettings.antiAliasing = antiAliasingOptions[value];
+        Debug.Log((int)antiAliasingOptions[value]);
+        QualitySettings.antiAliasing = (int)antiAliasingOptions[value];
     }
     public void UpdateTextureQuality() {
         int value = textureQualityDropdown.value;
         if (!ValidateUserInput(0, textureQualityOptions.Length - 1, value, "UpdateTextureQuality"))
             return;
 
-        //Not sure about index 0!
-        Debug.Log(textureQualityOptions[value].ToString());
-        QualitySettings.globalTextureMipmapLimit = textureQualityOptions[value];
+
+        Debug.Log((int)textureQualityOptions[value]);
+        QualitySettings.globalTextureMipmapLimit = (int)textureQualityOptions[value];
     }
     public void UpdateAnisotropicFiltering() {
         int value = anisotropicFilteringDropdown.value;
         if (!ValidateUserInput(0, anisotropicFilteringOptions.Length - 1, value, "UpdateAnisotropicFiltering"))
             return;
 
-        Debug.Log(anisotropicFilteringOptions[value].ToString());
-        QualitySettings.anisotropicFiltering = anisotropicFilteringOptions[value];
+        Debug.Log((UnityEngine.AnisotropicFiltering)anisotropicFilteringOptions[value]);
+        QualitySettings.anisotropicFiltering = (UnityEngine.AnisotropicFiltering)anisotropicFilteringOptions[value];
     }
     public void UpdatePixelLightCount() {
         int value = pixelLightCountDropdown.value;
         if (!ValidateUserInput(0, pixelLightCountOptions.Length - 1, value, "UpdatePixelLightCount"))
             return;
 
-        Debug.Log(pixelLightCountOptions[value].ToString());
-        QualitySettings.pixelLightCount = pixelLightCountOptions[value];
+        Debug.Log((int)pixelLightCountOptions[value]);
+        QualitySettings.pixelLightCount = (int)pixelLightCountOptions[value];
     }
     public void UpdateShadowQuality() {
         int value = shadowQualityDropdown.value;
         if (!ValidateUserInput(0, shadowQualityOptions.Length - 1, value, "UpdateShadowQuality"))
             return;
 
-        Debug.Log(shadowQualityOptions[value].ToString());
-        QualitySettings.shadows = shadowQualityOptions[value];
+        Debug.Log((UnityEngine.ShadowQuality)shadowQualityOptions[value]);
+        QualitySettings.shadows = (UnityEngine.ShadowQuality)shadowQualityOptions[value];
     }
     public void UpdateShadowResolution() {
         int value = shadowResolutionDropdown.value;
         if (!ValidateUserInput(0, shadowResolutionOptions.Length - 1, value, "UpdateShadowResolution"))
             return;
 
-        Debug.Log(shadowResolutionOptions[value].ToString());
-        QualitySettings.shadowResolution = shadowResolutionOptions[value];
+        Debug.Log((UnityEngine.ShadowResolution)shadowResolutionOptions[value]);
+        QualitySettings.shadowResolution = (UnityEngine.ShadowResolution)shadowResolutionOptions[value];
     }
     public void ToggleSoftParticles() {
         bool value = softParticlesToggle.isOn;

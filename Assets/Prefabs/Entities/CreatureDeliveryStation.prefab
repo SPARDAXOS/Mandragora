@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2830251031956030863}
   - component: {fileID: 7402382307644212185}
   - component: {fileID: 7500242228242935786}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: CreatureDeliveryStation
   m_TagString: Untagged
   m_Icon: {fileID: 0}

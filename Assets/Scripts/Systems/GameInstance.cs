@@ -3,6 +3,7 @@ using Mandragora;
 using UnityEditor;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
+using Unity.VisualScripting;
 
 namespace Initialization {
     public class Initialization {
@@ -70,15 +71,15 @@ public class GameInstance : MonoBehaviour {
 
     private Player player1Script = null;
     private Player player2Script = null;
-    private MainCamera cameraScript = null;
+    private MainCamera mainCameraScript = null;
     private SoundManager soundManagerScript = null;
     private TutorialSequencer tutorialSequencerScript = null;
-    private UIMainMenu mainMenuScript = null;
-    private UISettingsMenu settingsMenuScript = null;
-    private UIPauseMenu pauseMenuScript = null;
-    private UILoseMenu loseMenuScript = null;
+    private MainMenu mainMenuScript = null;
+    private SettingsMenu settingsMenuScript = null;
+    private PauseMenu pauseMenuScript = null;
+    private LoseMenu loseMenuScript = null;
     private UIWinMenu winMenuScript = null;
-    private UICreditsMenu creditsMenuScript = null;
+    private CreditsMenu creditsMenuScript = null;
 
 
 
@@ -150,7 +151,7 @@ public class GameInstance : MonoBehaviour {
         else {
             tutorialSequencer = Instantiate(entitiesResources["TutorialSequencer"]);
             tutorialSequencerScript = tutorialSequencer.GetComponent<TutorialSequencer>();
-            tutorialSequencerScript.Initialize();
+            tutorialSequencerScript.Initialize(this, soundManagerScript);
         }
 
         
@@ -158,8 +159,8 @@ public class GameInstance : MonoBehaviour {
             Abort("Failed to find MainMenu resource");
         else {
             mainMenu = Instantiate(entitiesResources["MainMenu"]);
-            mainMenuScript = mainMenu.GetComponent<UIMainMenu>();
-            mainMenuScript.Initialize(this);
+            mainMenuScript = mainMenu.GetComponent<MainMenu>();
+            mainMenuScript.Initialize(this, soundManagerScript);
             mainMenu.SetActive(false);
         }
 
@@ -167,7 +168,7 @@ public class GameInstance : MonoBehaviour {
             Abort("Failed to find SettingsMenu resource");
         else {
             settingsMenu = Instantiate(entitiesResources["SettingsMenu"]);
-            settingsMenuScript = settingsMenu.GetComponent<UISettingsMenu>();
+            settingsMenuScript = settingsMenu.GetComponent<SettingsMenu>();
             settingsMenuScript.Initialize(this, soundManagerScript);
             settingsMenu.SetActive(false);
         }
@@ -185,7 +186,7 @@ public class GameInstance : MonoBehaviour {
             Abort("Failed to find LoseMenu resource");
         else {
             loseMenu = Instantiate(entitiesResources["LoseMenu"]);
-            loseMenuScript = loseMenu.GetComponent<UILoseMenu>();
+            loseMenuScript = loseMenu.GetComponent<LoseMenu>();
             loseMenuScript.Initialize(this);
             loseMenu.SetActive(false);
         }
@@ -194,8 +195,8 @@ public class GameInstance : MonoBehaviour {
             Abort("Failed to find CreditsMenu resource");
         else {
             creditsMenu = Instantiate(entitiesResources["CreditsMenu"]);
-            creditsMenuScript = creditsMenu.GetComponent<UICreditsMenu>();
-            creditsMenuScript.Initialize(this);
+            creditsMenuScript = creditsMenu.GetComponent<CreditsMenu>();
+            creditsMenuScript.Initialize(this, soundManagerScript);
             creditsMenu.SetActive(false);
         }
 
@@ -203,7 +204,7 @@ public class GameInstance : MonoBehaviour {
             Abort("Failed to find PauseMenu resource");
         else {
             pauseMenu = Instantiate(entitiesResources["PauseMenu"]);
-            pauseMenuScript = pauseMenu.GetComponent<UIPauseMenu>();
+            pauseMenuScript = pauseMenu.GetComponent<PauseMenu>();
             pauseMenuScript.Initialize(this);
             pauseMenu.SetActive(false);
         }
@@ -233,10 +234,11 @@ public class GameInstance : MonoBehaviour {
             Abort("Failed to find MainCamera resource");
         else {
             mainCamera = Instantiate(entitiesResources["MainCamera"]);
-            cameraScript = mainCamera.GetComponent<MainCamera>();
-            cameraScript.Initialize();
-            cameraScript.AddTarget(player1);
-            cameraScript.AddTarget(player2);
+            mainCameraScript = mainCamera.GetComponent<MainCamera>();
+            mainCameraScript.Initialize();
+            mainCameraScript.AddTarget(player1);
+            mainCameraScript.AddTarget(player2);
+            soundManagerScript.SetMainCamera(mainCameraScript);
         }
 
         if (!entitiesResources["EventSystem"])
@@ -252,7 +254,7 @@ public class GameInstance : MonoBehaviour {
         else {
             currentLevel = Instantiate(levelsResources["Level1"]);
             currentLevelScript = currentLevel.GetComponent<Level>();
-            currentLevelScript.Initialize(this);
+            currentLevelScript.Initialize(this, soundManagerScript);
         }
     }
 
@@ -268,7 +270,7 @@ public class GameInstance : MonoBehaviour {
     private void UpdateFixedPlayingState() {
         player1Script.FixedTick();
         player2Script.FixedTick();
-        cameraScript.FixedTick();
+        mainCameraScript.FixedTick();
         currentLevelScript.FixedTick();
     }
 
@@ -308,7 +310,7 @@ public class GameInstance : MonoBehaviour {
         SetCursorState(true);
         HideAllMenus();
 
-        soundManagerScript.PlayTrack("TestTrack1", true);
+        soundManagerScript.PlayTrack("MainMenu", true);
         mainMenu.SetActive(true);
     }
     private void SetupSettingsMenuState() {
@@ -363,8 +365,7 @@ public class GameInstance : MonoBehaviour {
         player2.SetActive(true);
         player1Script.EnableInput();
         player2Script.EnableInput();
-        soundManagerScript.PlayTrack("TestTrack2", true);
-        currentGameState = GameState.PLAYING;     
+        currentGameState = GameState.PLAYING;
         StartGame();
     }
 
@@ -389,18 +390,21 @@ public class GameInstance : MonoBehaviour {
     public void LevelFinished(GameResults results) {
         Debug.Log("Game is over with results " + results.ToString());
 
-        if (results == GameResults.WIN)
+        if (results == GameResults.WIN) {
+            soundManagerScript.PlaySFX("YouWin", Vector3.zero, true);
             SetGameState(GameState.WIN_MENU);
-        else if (results == GameResults.LOSE)
+        }
+        else if (results == GameResults.LOSE) {
+            soundManagerScript.PlaySFX("YouLose", Vector3.zero, true);
             SetGameState(GameState.LOSE_MENU);
-        soundManagerScript.PlayTrack("TestTrack1", true);
+        }
         gameStarted = false;
     }
     private void StartGame() {
         gameStarted = true;
 
         if (playTutorials)
-            tutorialSequencerScript.StartTutorial(this, currentLevelScript);
+            tutorialSequencerScript.StartTutorial(currentLevelScript);
         else
             currentLevelScript.StartLevel();
     }
@@ -438,6 +442,6 @@ public class GameInstance : MonoBehaviour {
 
 
     public MainCamera GetCameraScript() {
-        return cameraScript;
+        return mainCameraScript;
     }
 }

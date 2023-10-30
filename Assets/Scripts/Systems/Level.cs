@@ -3,8 +3,6 @@ using Mandragora;
 using System.Collections.Generic;
 using Unity.AI.Navigation;
 using UnityEngine.AI;
-using Unity.VisualScripting;
-using static UnityEngine.EventSystems.EventTrigger;
 
 public class Level : MonoBehaviour {
 
@@ -14,7 +12,7 @@ public class Level : MonoBehaviour {
 
     [Header("Spawner")]
     [Range(1, 15)] [SerializeField] private uint spawnPointCalculationRetries = 10;
-    [Range(0.0f, 10.0f)][SerializeField] private float spawnHeightOffset = 7.0f;
+    [Range(0.0f, 20.0f)][SerializeField] private float spawnHeightOffset = 7.0f;
 
     private bool initialize = false;
 
@@ -26,6 +24,7 @@ public class Level : MonoBehaviour {
     float lowerNavMeshEdge = 0.0f;
 
     private GameInstance gameInstance = null;
+    private SoundManager soundManager = null;
 
     private NavMeshSurface navMesh = null;
 
@@ -40,10 +39,11 @@ public class Level : MonoBehaviour {
     private Creature tutorialCreature = null;
 
 
-    public void Initialize(GameInstance instance) {
+    public void Initialize(GameInstance instance, SoundManager soundManager) {
         if (initialize)
             return;
 
+        this.soundManager = soundManager;
         gameInstance = instance;
         SetupReferences();
         CreateCreaturesPool();
@@ -98,7 +98,7 @@ public class Level : MonoBehaviour {
                 Debug.LogWarning("TaskStations does not contain any children!");
             else {
                 foreach (var entry in taskStations)
-                    entry.Initialize(gameInstance.GetCameraScript());
+                    entry.Initialize(gameInstance.GetCameraScript(), soundManager);
             }
         }
     }
@@ -147,7 +147,7 @@ public class Level : MonoBehaviour {
     }
 
 
-    public void RegisterCreatureMaximumDisatisfied() {
+    public void RegisterCreatureDesatisfied() {
         gameInstance.LevelFinished(GameInstance.GameResults.LOSE);
     }
     public void RegisterSatisfiedCreature() {
@@ -162,14 +162,18 @@ public class Level : MonoBehaviour {
         if (tutorialCreature)
             return tutorialCreature;
 
+        currentSatisfiedCreatures = 0;
+
         tutorialCreature = creatures[0];
         tutorialCreature.ClearAllTasks();
         tutorialCreature.SetActive(true);
         tutorialCreature.SetupStartState();
         tutorialCreature.StopDissatisfaction();
+        tutorialCreature.SetTutorialCreature(true); //THIS!!!!! Need to control it for tutorial of delivering creatures!
         Vector3 spawnPosition = GetRandomPointOnNavMesh();
         spawnPosition.y += spawnHeightOffset;
         tutorialCreature.transform.position = spawnPosition;
+        soundManager.PlayTrack("Tutorial", true);
         return tutorialCreature;
     }
 
@@ -182,6 +186,7 @@ public class Level : MonoBehaviour {
         }
         RandomizeCreatureSpawns();
         currentSatisfiedCreatures = 0;
+        soundManager.PlayTrack("Gameplay", true);
     }
     public void GameOver() {
 

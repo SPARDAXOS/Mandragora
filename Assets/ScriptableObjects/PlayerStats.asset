@@ -16,12 +16,24 @@ MonoBehaviour:
   turnRate: 5.93
   accelerationRate: 498
   decelerationRate: 864
+  reverseRetainedSpeed: 0.1
+  speedRetainedOnHit: 0.9
   customGravity: 0
-  gravityScale: 20
-  knockbackForce: 30
-  knockbackHeightAngle: 45
+  gravityScale: 10
+  customGravityBounciness: 0.5
+  normalGravityBounciness: 0.7
+  knockbackForce: 15
+  knockbackHeightAngle: 32.3
+  knockbackCreatureDropForce: 10
+  dashKnockbackForce: 25
+  dashKnockbackHeightAngle: 39.7
+  objectBouceOffForce: 11.4
+  objectBounceOffAngle: 58.2
   dashSpeed: 30
   dashLength: 0.3
+  dashCooldown: 1
   retainedSpeed: 1
-  knockbackMultiplier: 2
+  dashCreatureDropForce: 20
   stunDuration: 3.5
+  throwForce: 10
+  throwHeightAngle: 30

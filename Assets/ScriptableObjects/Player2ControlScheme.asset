@@ -88,11 +88,28 @@ MonoBehaviour:
     m_SingletonActionBindings:
     - m_Name: 
       m_Id: bc3a3bd1-8bc4-4e63-83fa-d6b247b95bdb
-      m_Path: <Keyboard>/numpad2
+      m_Path: <Keyboard>/numpad0
       m_Interactions: 
       m_Processors: 
       m_Groups: 
       m_Action: Dash
+      m_Flags: 0
+    m_Flags: 0
+  throwAway:
+    m_Name: Throw Away
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 337253b5-c5b0-4653-b0cd-39af27bde7b4
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 4d5739c5-4626-4db0-b958-d17b0c594b7a
+      m_Path: <Keyboard>/numpad2
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Throw Away
       m_Flags: 0
     m_Flags: 0
   pause:

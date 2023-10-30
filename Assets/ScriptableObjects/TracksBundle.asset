@@ -13,13 +13,18 @@ MonoBehaviour:
   m_Name: TracksBundle
   m_EditorClassIdentifier: 
   entries:
-  - key: TestTrack1
-    clip: {fileID: 8300000, guid: e27d2c09c9a9fa145b295579573d87de, type: 3}
-    volume: 0.755
+  - key: MainMenu
+    clip: {fileID: 8300000, guid: 4306cf479551a624495dcaf67bfcce4d, type: 3}
+    volume: 0.4
     maxPitch: 1
     minPitch: 1
-  - key: TestTrack2
+  - key: Gameplay
     clip: {fileID: 8300000, guid: bb3a7a789e5b2254882617bfc8e84fd2, type: 3}
-    volume: 0.252
+    volume: 0.3
+    maxPitch: 1
+    minPitch: 1
+  - key: Tutorial
+    clip: {fileID: 8300000, guid: ff1b565112f81f04e88fd6a97d8623dd, type: 3}
+    volume: 0.3
     maxPitch: 1
     minPitch: 1

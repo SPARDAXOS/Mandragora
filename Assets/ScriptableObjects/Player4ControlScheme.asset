@@ -126,6 +126,24 @@ MonoBehaviour:
       m_Action: Interact
       m_Flags: 0
     m_Flags: 0
+  dash:
+    m_Name: Dash
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: c0e27466-2e4d-45f6-8592-b6e0dfaa5b3a
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  throwAway:
+    m_Name: Throw Away
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 61a66902-dc7c-453d-a48f-272c969735d0
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
   pause:
     m_Name: Pause
     m_Type: 0

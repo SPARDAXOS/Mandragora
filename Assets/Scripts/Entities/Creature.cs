@@ -22,6 +22,9 @@ public struct CreatureStats
     public float maxRestDuration;
     [Range(0, 1f)]
     public float restProbability;
+    [Tooltip("Probability each second of escaping the held state each second.")]
+    [Range(0, 1f)]
+    public float escapeHeldProbability;
     [Tooltip("Time in seconds from the initial number of tasks.")]
     [Range(0, 120f)]
     public float timeUntilDissatisfied;
@@ -41,23 +44,26 @@ public class Creature : MonoBehaviour
 
     [SerializeField] private CreatureStats stats;
     [SerializeField] private bool drawAIGizmos;
-    public List<TaskStation.TaskType> taskList;
+    [SerializeField] private List<TaskStation.TaskType> taskList;
     [SerializeField] private Material satisfiedMaterial, dissatisfiedMaterial;
     [SerializeField] private GameObject changeMaterialOn;
     private SkinnedMeshRenderer meshRenderer;
     [Range (0, 1f)]
     [SerializeField] private float dissatisfaction;
+    public bool doDissatisfaction;
+    public bool doEscapeHeld;
 
+    private List<TaskStation.TaskType> queueTasks;
     private int numTasksAtStart;
 
     private bool initialized = false;
     private bool active;
     public CreatureState state;
     private bool isHeld;
+    private float deltaHeldEscapeProbability;
 
-    private float dissatisfactionMultiplier;
+    private float dissatisfactionMultiplier = 1f;
     private float timeIncrement;
-
     private float accelerationIncrement;
     private float decelerationIncrement;
 
@@ -72,7 +78,8 @@ public class Creature : MonoBehaviour
     float restDuration = 0;
 
     private Rigidbody rigidbodyComp = null;
-    private Collider col = null;
+    private Collider colliderComp = null;
+    private Player player = null;
     private ParticleSystem stinkPS = null;
     private ParticleSystem cryPS = null;
     private ParticleSystem runDustPS = null;
@@ -84,29 +91,32 @@ public class Creature : MonoBehaviour
             return;
 
         this.levelScript = level;
-        numTasksAtStart = taskList.Count;
 
         SetupReferences();
-        GetDissatisfactionMultiplier();
 
-        timeIncrement = (1f / stats.timeUntilDissatisfied) * Time.fixedDeltaTime;
+        timeIncrement = (1f / stats.timeUntilDissatisfied);
+        CalculateEscapeProbability();
 
         accelerationIncrement = Time.fixedDeltaTime * stats.maxSpeed / stats.accelerationTime;
         decelerationIncrement = Time.fixedDeltaTime * stats.maxSpeed / stats.decelerationTime;
-
-        direction = RandomDirection();
-        FindNewValidTarget();
 
         initialized = true;
     }
     public void FixedTick()
     {
+        if (!initialized)
+            return;
+
         UpdateStates();
-        UpdateSatisfaction();
+        Debug.Log(rigidbodyComp.velocity.y);
     }
     public void Tick()
     {
+        if (!initialized)
+            return;
 
+        if (doDissatisfaction)
+            UpdateSatisfaction();
     }
 
     /// <summary>
@@ -114,8 +124,12 @@ public class Creature : MonoBehaviour
     /// </summary>
     public void SetupStartState() {
 
+        StartDissatisfaction();
+        queueTasks = taskList;
 
-
+        direction = RandomDirection();
+        state = CreatureState.FALL;
+        FindNewValidTarget();
 
         SetupParticleSystems();
     }
@@ -123,7 +137,7 @@ public class Creature : MonoBehaviour
     void SetupReferences()
     {
         rigidbodyComp   = GetComponent<Rigidbody>();
-        col = GetComponent<Collider>();
+        colliderComp = GetComponent<Collider>();
         stinkPS = transform.Find("StinkPS").GetComponent<ParticleSystem>();
         cryPS = transform.Find("CryPS").GetComponent<ParticleSystem>();
         runDustPS = transform.Find("RunDustPS").GetComponent<ParticleSystem>();
@@ -172,13 +186,25 @@ public class Creature : MonoBehaviour
     }
     private void UpdateSatisfaction()
     {
-        dissatisfaction += timeIncrement * dissatisfactionMultiplier;
+        dissatisfaction += timeIncrement * Time.deltaTime;
 
         if (dissatisfaction > 1f)
             levelScript.RegisterCreatureMaximumDisatisfied();
 
         UpdateMaterials();
     }
+    public void StartDissatisfaction()
+    {
+        dissatisfaction = 0f;
+        doDissatisfaction = true;
+    }
+    public void StopDissatisfaction()
+    {
+        dissatisfaction = 0f;
+        doDissatisfaction = false;
+    }
+
+
     void UpdateMaterials()
     {
         if(IsSatisfied()) 
@@ -211,20 +237,6 @@ public class Creature : MonoBehaviour
     {
         foreach (var entry in taskList)
             SetParticleSystemState(entry, true);
-
-
-        //foreach (TaskStation.TaskType task in taskList)
-        //{
-        //    switch (task)
-        //    {
-        //        case TaskStation.TaskType.BATHING:
-        //            stinkPS.Play();
-        //            break;
-        //        case TaskStation.TaskType.FEEDING:
-        //            cryPS.Play();
-        //            break;
-        //    }
-        //}
     }
     void SetParticleSystemState(TaskStation.TaskType task, bool state)
     {
@@ -265,8 +277,9 @@ public class Creature : MonoBehaviour
             case CreatureState.FALL:
                 FallBehavior();
                 break;
-
-                //Held?
+            case CreatureState.HELD:
+                HeldBehavior();
+                break;
         }
     }
     private void RunBehavior()
@@ -301,24 +314,43 @@ public class Creature : MonoBehaviour
     }
     void FallBehavior()
     {
-        /*if (transform.position.y < 1f)
-        {
-            ChangeState(CreatureState.REST);
-            return;
-        }*/
+        //rigidbodyComp.useGravity = true;
+        //UpdateGravity();
 
-        UpdateGravity();
+        // TEMP ANTI-SOFTLOCK
+        if(transform.position.y < -5f) transform.position = new Vector3(0f, 0.5f, 0f);
+    }
+    void HeldBehavior()
+    {
+        if (!doEscapeHeld) 
+            return;
+
+        float random = UnityEngine.Random.value;
+
+        if(random < deltaHeldEscapeProbability && player)
+        {
+            player.DropHeldCreature();
+            ApplyImpulse(Vector3.up + RandomDirection(), 5f);
+        }
+    }
+
+    void CalculateEscapeProbability()
+    {
+        deltaHeldEscapeProbability = stats.escapeHeldProbability != 0 ? 1 - Mathf.Exp(Mathf.Log(1 - stats.escapeHeldProbability) / 60) : 0;
     }
 
     void CheckFallState()
     {
+        float threshold = 0.01f;
         float yVelocity = rigidbodyComp.velocity.y;
-        if (yVelocity < -0.01)
+        if (yVelocity < -threshold)
         {
             ChangeState(CreatureState.FALL);
         }
-        else if (state == CreatureState.FALL)
+        else if (yVelocity < threshold && state == CreatureState.FALL)
+        {
             ChangeState(CreatureState.REST);
+        }
     }
 
     private Vector3 RandomDirection()
@@ -363,9 +395,9 @@ public class Creature : MonoBehaviour
     {
         Vector3 origin = transform.position;
         Vector3 direction = target - transform.position;
-        col.enabled = false;
+        colliderComp.enabled = false;
         bool output = Physics.SphereCast(new Ray(origin, direction), 0.25f, stats.viewRange);
-        col.enabled = true;
+        colliderComp.enabled = true;
         if (!output && assignTarget) targetPosition = target;
         return output;
     }
@@ -405,6 +437,7 @@ public class Creature : MonoBehaviour
     private void UpdateGravity() {
         rigidbodyComp.velocity += new Vector3(0.0f, -stats.gravityScale * Time.fixedDeltaTime, 0.0f);
     }
+
     private void UpdateDirection()
     {
         targetDirection = (targetPosition - transform.position).normalized;
@@ -434,8 +467,9 @@ public class Creature : MonoBehaviour
     }
     public void PickUp(Player player)
     {
+        this.player = player;
         ChangeState(CreatureState.HELD);
-        col.enabled = false;
+        colliderComp.enabled = false;
         speed = 0f;
         isHeld = true;
         
@@ -444,15 +478,14 @@ public class Creature : MonoBehaviour
     }
     public void PutDown()
     {
-        ChangeState(CreatureState.RUN);
-        col.enabled = true;
+        ChangeState(CreatureState.FALL);
+        colliderComp.enabled = true;
         isHeld = false;
-        rigidbodyComp.velocity = Vector3.zero;
+        player = null;
     }
     public void ApplyImpulse(Vector3 direction, float force) {
-        rigidbodyComp.velocity += direction * force;
+        rigidbodyComp.velocity = direction * force;
     }
-
 
     public void RegisterSatisfied() {
         SetActive(false);

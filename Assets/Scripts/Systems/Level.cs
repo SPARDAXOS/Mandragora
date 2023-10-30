@@ -57,14 +57,18 @@ public class Level : MonoBehaviour {
             entry.Tick();
 
         if (gameInstance.IsGameStarted()) {
-            foreach (var entry in creatures)
-                entry.Tick();
+            foreach (var entry in creatures) {
+                if (entry.GetActive())
+                    entry.Tick();
+            }
         }
     }
     public void FixedTick() {
         if (gameInstance.IsGameStarted()) {
-            foreach (var entry in creatures)
-                entry.FixedTick();
+            foreach (var entry in creatures) {
+                if (entry.GetActive())
+                    entry.FixedTick();
+            }
         }
     }
     private void SetupReferences() {
@@ -162,6 +166,7 @@ public class Level : MonoBehaviour {
         tutorialCreature.ClearAllTasks();
         tutorialCreature.SetActive(true);
         tutorialCreature.SetupStartState();
+        tutorialCreature.StopDissatisfaction();
         Vector3 spawnPosition = GetRandomPointOnNavMesh();
         spawnPosition.y += spawnHeightOffset;
         tutorialCreature.transform.position = spawnPosition;

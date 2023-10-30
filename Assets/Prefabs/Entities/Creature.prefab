@@ -99,22 +99,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stats:
-    maxSpeed: 4
+    maxSpeed: 8
     accelerationTime: 0.5
     decelerationTime: 1
     gravityScale: 5
     turnRate: 360
     shyness: 0.038
-    viewRange: 4
+    viewRange: 10
     maxRestDuration: 1
-    restProbability: 0.25
+    restProbability: 0.05
+    escapeHeldProbability: 0.5
     timeUntilDissatisfied: 120
-  drawAIGizmos: 0
+  drawAIGizmos: 1
   taskList: 0100000002000000
   satisfiedMaterial: {fileID: 2100000, guid: a90a943932679e44587087b20903f0e6, type: 2}
   dissatisfiedMaterial: {fileID: 2100000, guid: 4d3861c7f13eca542b69a4c01a4d6662, type: 2}
   changeMaterialOn: {fileID: 80657961753095836}
   dissatisfaction: 0
+  doDissatisfaction: 0
+  doEscapeHeld: 1
   state: 0
 --- !u!1001 &1405697963936289669
 PrefabInstance:

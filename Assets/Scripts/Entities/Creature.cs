@@ -419,13 +419,14 @@ public class Creature : MonoBehaviour
     }
     bool CastToTarget(Vector3 target, bool assignTarget = true)
     {
-        if (!Physics.CheckSphere(target, 0.5f))
+        float scale = transform.localScale.x;
+        if (!Physics.CheckSphere(target, scale))
             return false;
 
         Vector3 origin = transform.position;
         Vector3 direction = target - transform.position;
         colliderComp.enabled = false;
-        bool output = Physics.SphereCast(new Ray(origin, direction), 0.5f, stats.viewRange);
+        bool output = Physics.SphereCast(new Ray(origin, direction), scale * 0.9f, stats.viewRange);
         colliderComp.enabled = true;
         if (!output && assignTarget) targetPosition = target;
         return output;

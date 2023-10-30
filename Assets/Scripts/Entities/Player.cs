@@ -1,4 +1,5 @@
 using Mandragora;
+using System.ComponentModel;
 using UnityEngine;
 using UnityEngine.Windows;
 using static UnityEngine.UI.Image;
@@ -15,7 +16,7 @@ public class Player : MonoBehaviour {
 
     [Header("Pickup")]
     [SerializeField] private float pickupCheckBoxSize = 1.0f;
-    [SerializeField] private Vector3 pickupCheckOffset;
+    [SerializeField] public Vector3 pickupCheckOffset;
     [SerializeField] private LayerMask pickupMask;
     [SerializeField] private Vector3 pickupBoxColliderCenter;
     [SerializeField] private Vector3 pickupBoxColliderSize;

@@ -12,16 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e2101d48634ef741a2af9aaa87a5d43, type: 3}
   m_Name: GameSettings
   m_EditorClassIdentifier: 
-  windowMode: 0
+  windowMode: 1
   vsync: 1
-  fpsLimit: 0
-  antiAliasing: 0
-  textureQuality: 2
-  anisotropicFiltering: 1
+  fpsLimit: -1
+  antiAliasing: 8
+  textureQuality: 0
+  anisotropicFiltering: 2
   pixelLightCount: 4
   softParticles: 1
   shadowQuality: 2
-  shadwoResolution: 3
+  shadowResolution: 3
   masterVolume: 1
   musicVolume: 1
   sfxVolume: 1

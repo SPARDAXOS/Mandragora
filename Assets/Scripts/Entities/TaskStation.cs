@@ -109,6 +109,9 @@ public class TaskStation : MonoBehaviour {
         if (interactionOngoing)
             UpdateInteraction();
     }
+    public void SetupStartState() {
+        //Reset interaction stuff with player.
+    }
     private void SetupReferences() {
         GUI = transform.Find("GUI").gameObject;
         if (!Utility.Validate(GUI, "Failed to get reference to GUI - " + gameObject.name, Utility.ValidationType.ERROR))

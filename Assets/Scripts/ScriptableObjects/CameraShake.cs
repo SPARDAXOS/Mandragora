@@ -1,13 +1,8 @@
 using UnityEngine;
 
 
-
-//public class CameraShake : ScriptableObject {
-
-//Vector2 min
-//Vector2 max
-//float frequency
-//float amplitude
-
-
-//}
+[CreateAssetMenu(fileName = "CameraShake", menuName = "Data/CameraShake")]
+public class CameraShake : ScriptableObject 
+{
+    public float amplitude = 1;
+}

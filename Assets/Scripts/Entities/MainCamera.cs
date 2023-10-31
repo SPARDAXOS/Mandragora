@@ -4,30 +4,23 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
-
-[Serializable]
-public struct CameraShake 
-{
-    public float amplitude;
-    public float frequency;
-    public bool isShaking;
-}
-public class MainCamera : MonoBehaviour 
+public class MainCamera : MonoBehaviour
 {
     [SerializeField] private float restingCameraDistance;
     [SerializeField] private float zOffset;
     [SerializeField] private float maxAngleBetweenTargets;
     [SerializeField] private float zoomToFitFactor;
     [SerializeField] private float lerpSpeed;
+    [SerializeField] CameraShake cameraShake;
+    [SerializeField] private bool shakeEnabled;
 
     private bool initialized = false;
 
+    private float shakeMultiplier = 1f;
     private List<GameObject> targets;
     private float cameraViewAngle;
     private float targetDistance;
     private Vector3 targetPos;
-    [Range(0f, 1f)]
-    public CameraShake cameraShake;
     private float zDist;
 
     public void Initialize() 
@@ -59,14 +52,27 @@ public class MainCamera : MonoBehaviour
     }
     private Vector3 ShakeOffset() 
     {
-        return UnityEngine.Random.insideUnitSphere * cameraShake.amplitude;
+        return UnityEngine.Random.insideUnitSphere * cameraShake.amplitude * shakeMultiplier * shakeMultiplier;
     }
-    public IEnumerator ShakeFor(float duration) 
+    public void Shake(float duration) 
     {
-        cameraShake.isShaking = true;
-        yield return new WaitForSeconds(duration);
-        cameraShake.isShaking = false;
+        StartCoroutine(ShakeRoutine(duration));
     }
+    private IEnumerator ShakeRoutine(float duration)
+    {
+        shakeEnabled = true;
+
+        shakeMultiplier = 1f;
+
+        while (shakeMultiplier > 0f)
+        {
+            shakeMultiplier -= duration * Time.fixedDeltaTime;
+
+            yield return null;
+        }
+        shakeEnabled = false;
+    }
+
     public void AddTarget(GameObject target) 
     {
         if (target)
@@ -77,7 +83,7 @@ public class MainCamera : MonoBehaviour
         float dist = GetDistBetweenTargets();
 
         targetDistance = dist / (2 * Mathf.Cos(cameraViewAngle) * Mathf.Tan(maxAngleBetweenTargets));
-        // These two lines lerp between the calculated distance and the rest distance, in case you'd want that
+        // These two lines below lerp between the calculated distance and the rest distance, in case you'd want that
         targetDistance *= zoomToFitFactor;
         targetDistance += (1 - zoomToFitFactor) * restingCameraDistance;
 
@@ -92,7 +98,7 @@ public class MainCamera : MonoBehaviour
         Vector3 offset = new Vector3(0, Mathf.Sin(cameraViewAngle) * targetDistance, zDist + zOffset);
         Vector3 position = GetPlayerCenter() + offset;
 
-        if (cameraShake.isShaking)
+        if (shakeEnabled)
         {
             position += ShakeOffset();
         }

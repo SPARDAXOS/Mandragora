@@ -174,7 +174,11 @@ public class Creature : MonoBehaviour
         while (taskList.Count != amountOfTasks)
         {
             int randomTask = UnityEngine.Random.Range(1, availableTasks.Count);
-            AddTask(availableTasks[randomTask]);
+
+            if (taskList.Contains(availableTasks[randomTask]))
+                continue;
+
+            taskList.Add(availableTasks[randomTask]);
             availableTasks.RemoveAt(randomTask);
         }
     }

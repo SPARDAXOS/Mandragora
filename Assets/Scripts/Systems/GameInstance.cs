@@ -69,6 +69,7 @@ public class GameInstance : MonoBehaviour {
     private GameObject winMenu = null;
     private GameObject loseMenu = null;
     private GameObject creditsMenu = null;
+    private GameObject countdown = null;
 
     private Player player1Script = null;
     private Player player2Script = null;
@@ -81,6 +82,7 @@ public class GameInstance : MonoBehaviour {
     private LoseMenu loseMenuScript = null;
     private WinMenu winMenuScript = null;
     private CreditsMenu creditsMenuScript = null;
+    private Countdown countdownScript = null;
 
 
 
@@ -155,7 +157,15 @@ public class GameInstance : MonoBehaviour {
             tutorialSequencerScript.Initialize(this, soundManagerScript);
         }
 
-        
+        if (!entitiesResources["Countdown"])
+            Abort("Failed to find Countdown resource");
+        else {
+            countdown = Instantiate(entitiesResources["Countdown"]);
+            countdownScript = countdown.GetComponent<Countdown>();
+            countdownScript.Initialize();
+        }
+
+
         if (!entitiesResources["MainMenu"])
             Abort("Failed to find MainMenu resource");
         else {
@@ -384,7 +394,9 @@ public class GameInstance : MonoBehaviour {
     }
 
 
-
+    private void Test() {
+        Debug.Log("Callback works!");
+    }
     public void StartGame() {
         gameStarted = true;
 
@@ -392,6 +404,8 @@ public class GameInstance : MonoBehaviour {
         player2.transform.position = currentLevelScript.GetPlayer2SpawnPosition();
         player1Script.SetupStartingState();
         player2Script.SetupStartingState();
+
+        countdownScript.StartCountdown(Test);
 
         if (playTutorials)
             tutorialSequencerScript.StartTutorial(currentLevelScript);

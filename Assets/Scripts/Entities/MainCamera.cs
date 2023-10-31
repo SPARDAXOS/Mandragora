@@ -54,7 +54,7 @@ public class MainCamera : MonoBehaviour
     {
         return UnityEngine.Random.insideUnitSphere * cameraShake.amplitude * shakeMultiplier * shakeMultiplier;
     }
-    public void Shake(float duration) 
+    public void ShakeFor(float duration) 
     {
         StartCoroutine(ShakeRoutine(duration));
     }

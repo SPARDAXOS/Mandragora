@@ -31,6 +31,8 @@ public class Level : MonoBehaviour {
     private Vector3 player1SpawnPosition = Vector3.zero;
     private Vector3 player2SpawnPosition = Vector3.zero;
 
+    private GameObject effects = null;
+
     private List<Creature> creatures = new List<Creature>();
     private TaskStation[] taskStations;
     private CreatureDeliveryStation creatureDeliveryStationScript = null;
@@ -47,6 +49,7 @@ public class Level : MonoBehaviour {
         this.soundManager = soundManager;
         gameInstance = instance;
         SetupReferences();
+        DisableEffects();
         CreateCreaturesPool();
         initialize = true;
     }
@@ -89,6 +92,10 @@ public class Level : MonoBehaviour {
         var player1SpawnPositionTransform = transform.Find("Player1SpawnPoint");
         var player2SpawnPositionTransform = transform.Find("Player2SpawnPoint");
 
+        effects = transform.Find("Effects").gameObject;
+        Utility.Validate(effects, gameObject.name + " does not contain a Effects!", Utility.ValidationType.WARNING);
+
+
         if (Utility.Validate(player1SpawnPositionTransform, gameObject.name + " does not contain a player 1 spawn point!", Utility.ValidationType.WARNING))
             player1SpawnPosition = player1SpawnPositionTransform.position;
         if (Utility.Validate(player2SpawnPositionTransform, gameObject.name + " does not contain a player 2 spawn point!", Utility.ValidationType.WARNING))
@@ -120,6 +127,15 @@ public class Level : MonoBehaviour {
             script.SetActive(false);
             creatures.Add(script);
         }
+    }
+
+    public void EnableEffects() {
+        if (effects)
+            effects.SetActive(true);
+    }
+    public void DisableEffects() {
+        if (effects)
+            effects.SetActive(false);
     }
 
 
@@ -186,6 +202,8 @@ public class Level : MonoBehaviour {
 
 
     public void StartLevel() {
+        EnableEffects();
+
         foreach (var entry in creatures) {
             entry.SetActive(true);
             entry.SetupStartState();
@@ -198,6 +216,9 @@ public class Level : MonoBehaviour {
         soundManager.PlayTrack("Gameplay", true);
     }
     public void GameOver() {
+
+        DisableEffects();
+
         foreach (var creature in creatures)
             creature.SetActive(false);
 

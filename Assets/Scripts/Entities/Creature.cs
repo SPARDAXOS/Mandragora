@@ -108,6 +108,7 @@ public class Creature : MonoBehaviour
         tutorialCreature = false;
 
         speed = 0;
+        rigidbodyComp.velocity = Vector3.zero;
         direction = RandomDirection();
         state = CreatureState.FALL;
         transform.localScale = initialScale * Vector3.one;

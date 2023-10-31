@@ -349,7 +349,7 @@ public class TutorialSequencer : MonoBehaviour {
         if (queuedTutorials.Count == 0) {
             currentTutorial = Tutorials.NONE;
             tutorialRunning = false;
-            targetLevel.StartLevel();
+            gameInstance.StartLevelCountdown();
             return;
         }
         soundManager.PlaySFX("NextTutorial", Vector3.zero, true);

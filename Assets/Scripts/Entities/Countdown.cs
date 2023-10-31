@@ -46,5 +46,6 @@ public class Countdown : MonoBehaviour {
             Debug.LogError("Countdown animation player but target callback was invalid!");
 
         gameObject.SetActive(false);
+        targetCallback = null;
     }
 }

@@ -72,6 +72,9 @@ public class Player : MonoBehaviour {
     private MainCamera mainCamera = null;
 
     private ParticleSystem runDustPS = null;
+    private ParticleSystem stunnedPS = null;
+    private ParticleSystem impactPS = null;
+    private ParticleSystem knockbackTrailPS = null;
 
 
     private Rigidbody rigidbodyComp = null;
@@ -99,6 +102,16 @@ public class Player : MonoBehaviour {
 
         runDustPS = transform.Find("RunDustPS").GetComponent<ParticleSystem>();
         Utility.Validate(runDustPS, "Failed to find RunDustPS.", Utility.ValidationType.WARNING);
+
+        stunnedPS = transform.Find("StunnedPS").GetComponent<ParticleSystem>();
+        Utility.Validate(stunnedPS, "Failed to find StunnedPS.", Utility.ValidationType.WARNING);
+
+        impactPS = transform.Find("ImpactPS").GetComponent<ParticleSystem>();
+        Utility.Validate(impactPS, "Failed to find ImpactPS.", Utility.ValidationType.WARNING);
+
+        knockbackTrailPS = transform.Find("KnockbackTrailPS").GetComponent<ParticleSystem>();
+        Utility.Validate(knockbackTrailPS, "Failed to find KnockbackTrailPS.", Utility.ValidationType.WARNING);
+        
 
         rigidbodyComp = GetComponent<Rigidbody>();
         if (!rigidbodyComp)
@@ -170,8 +183,11 @@ public class Player : MonoBehaviour {
 
 
         if (isKnockedback) {
-            if (isGrounded && rigidbodyComp.velocity.y < 0.0f)
+            if (isGrounded && rigidbodyComp.velocity.y < 0.0f) {
+                if (knockbackTrailPS.isPlaying)
+                    knockbackTrailPS.Stop();
                 isKnockedback = false;
+            }
         }
         else if (!isDashing)
             UpdateMovement();
@@ -345,7 +361,9 @@ public class Player : MonoBehaviour {
                     bounceDirection.z *= Mathf.Cos(Mathf.Deg2Rad * stats.objectBounceOffAngle);
                     ApplyKnockback(bounceDirection, stats.objectBouceOffForce);
                     mainCamera.ShakeFor(10.0f);
-                    soundManager.PlaySFX("BounceOffObject", transform.position);                                                  
+                    soundManager.PlaySFX("BounceOffObject", transform.position);
+                    if (!impactPS.isPlaying)
+                        impactPS.Play();
                 }
                 isPathBlocked = true;
             }
@@ -422,7 +440,7 @@ public class Player : MonoBehaviour {
             Decelerate();
     }
     private void CheckMovementPS() {
-        if (isMoving && !runDustPS.isPlaying)
+        if (isMoving && !runDustPS.isPlaying && isGrounded) //Test this
             runDustPS.Play();
         else if (!isMoving && runDustPS.isPlaying)
             runDustPS.Stop();
@@ -504,7 +522,8 @@ public class Player : MonoBehaviour {
                 stunTimer = 0.0f;
                 isStunned = false;
                 EnableInteractionInput();
-                //Disable VFX
+                if (stunnedPS.isPlaying)
+                    stunnedPS.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             }
         }
         else
@@ -607,6 +626,8 @@ public class Player : MonoBehaviour {
         rigidbodyComp.velocity = Vector3.zero;
         rigidbodyComp.velocity += direction * force;
         isKnockedback = true;
+        //if (!knockbackTrailPS.isPlaying)
+            knockbackTrailPS.Play();
     }
     public void ApplyStun(float duration, bool stack = false) {
         if (stack)
@@ -618,7 +639,8 @@ public class Player : MonoBehaviour {
         if (stunTimer > 0.0f) {
             DisableInteractionInput();
 
-            //Start VFX
+            if (!stunnedPS.isPlaying)
+                stunnedPS.Play();
             isStunned = true;
         }
     }
@@ -645,6 +667,8 @@ public class Player : MonoBehaviour {
             if (script) {
                 soundManager.PlaySFX("PlayerBounce", transform.position);
                 CheckKnockback(script, collision.GetContact(0).point);
+                if (!impactPS.isPlaying)
+                    impactPS.Play();
             }
         }
     }

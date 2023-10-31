@@ -70,6 +70,7 @@ public class GameInstance : MonoBehaviour {
     private GameObject loseMenu = null;
     private GameObject creditsMenu = null;
     private GameObject countdown = null;
+    private GameObject fadeOut = null;
 
     private Player player1Script = null;
     private Player player2Script = null;
@@ -83,6 +84,7 @@ public class GameInstance : MonoBehaviour {
     private WinMenu winMenuScript = null;
     private CreditsMenu creditsMenuScript = null;
     private Countdown countdownScript = null;
+    private FadeOut fadeOutScript = null;
 
 
 
@@ -163,6 +165,14 @@ public class GameInstance : MonoBehaviour {
             countdown = Instantiate(entitiesResources["Countdown"]);
             countdownScript = countdown.GetComponent<Countdown>();
             countdownScript.Initialize();
+        }
+
+        if (!entitiesResources["FadeOut"])
+            Abort("Failed to find FadeOut resource");
+        else {
+            fadeOut = Instantiate(entitiesResources["FadeOut"]);
+            fadeOutScript = fadeOut.GetComponent<FadeOut>();
+            fadeOutScript.Initialize();
         }
 
 
@@ -357,8 +367,13 @@ public class GameInstance : MonoBehaviour {
         HideAllMenus();
 
         EnablePlayerCharacters();
+        player1.transform.position = currentLevelScript.GetPlayer1SpawnPosition();
+        player2.transform.position = currentLevelScript.GetPlayer2SpawnPosition();
+        player1Script.SetupStartingState();
+        player2Script.SetupStartingState();
+
         currentGameState = GameState.PLAYING;
-        StartGame();
+        //StartGame();
     }
 
 
@@ -394,23 +409,20 @@ public class GameInstance : MonoBehaviour {
     }
 
 
-    private void Test() {
-        Debug.Log("Callback works!");
+    public void StartLevelStartFade() {
+        fadeOutScript.StartFadeOut(SetupPlayingState, StartGame);
+    }
+    public void StartLevelCountdown() {
+        countdownScript.StartCountdown(currentLevelScript.StartLevel);
     }
     public void StartGame() {
         gameStarted = true;
 
-        player1.transform.position = currentLevelScript.GetPlayer1SpawnPosition();
-        player2.transform.position = currentLevelScript.GetPlayer2SpawnPosition();
-        player1Script.SetupStartingState();
-        player2Script.SetupStartingState();
-
-        countdownScript.StartCountdown(Test);
 
         if (playTutorials)
             tutorialSequencerScript.StartTutorial(currentLevelScript);
         else
-            currentLevelScript.StartLevel();
+            StartLevelCountdown();
     }
     public void EndGame(GameResults results) {
 

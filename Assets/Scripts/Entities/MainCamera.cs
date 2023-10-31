@@ -51,6 +51,7 @@ public class MainCamera : MonoBehaviour
     }
     private Vector3 ShakeOffset() 
     {
+        return Vector3.zero;
         if (shakeMultiplier <= 0) return Vector3.zero;
         return UnityEngine.Random.insideUnitSphere * cameraShake.amplitude * shakeMultiplier * shakeMultiplier;
     }
@@ -94,8 +95,8 @@ public void AddTarget(GameObject target)
         position += ShakeOffset();
         targetPos = position;
 
-        if(shakeMultiplier > 0f)
-            shakeMultiplier -= Time.fixedDeltaTime / cameraShake.duration;
+        /*if(shakeMultiplier > 0f)
+            shakeMultiplier -= Time.fixedDeltaTime / cameraShake.duration;*/
     }
     Vector3 GetPlayerCenter() 
     {

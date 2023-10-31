@@ -109,10 +109,8 @@ public class SoundManager : MonoBehaviour {
 
         if (!newUnit) {
             SFXRequest? request = FindSFXRequest(owner, key);
-            if (request != null) {
-                Debug.Log("SFX with key " + key + " is still playing!");
+            if (request != null)
                 return false;
-            }
         }
 
         SoundEntry? TargetSoundEntry = FindClip(key, ClipType.SFX);

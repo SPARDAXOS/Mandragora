@@ -33,6 +33,7 @@ public class Level : MonoBehaviour {
 
     private List<Creature> creatures = new List<Creature>();
     private TaskStation[] taskStations;
+    private CreatureDeliveryStation creatureDeliveryStationScript = null;
 
     private Bounds navMeshBounds = new Bounds();
 
@@ -53,8 +54,10 @@ public class Level : MonoBehaviour {
         if (!initialize)
             return;
 
-        foreach (var entry in taskStations)
-            entry.Tick();
+        if (gameInstance.IsGameStarted()) {
+            foreach (var entry in taskStations)
+                entry.Tick();
+        }
 
         if (gameInstance.IsGameStarted()) {
             foreach (var entry in creatures) {
@@ -101,6 +104,11 @@ public class Level : MonoBehaviour {
                     entry.Initialize(gameInstance.GetCameraScript(), soundManager);
             }
         }
+
+        var creatureDeliveryStation = transform.Find("CreatureDeliveryStation").gameObject;
+        creatureDeliveryStationScript = creatureDeliveryStation.GetComponent<CreatureDeliveryStation>();
+        creatureDeliveryStationScript.Initialize();
+        creatureDeliveryStationScript.SetSoundManagerReference(soundManager);
     }
     private void CreateCreaturesPool() {
         if (creaturesCount == 0)
@@ -148,13 +156,12 @@ public class Level : MonoBehaviour {
 
 
     public void RegisterCreatureDesatisfied() {
-        gameInstance.LevelFinished(GameInstance.GameResults.LOSE);
+        gameInstance.EndGame(GameInstance.GameResults.LOSE);
     }
     public void RegisterSatisfiedCreature() {
         currentSatisfiedCreatures++;
-        if (currentSatisfiedCreatures == creaturesCount) {
-            gameInstance.LevelFinished(GameInstance.GameResults.WIN);
-        }
+        if (currentSatisfiedCreatures == creaturesCount)
+            gameInstance.EndGame(GameInstance.GameResults.WIN);
     }
 
 
@@ -180,15 +187,22 @@ public class Level : MonoBehaviour {
 
     public void StartLevel() {
         foreach (var entry in creatures) {
-            //Might cause problems. The order of execution.
             entry.SetActive(true);
             entry.SetupStartState();
         }
+        foreach (var taskStation in taskStations)
+            taskStation.ResetState();
+
         RandomizeCreatureSpawns();
         currentSatisfiedCreatures = 0;
         soundManager.PlayTrack("Gameplay", true);
     }
     public void GameOver() {
+        foreach (var creature in creatures)
+            creature.SetActive(false);
 
+        //will happen at start regardless
+        foreach (var taskStation in taskStations)
+            taskStation.ResetState(); //Some other reset function!
     }
 }

@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fec23b72d2cb807468bccdbaa69fe8e8, type: 3}
+  m_Name: PlayerStats_Original
+  m_EditorClassIdentifier: 
+  maxSpeed: 458
+  turnRate: 5.93
+  accelerationRate: 498
+  decelerationRate: 864
+  reverseRetainedSpeed: 0.1
+  speedRetainedOnHit: 0.9
+  customGravity: 0
+  gravityScale: 20
+  customGravityBounciness: 1
+  normalGravityBounciness: 0.7
+  knockbackForce: 15
+  knockbackHeightAngle: 32.3
+  knockbackCreatureDropForce: 10
+  dashKnockbackForce: 25
+  dashKnockbackHeightAngle: 39.7
+  objectBouceOffForce: 11.4
+  objectBounceOffAngle: 58.2
+  dashSpeed: 30
+  dashLength: 0.3
+  dashCooldown: 1
+  retainedSpeed: 1
+  dashCreatureDropForce: 20
+  stunDuration: 3.5
+  throwForce: 10
+  throwHeightAngle: 30

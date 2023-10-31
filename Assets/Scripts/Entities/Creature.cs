@@ -62,6 +62,8 @@ public class Creature : MonoBehaviour
     private ParticleSystem stinkPS = null;
     private ParticleSystem cryPS = null;
     private ParticleSystem runDustPS = null;
+    private ParticleSystem stressedPS = null;
+    private ParticleSystem sickPS = null;
     private Level levelScript;
 
     public void Initialize(Level level)
@@ -127,6 +129,10 @@ public class Creature : MonoBehaviour
         stinkPS = transform.Find("StinkPS").GetComponent<ParticleSystem>();
         cryPS = transform.Find("CryPS").GetComponent<ParticleSystem>();
         runDustPS = transform.Find("RunDustPS").GetComponent<ParticleSystem>();
+        stressedPS = transform.Find("StressedPS").GetComponent<ParticleSystem>();
+        sickPS = transform.Find("SickPS").GetComponent<ParticleSystem>();
+
+
         meshRendererComp = changeMaterialOn.GetComponent<SkinnedMeshRenderer>();
     }
 
@@ -285,6 +291,20 @@ public class Creature : MonoBehaviour
                         stinkPS.Play();
                     else if (!state && stinkPS.isPlaying)
                         stinkPS.Stop();
+                }
+                break;
+            case TaskStation.TaskType.HEALING: {
+                    if (state && !sickPS.isPlaying)
+                        sickPS.Play();
+                    else if (!state && sickPS.isPlaying)
+                        sickPS.Stop();
+                }
+                break;
+            case TaskStation.TaskType.SLEEPING: {
+                    if (state && !stressedPS.isPlaying)
+                        stressedPS.Play();
+                    else if (!state && stressedPS.isPlaying)
+                        stressedPS.Stop();
                 }
                 break;
         }

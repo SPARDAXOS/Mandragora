@@ -51,3 +51,5 @@ MonoBehaviour:
   player2ControlScheme: {fileID: 11400000, guid: ab22c9cb5ecda9c449b57b56b7c03d51, type: 2}
   playTutorials: 0
   currentGameState: 0
+  gameStarted: 0
+  gamePaused: 0

@@ -251,8 +251,12 @@ public class Creature : MonoBehaviour
     }
     void SetupParticleSystems()
     {
+        //What if list is empty? - Quick bailout
+
         foreach (var entry in taskList)
             SetParticleSystemState(entry, true);
+
+
     }
     void SetParticleSystemState(TaskStation.TaskType task, bool state)
     {
@@ -543,6 +547,12 @@ public class Creature : MonoBehaviour
 
     public void SetTutorialCreature(bool state)
     {
+        taskList.Clear();
+        //:)
+        SetParticleSystemState(TaskStation.TaskType.BATHING, false);
+        SetParticleSystemState(TaskStation.TaskType.SLEEPING, false);
+        SetParticleSystemState(TaskStation.TaskType.FEEDING, false);
+        SetParticleSystemState(TaskStation.TaskType.HEALING, false);
         tutorialCreature = state;
     }
     public bool GetTutorialCreature() 

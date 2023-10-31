@@ -5,4 +5,5 @@ using UnityEngine;
 public class CameraShake : ScriptableObject 
 {
     public float amplitude = 1;
+    public float duration = 0.5f;
 }

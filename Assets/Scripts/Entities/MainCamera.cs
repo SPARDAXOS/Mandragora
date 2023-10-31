@@ -11,12 +11,11 @@ public class MainCamera : MonoBehaviour
     [SerializeField] private float maxAngleBetweenTargets;
     [SerializeField] private float zoomToFitFactor;
     [SerializeField] private float lerpSpeed;
-    [SerializeField] CameraShake cameraShake;
-    [SerializeField] private bool shakeEnabled;
 
     private bool initialized = false;
 
-    private float shakeMultiplier = 1f;
+    private CameraShake cameraShake;
+    private float shakeMultiplier = 0f;
     private List<GameObject> targets;
     private float cameraViewAngle;
     private float targetDistance;
@@ -52,28 +51,22 @@ public class MainCamera : MonoBehaviour
     }
     private Vector3 ShakeOffset() 
     {
+        if (shakeMultiplier <= 0) return Vector3.zero;
         return UnityEngine.Random.insideUnitSphere * cameraShake.amplitude * shakeMultiplier * shakeMultiplier;
     }
     public void ShakeFor(float duration) 
     {
-        StartCoroutine(ShakeRoutine(duration));
-    }
-    private IEnumerator ShakeRoutine(float duration)
-    {
-        shakeEnabled = true;
-
         shakeMultiplier = 1f;
-
-        while (shakeMultiplier > 0f)
-        {
-            shakeMultiplier -= duration * Time.fixedDeltaTime;
-
-            yield return null;
-        }
-        shakeEnabled = false;
     }
 
-    public void AddTarget(GameObject target) 
+    // REAL CODE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    /*public void ShakeFor(CameraShake cameraShake) 
+    {
+        this.cameraShake = cameraShake;
+        shakeMultiplier = 1f;
+    }*/
+
+public void AddTarget(GameObject target) 
     {
         if (target)
             targets.Add(target);
@@ -98,12 +91,11 @@ public class MainCamera : MonoBehaviour
         Vector3 offset = new Vector3(0, Mathf.Sin(cameraViewAngle) * targetDistance, zDist + zOffset);
         Vector3 position = GetPlayerCenter() + offset;
 
-        if (shakeEnabled)
-        {
-            position += ShakeOffset();
-        }
-        
+        position += ShakeOffset();
         targetPos = position;
+
+        if(shakeMultiplier > 0f)
+            shakeMultiplier -= Time.fixedDeltaTime / cameraShake.duration;
     }
     Vector3 GetPlayerCenter() 
     {

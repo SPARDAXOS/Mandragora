@@ -25,6 +25,10 @@ public class Player : MonoBehaviour {
     [Header("Navigation")]
     [SerializeField] private float pathCheckOffset = 0.1f;
 
+    [Header("CameraShakes")]
+    [SerializeField] private CameraShake bounceCameraShake;
+    [SerializeField] private CameraShake dashBounceCameraShake;
+
     [Header("Debugging")]
     [SerializeField] private bool showPickupTrigger = true;
     [SerializeField] private bool showPathCheck = true;
@@ -360,7 +364,7 @@ public class Player : MonoBehaviour {
                     bounceDirection.y = Mathf.Sin(Mathf.Deg2Rad * stats.objectBounceOffAngle);
                     bounceDirection.z *= Mathf.Cos(Mathf.Deg2Rad * stats.objectBounceOffAngle);
                     ApplyKnockback(bounceDirection, stats.objectBouceOffForce);
-                    mainCamera.ShakeFor(10.0f);
+                    mainCamera.ShakeFor(bounceCameraShake);
                     soundManager.PlaySFX("BounceOffObject", transform.position);
                     if (!impactPS.isPlaying)
                         impactPS.Play();

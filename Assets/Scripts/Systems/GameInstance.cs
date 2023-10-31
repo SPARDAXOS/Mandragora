@@ -4,6 +4,7 @@ using UnityEditor;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
 using Unity.VisualScripting;
+using static GameInstance;
 
 namespace Initialization {
     public class Initialization {
@@ -23,7 +24,6 @@ public class GameInstance : MonoBehaviour {
         NONE = 0,
         MAIN_MENU,
         SETTINGS_MENU,
-        CUSTOMIZATION_MENU,
         WIN_MENU,
         LOSE_MENU,
         CREDITS_MENU,
@@ -49,8 +49,8 @@ public class GameInstance : MonoBehaviour {
     private Dictionary<string, GameObject> levelsResources;
 
 
-    private bool gameStarted = false;
-    private bool gamePaused = false;
+    public bool gameStarted = false;
+    public bool gamePaused = false;
 
 
     private GameObject currentLevel;
@@ -79,7 +79,7 @@ public class GameInstance : MonoBehaviour {
     private SettingsMenu settingsMenuScript = null;
     private PauseMenu pauseMenuScript = null;
     private LoseMenu loseMenuScript = null;
-    private UIWinMenu winMenuScript = null;
+    private WinMenu winMenuScript = null;
     private CreditsMenu creditsMenuScript = null;
 
 
@@ -170,7 +170,7 @@ public class GameInstance : MonoBehaviour {
         else {
             settingsMenu = Instantiate(entitiesResources["SettingsMenu"]);
             settingsMenuScript = settingsMenu.GetComponent<SettingsMenu>();
-            settingsMenuScript.Initialize(this, soundManagerScript, gameSettings, true); //Here!
+            settingsMenuScript.Initialize(this, soundManagerScript, gameSettings);
             settingsMenu.SetActive(false);
         }
 
@@ -178,7 +178,7 @@ public class GameInstance : MonoBehaviour {
             Abort("Failed to find WinMenu resource");
         else {
             winMenu = Instantiate(entitiesResources["WinMenu"]);
-            winMenuScript = winMenu.GetComponent<UIWinMenu>();
+            winMenuScript = winMenu.GetComponent<WinMenu>();
             winMenuScript.Initialize(this);
             winMenu.SetActive(false);
         }
@@ -211,6 +211,14 @@ public class GameInstance : MonoBehaviour {
         }
 
 
+        if (!entitiesResources["MainCamera"])
+            Abort("Failed to find MainCamera resource");
+        else {
+            mainCamera = Instantiate(entitiesResources["MainCamera"]);
+            mainCameraScript = mainCamera.GetComponent<MainCamera>();
+            mainCameraScript.Initialize();
+            soundManagerScript.SetMainCamera(mainCameraScript);
+        }
 
         if (!entitiesResources["Player"])
             Abort("Failed to find Player resource");
@@ -218,29 +226,21 @@ public class GameInstance : MonoBehaviour {
             player1 = Instantiate(entitiesResources["Player"]);
             player1.name = "Player_1";
             player1Script = player1.GetComponent<Player>();
-            player1Script.Initialize(Player.PlayerType.PLAYER_1, player1ControlScheme, this, soundManagerScript);
-            player1Script.SetColor(Color.blue);
+            player1Script.Initialize(Player.PlayerType.PLAYER_1, player1ControlScheme, this, soundManagerScript, mainCameraScript);
             player1.SetActive(false);
 
             player2 = Instantiate(entitiesResources["Player"]);
             player2.name = "Player_2";
             player2Script = player2.GetComponent<Player>();
-            player2Script.Initialize(Player.PlayerType.PLAYER_2, player2ControlScheme, this, soundManagerScript);
-            player2Script.SetColor(Color.red);
+            player2Script.Initialize(Player.PlayerType.PLAYER_2, player2ControlScheme, this, soundManagerScript, mainCameraScript);
             player2.SetActive(false);
-        }
 
-
-        if (!entitiesResources["MainCamera"])
-            Abort("Failed to find MainCamera resource");
-        else {
-            mainCamera = Instantiate(entitiesResources["MainCamera"]);
-            mainCameraScript = mainCamera.GetComponent<MainCamera>();
-            mainCameraScript.Initialize();
             mainCameraScript.AddTarget(player1);
             mainCameraScript.AddTarget(player2);
-            soundManagerScript.SetMainCamera(mainCameraScript);
         }
+
+
+
 
         if (!entitiesResources["EventSystem"])
             Abort("Failed to find EventSystem resource");
@@ -287,9 +287,6 @@ public class GameInstance : MonoBehaviour {
             case GameState.SETTINGS_MENU:
                 SetupSettingsMenuState();
                 break;
-            case GameState.CUSTOMIZATION_MENU:
-                SetupCustomizationMenuState();
-                break;
             case GameState.WIN_MENU:
                 SetupWinMenuState();
                 break;
@@ -311,6 +308,7 @@ public class GameInstance : MonoBehaviour {
         SetCursorState(true);
         HideAllMenus();
 
+        currentGameState = GameState.MAIN_MENU;
         soundManagerScript.PlayTrack("MainMenu", true);
         mainMenu.SetActive(true);
     }
@@ -318,54 +316,37 @@ public class GameInstance : MonoBehaviour {
         SetCursorState(true);
         HideAllMenus();
 
+        currentGameState = GameState.SETTINGS_MENU;
         settingsMenu.SetActive(true);
-    }
-    private void SetupCustomizationMenuState() {
-        SetCursorState(true);
-        HideAllMenus();
-
     }
     private void SetupWinMenuState() {
         SetCursorState(true);
         HideAllMenus();
 
-        player1.SetActive(false);
-        player2.SetActive(false);
-        player1Script.DisableInput();
-        player2Script.DisableInput();
-
+        currentGameState = GameState.WIN_MENU;
+        DisablePlayerCharacters();
         winMenu.SetActive(true);
     }
     private void SetupLoseMenuState() {
         SetCursorState(true);
         HideAllMenus();
 
-        //DRY
-        player1.SetActive(false);
-        player2.SetActive(false);
-        player1Script.DisableInput();
-        player2Script.DisableInput();
-
+        currentGameState = GameState.LOSE_MENU;
+        DisablePlayerCharacters();
         loseMenu.SetActive(true);
     }
     private void SetupCreditsMenuState() {
         SetCursorState(true);
         HideAllMenus();
 
+        currentGameState = GameState.CREDITS_MENU;
         creditsMenu.SetActive(true);
     }
     private void SetupPlayingState() {
         SetCursorState(true);
         HideAllMenus();
 
-        //DRY
-        player1.transform.position = currentLevelScript.GetPlayer1SpawnPosition();
-        player2.transform.position = currentLevelScript.GetPlayer2SpawnPosition();
-
-        player1.SetActive(true);
-        player2.SetActive(true);
-        player1Script.EnableInput();
-        player2Script.EnableInput();
+        EnablePlayerCharacters();
         currentGameState = GameState.PLAYING;
         StartGame();
     }
@@ -378,19 +359,48 @@ public class GameInstance : MonoBehaviour {
         pauseMenu.SetActive(true);
         Time.timeScale = 0.0f;
         gamePaused = true;
+        currentGameState = GameState.PAUSE_MENU;
     }
     public void UnpauseGame() {
         HideAllMenus();
         SetCursorState(false);
-
-        pauseMenu.SetActive(false);
         Time.timeScale = 1.0f;
         gamePaused = false;
+        currentGameState = GameState.PLAYING;
     }
 
-    public void LevelFinished(GameResults results) {
-        Debug.Log("Game is over with results " + results.ToString());
 
+    private void EnablePlayerCharacters() {
+        player1.SetActive(true);
+        player2.SetActive(true);
+        player1Script.EnableInput();
+        player2Script.EnableInput();
+    }
+    private void DisablePlayerCharacters() {
+        player1.SetActive(false);
+        player2.SetActive(false);
+        player1Script.DisableInput();
+        player2Script.DisableInput();
+    }
+
+
+
+    public void StartGame() {
+        gameStarted = true;
+
+        player1.transform.position = currentLevelScript.GetPlayer1SpawnPosition();
+        player2.transform.position = currentLevelScript.GetPlayer2SpawnPosition();
+        player1Script.SetupStartingState();
+        player2Script.SetupStartingState();
+
+        if (playTutorials)
+            tutorialSequencerScript.StartTutorial(currentLevelScript);
+        else
+            currentLevelScript.StartLevel();
+    }
+    public void EndGame(GameResults results) {
+
+        soundManagerScript.StopTrack(true);
         if (results == GameResults.WIN) {
             soundManagerScript.PlaySFX("YouWin", Vector3.zero, true);
             SetGameState(GameState.WIN_MENU);
@@ -399,15 +409,19 @@ public class GameInstance : MonoBehaviour {
             soundManagerScript.PlaySFX("YouLose", Vector3.zero, true);
             SetGameState(GameState.LOSE_MENU);
         }
+
+        currentLevelScript.GameOver();
         gameStarted = false;
     }
-    private void StartGame() {
-        gameStarted = true;
+    public void QuitGame() {
+        if (gamePaused)
+            UnpauseGame();
 
-        if (playTutorials)
-            tutorialSequencerScript.StartTutorial(currentLevelScript);
-        else
-            currentLevelScript.StartLevel();
+        DisablePlayerCharacters();
+        currentLevelScript.GameOver();
+
+        gameStarted = false;
+        SetGameState(GameState.MAIN_MENU);
     }
     public bool IsGameStarted() {
         return gameStarted;
@@ -420,7 +434,9 @@ public class GameInstance : MonoBehaviour {
     public Player GetPlayer2Script() {
         return player2Script;
     }
-
+    public MainCamera GetCameraScript() {
+        return mainCameraScript;
+    }
 
 
     private void SetCursorState(bool state) {
@@ -431,18 +447,11 @@ public class GameInstance : MonoBehaviour {
             UnityEngine.Cursor.lockState = CursorLockMode.Locked;
     }
     private void HideAllMenus() {
-        //Add all menus here
         mainMenu.SetActive(false);
         settingsMenu.SetActive(false);
         winMenu.SetActive(false);
         loseMenu.SetActive(false);
         creditsMenu.SetActive(false);
         pauseMenu.SetActive(false);
-        //Customization
-    }
-
-
-    public MainCamera GetCameraScript() {
-        return mainCameraScript;
     }
 }

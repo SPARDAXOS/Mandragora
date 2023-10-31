@@ -1,13 +1,11 @@
 using UnityEngine;
 
-public class LoseMenu : MonoBehaviour
-{
+public class LoseMenu : MonoBehaviour {
     private bool initialize = false;
     private GameInstance gameInstance = null;
 
 
-    public void Initialize(GameInstance reference)
-    {
+    public void Initialize(GameInstance reference) {
         if (initialize)
             return;
 
@@ -15,8 +13,11 @@ public class LoseMenu : MonoBehaviour
         initialize = true;
     }
 
-    public void MainMenu()
-    {
+
+    public void RetryButton() {
+        gameInstance.SetGameState(GameInstance.GameState.PLAYING);
+    }
+    public void QuitButton() {
         gameInstance.SetGameState(GameInstance.GameState.MAIN_MENU);
     }
 }

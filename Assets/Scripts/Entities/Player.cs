@@ -1,6 +1,8 @@
 using Mandragora;
+using System.ComponentModel;
 using UnityEngine;
 using UnityEngine.Windows;
+using static UnityEngine.GraphicsBuffer;
 using static UnityEngine.UI.Image;
 
 public class Player : MonoBehaviour {
@@ -15,7 +17,7 @@ public class Player : MonoBehaviour {
 
     [Header("Pickup")]
     [SerializeField] private float pickupCheckBoxSize = 1.0f;
-    [SerializeField] private Vector3 pickupCheckOffset;
+    [SerializeField] public Vector3 pickupCheckOffset;
     [SerializeField] private LayerMask pickupMask;
     [SerializeField] private Vector3 pickupBoxColliderCenter;
     [SerializeField] private Vector3 pickupBoxColliderSize;
@@ -67,7 +69,7 @@ public class Player : MonoBehaviour {
 
     private GameInstance gameInstance = null;
     private SoundManager soundManager = null;
-
+    private MainCamera mainCamera = null;
 
     private ParticleSystem runDustPS = null;
 
@@ -80,7 +82,7 @@ public class Player : MonoBehaviour {
 
     private PhysicMaterial physicsMaterial = null;
 
-    public void Initialize(PlayerType type, PlayerControlScheme controlScheme, GameInstance gameInstance, SoundManager soundManager) {
+    public void Initialize(PlayerType type, PlayerControlScheme controlScheme, GameInstance gameInstance, SoundManager soundManager, MainCamera mainCamera) {
         if (initialized)
             return;
 
@@ -88,16 +90,11 @@ public class Player : MonoBehaviour {
         activeControlScheme = controlScheme;
         this.gameInstance = gameInstance;
         this.soundManager = soundManager;
-
+        this.mainCamera = mainCamera;
         SetupReferences();
         initialized = true;
     }
     private void SetupReferences() {
-        //meshRendererComp = GetComponent<MeshRenderer>();
-        //if (!meshRendererComp)
-        //    GameInstance.Abort("Failed to get MeshRenderer component on " + gameObject.name);
-        //mainMaterial = meshRendererComp.materials[0];
-
         pickupPoint = transform.Find("PickupPoint").gameObject;
 
         runDustPS = transform.Find("RunDustPS").GetComponent<ParticleSystem>();
@@ -130,6 +127,14 @@ public class Player : MonoBehaviour {
         dashTimer = 0.0f;
         dashCooldownTimer = 0.0f;
         stunTimer = 0.0f;
+
+        //Reset interaction state
+        isInteractingWithTaskStation = false;
+        interactingTaskStation = null;
+        inTaskStationRange = false;
+
+        //Reset held creature stuff
+        DropHeldCreature(); //This is the only thing that doesnt work
     }
 
 
@@ -172,13 +177,6 @@ public class Player : MonoBehaviour {
             UpdateMovement();
     }
 
-
-    public void SetColor(Color color) {
-        if (!initialized)
-            return;
-
-        //mainMaterial.color = color;
-    }
     public void EnableInput() {
 
         activeControlScheme.movement.Enable();
@@ -213,7 +211,6 @@ public class Player : MonoBehaviour {
         activeControlScheme.dash.Enable();
         activeControlScheme.throwAway.Enable();
     }
-
     public void EnableInteractionInput() {
         activeControlScheme.movement.Enable();
         activeControlScheme.interact.Enable();
@@ -347,6 +344,7 @@ public class Player : MonoBehaviour {
                     bounceDirection.y = Mathf.Sin(Mathf.Deg2Rad * stats.objectBounceOffAngle);
                     bounceDirection.z *= Mathf.Cos(Mathf.Deg2Rad * stats.objectBounceOffAngle);
                     ApplyKnockback(bounceDirection, stats.objectBouceOffForce);
+                    mainCamera.ShakeFor(10.0f);
                     soundManager.PlaySFX("BounceOffObject", transform.position);                                                  
                 }
                 isPathBlocked = true;
@@ -593,7 +591,7 @@ public class Player : MonoBehaviour {
     public void DropHeldCreature() {
         if (!heldCreature)
             return;
-
+        
         //Disable VFX
         heldCreature.PutDown();
         heldCreature = null;

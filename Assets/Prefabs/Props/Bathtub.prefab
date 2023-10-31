@@ -103,7 +103,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9118575277137071948}
-  - component: {fileID: 4292148902372787445}
+  - component: {fileID: 2324279829900677714}
   - component: {fileID: 8022792305319624024}
   m_Layer: 0
   m_Name: Bathtub
@@ -132,8 +132,8 @@ Transform:
   - {fileID: 8059494489684552059}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &4292148902372787445
-BoxCollider:
+--- !u!64 &2324279829900677714
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -150,9 +150,10 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 22, y: 25, z: 29.2}
-  m_Center: {x: 0, y: 7.16, z: 0.4}
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 0}
 --- !u!208 &8022792305319624024
 NavMeshObstacle:
   m_ObjectHideFlags: 0

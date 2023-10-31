@@ -19,7 +19,7 @@ MonoBehaviour:
     maxPitch: 1
     minPitch: 1
   - key: Gameplay
-    clip: {fileID: 8300000, guid: bb3a7a789e5b2254882617bfc8e84fd2, type: 3}
+    clip: {fileID: 8300000, guid: 8d5703e4ff4dd914584b2fd187da623b, type: 3}
     volume: 0.3
     maxPitch: 1
     minPitch: 1

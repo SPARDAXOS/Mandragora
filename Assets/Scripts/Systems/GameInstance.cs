@@ -74,6 +74,7 @@ public class GameInstance : MonoBehaviour {
 
     private Player player1Script = null;
     private Player player2Script = null;
+    private Camera cameraScript = null;
     private MainCamera mainCameraScript = null;
     private SoundManager soundManagerScript = null;
     private TutorialSequencer tutorialSequencerScript = null;
@@ -176,12 +177,44 @@ public class GameInstance : MonoBehaviour {
         }
 
 
+
+        if (!entitiesResources["MainCamera"])
+            Abort("Failed to find MainCamera resource");
+        else {
+            mainCamera = Instantiate(entitiesResources["MainCamera"]);
+            cameraScript = mainCamera.GetComponent<Camera>();
+            mainCameraScript = mainCamera.GetComponent<MainCamera>();
+            mainCameraScript.Initialize();
+            soundManagerScript.SetMainCamera(mainCameraScript);
+        }
+
+        if (!entitiesResources["Player"])
+            Abort("Failed to find Player resource");
+        else {
+            player1 = Instantiate(entitiesResources["Player"]);
+            player1.name = "Player_1";
+            player1Script = player1.GetComponent<Player>();
+            player1Script.Initialize(Player.PlayerType.PLAYER_1, player1ControlScheme, this, soundManagerScript, mainCameraScript);
+            player1.SetActive(false);
+
+            player2 = Instantiate(entitiesResources["Player"]);
+            player2.name = "Player_2";
+            player2Script = player2.GetComponent<Player>();
+            player2Script.Initialize(Player.PlayerType.PLAYER_2, player2ControlScheme, this, soundManagerScript, mainCameraScript);
+            player2.SetActive(false);
+
+            mainCameraScript.AddTarget(player1);
+            mainCameraScript.AddTarget(player2);
+        }
+
+
+        //Menus
         if (!entitiesResources["MainMenu"])
             Abort("Failed to find MainMenu resource");
         else {
             mainMenu = Instantiate(entitiesResources["MainMenu"]);
             mainMenuScript = mainMenu.GetComponent<MainMenu>();
-            mainMenuScript.Initialize(this, soundManagerScript);
+            mainMenuScript.Initialize(this, soundManagerScript, cameraScript);
             mainMenu.SetActive(false);
         }
 
@@ -228,35 +261,6 @@ public class GameInstance : MonoBehaviour {
             pauseMenuScript = pauseMenu.GetComponent<PauseMenu>();
             pauseMenuScript.Initialize(this);
             pauseMenu.SetActive(false);
-        }
-
-
-        if (!entitiesResources["MainCamera"])
-            Abort("Failed to find MainCamera resource");
-        else {
-            mainCamera = Instantiate(entitiesResources["MainCamera"]);
-            mainCameraScript = mainCamera.GetComponent<MainCamera>();
-            mainCameraScript.Initialize();
-            soundManagerScript.SetMainCamera(mainCameraScript);
-        }
-
-        if (!entitiesResources["Player"])
-            Abort("Failed to find Player resource");
-        else {
-            player1 = Instantiate(entitiesResources["Player"]);
-            player1.name = "Player_1";
-            player1Script = player1.GetComponent<Player>();
-            player1Script.Initialize(Player.PlayerType.PLAYER_1, player1ControlScheme, this, soundManagerScript, mainCameraScript);
-            player1.SetActive(false);
-
-            player2 = Instantiate(entitiesResources["Player"]);
-            player2.name = "Player_2";
-            player2Script = player2.GetComponent<Player>();
-            player2Script.Initialize(Player.PlayerType.PLAYER_2, player2ControlScheme, this, soundManagerScript, mainCameraScript);
-            player2.SetActive(false);
-
-            mainCameraScript.AddTarget(player1);
-            mainCameraScript.AddTarget(player2);
         }
 
 
@@ -373,6 +377,9 @@ public class GameInstance : MonoBehaviour {
         player2Script.SetupStartingState();
 
         currentGameState = GameState.PLAYING;
+
+        //It gets kinda messy! - Check from tutorial into start!
+        currentLevelScript.EnableEffects();
         //StartGame();
     }
 

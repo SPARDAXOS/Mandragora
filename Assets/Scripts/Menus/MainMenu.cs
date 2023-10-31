@@ -5,14 +5,28 @@ public class MainMenu : MonoBehaviour {
     private bool initialize = false;
     private GameInstance gameInstance = null;
     private SoundManager soundManager = null;
+    private Camera mainCamera = null;
 
-    public void Initialize(GameInstance reference, SoundManager soundManager) {
+    private Canvas canvasComp = null;
+
+    public void Initialize(GameInstance reference, SoundManager soundManager, Camera mainCamera) {
         if (initialize)
             return;
 
         this.soundManager = soundManager;
+        this.mainCamera = mainCamera;
         gameInstance = reference;
+        SetupReferences();
+        SetupCameraOverlay();
         initialize = true;
+    }
+    private void SetupReferences() {
+        canvasComp = GetComponent<Canvas>();
+    }
+    private void SetupCameraOverlay() {
+        canvasComp.renderMode = RenderMode.ScreenSpaceCamera;
+        canvasComp.worldCamera = mainCamera;
+        Debug.Log(mainCamera);
     }
 
     public void StartButton() {

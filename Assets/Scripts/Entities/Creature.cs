@@ -177,7 +177,7 @@ public class Creature : MonoBehaviour
                 }
                 break;
             case CreatureType.MUSHROOM:
-                mushroomMaterials = mesh.GetComponent<SkinnedMeshRenderer>().materials;
+                mushroomMaterials = mesh.GetComponentInChildren<SkinnedMeshRenderer>().materials;
                 break;
         }
     }

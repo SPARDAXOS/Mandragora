@@ -964,14 +964,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Bathtub
       objectReference: {fileID: 0}
-    - target: {fileID: 890715573373201312, guid: 62b7e65bfd9b1ac4090313be6babed9f, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2324279829900677714, guid: 62b7e65bfd9b1ac4090313be6babed9f, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 9118575277137071948, guid: 62b7e65bfd9b1ac4090313be6babed9f, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

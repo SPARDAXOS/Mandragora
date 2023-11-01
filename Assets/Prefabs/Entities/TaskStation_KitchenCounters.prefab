@@ -49,7 +49,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6b473bae00e6154dae8a7bf74560603, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  taskType: 1
+  taskType: 2
   actionType: 0
   mashIncreaseRate: 10
   holdIncreaseRate: 1

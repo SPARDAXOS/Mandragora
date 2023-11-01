@@ -142,6 +142,7 @@ public class TutorialsSequencer : MonoBehaviour {
         targetLevel = target;
         tutorialCreature = targetLevel.StartTutorial();
         tutorialsRunning = true;
+        tutorialsPaused = false;
         timer = 0.0f;
     }
     public void StopTutorials() {
@@ -155,9 +156,11 @@ public class TutorialsSequencer : MonoBehaviour {
         queuedTutorials.Clear();
         targetLevel = null;
         tutorialCreature.SetActive(false);
-        tutorialsRunning = false;
         currentTutorial = Tutorials.NONE;
         timer = 0.0f;
+
+        tutorialsRunning = false;
+        tutorialsPaused = false;
 
         HideAllTutorials();
     }
@@ -168,8 +171,7 @@ public class TutorialsSequencer : MonoBehaviour {
     }
     public void UnpauseTutorials() {
 
-
-
+        ToggleOnCurrentTutorialGUI();
         tutorialsPaused = false;
     }
 
@@ -361,6 +363,47 @@ public class TutorialsSequencer : MonoBehaviour {
             }
         }
     }
+
+    private void ToggleOnCurrentTutorialGUI() {
+        switch (currentTutorial) {
+            case Tutorials.INTRODUCTION:
+                introductionTutorial.SetActive(true);
+                break;
+            case Tutorials.MOVEMENT:
+                movementTutorial.SetActive(true);
+                break;
+            case Tutorials.DASH:
+                dashTutorial.SetActive(true);
+                break;
+            case Tutorials.PICKUP:
+                pickupTutorial.SetActive(true);
+                break;
+            case Tutorials.THROW:
+                throwingTutorial.SetActive(true);
+                break;
+            case Tutorials.WIN_AND_LOSE_CONDITIONS:
+                winLoseTutorial.SetActive(true);
+                break;
+            case Tutorials.DIRTY_CREATURES:
+                dirtyCreaturesTutorial.SetActive(true);
+                break;
+            case Tutorials.HUNGRY_CREATURES:
+                hungryCreaturesTutorial.SetActive(true);
+                break;
+            case Tutorials.ILL_CREATURES:
+                illCreaturesTutorial.SetActive(true);
+                break;
+            case Tutorials.SLEEPY_CREATURES:
+                sleepyCreaturesTutorial.SetActive(true);
+                break;
+            case Tutorials.DELIVER_CREATURES:
+                deliveringTutorial.SetActive(true);
+                break;
+            case Tutorials.TUTORIAL_COMPLETED:
+                completeTutorial.SetActive(true);
+                break;
+        }
+    }
     private void HideAllTutorials() {
         introductionTutorial.SetActive(false);
         movementTutorial.SetActive(false);
@@ -382,6 +425,7 @@ public class TutorialsSequencer : MonoBehaviour {
         if (queuedTutorials.Count == 0) {
             currentTutorial = Tutorials.NONE;
             tutorialsRunning = false;
+            tutorialsPaused = false;
             gameInstance.StartLevelCountdown();
             return;
         }

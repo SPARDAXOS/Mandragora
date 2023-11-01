@@ -15,7 +15,7 @@ public class WinMenu : MonoBehaviour {
 
 
     public void RetryButton() {
-        gameInstance.SetGameState(GameInstance.GameState.PLAYING);
+        gameInstance.StartLevelStartFade();
     }
     public void QuitButton() {
         gameInstance.SetGameState(GameInstance.GameState.MAIN_MENU);

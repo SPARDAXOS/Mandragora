@@ -31,6 +31,7 @@ public class TutorialsSequencer : MonoBehaviour {
 
     private bool initialized = false;
     private bool tutorialsRunning = false;
+    private bool tutorialsPaused = false;
 
     public float timer = 0.0f;
 
@@ -93,7 +94,7 @@ public class TutorialsSequencer : MonoBehaviour {
         }
 
 
-        if (tutorialsRunning) {
+        if (tutorialsRunning && !tutorialsPaused) {
             UpdateTutorials();
             UpdateNextTutorialTimer();
         }
@@ -160,6 +161,19 @@ public class TutorialsSequencer : MonoBehaviour {
 
         HideAllTutorials();
     }
+    public void PauseTutorials() {
+
+        HideAllTutorials();
+        tutorialsPaused = true;
+    }
+    public void UnpauseTutorials() {
+
+
+
+        tutorialsPaused = false;
+    }
+
+
     private void UpdateTutorials() {
         if (currentTutorial == Tutorials.NONE) {
             queuedTutorials.Remove(0);

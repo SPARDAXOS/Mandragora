@@ -391,6 +391,8 @@ public class GameInstance : MonoBehaviour {
     public void PauseGame() {
         HideAllMenus();
         SetCursorState(true);
+        if (tutorialsSequencerScript.IsTutorialRunning())
+            tutorialsSequencerScript.PauseTutorials();
 
         pauseMenu.SetActive(true);
         Time.timeScale = 0.0f;
@@ -398,6 +400,9 @@ public class GameInstance : MonoBehaviour {
         currentGameState = GameState.PAUSE_MENU;
     }
     public void UnpauseGame() {
+        if (tutorialsSequencerScript.IsTutorialRunning())
+            tutorialsSequencerScript.UnpauseTutorials();
+
         HideAllMenus();
         SetCursorState(false);
         Time.timeScale = 1.0f;

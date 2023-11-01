@@ -224,7 +224,7 @@ public class GameInstance : MonoBehaviour {
         else {
             settingsMenu = Instantiate(entitiesResources["SettingsMenu"]);
             settingsMenuScript = settingsMenu.GetComponent<SettingsMenu>();
-            settingsMenuScript.Initialize(this, soundManagerScript, gameSettings);
+            settingsMenuScript.Initialize(this, soundManagerScript, gameSettings, cameraScript);
             settingsMenu.SetActive(false);
         }
 
@@ -251,7 +251,7 @@ public class GameInstance : MonoBehaviour {
         else {
             creditsMenu = Instantiate(entitiesResources["CreditsMenu"]);
             creditsMenuScript = creditsMenu.GetComponent<CreditsMenu>();
-            creditsMenuScript.Initialize(this, soundManagerScript);
+            creditsMenuScript.Initialize(this, soundManagerScript, cameraScript);
             creditsMenu.SetActive(false);
         }
 

@@ -30,7 +30,8 @@ public class Player : MonoBehaviour {
     [SerializeField] private CameraShake dashBounceCameraShake;
 
     [Header("Debugging")]
-    [SerializeField] private bool showPickupTrigger = true;
+    [SerializeField] private bool showGroundedCheck = true;
+    [SerializeField] private bool showPickupCheck = true;
     [SerializeField] private bool showPathCheck = true;
 
 
@@ -321,8 +322,21 @@ public class Player : MonoBehaviour {
 
     private void CheckGrounded() {
         Vector3 startingPosition = transform.position;
-        startingPosition.y += 1;
-        bool results = Physics.BoxCast(startingPosition, Vector3.one / 2, -transform.up, transform.rotation, 1.0f);
+
+        Vector3 size;
+        float offset = 0.1f;
+        if (heldCreature) {
+            startingPosition += pickupBoxColliderCenter;
+            size = pickupBoxColliderSize;
+        }
+        else {
+            startingPosition += normalBoxColliderCenter;
+            size = normalBoxColliderSize;
+        }
+
+
+        startingPosition.y += offset;
+        bool results = Physics.BoxCast(startingPosition, size / 2, -transform.up, transform.rotation, offset * 2);
         if (!isGrounded && results)
             soundManager.PlaySFX("Landing", transform.position);
         isGrounded = results;
@@ -385,7 +399,6 @@ public class Player : MonoBehaviour {
     }
 
 
-    //Handles toggling interaction start and finish
     public void SetInteractingWithTaskStationState(TaskStation target, bool state) {
         if (!target) {
             Debug.LogError("Null taskstation sent to SetInteractingWithTaskStationState - Should always send valid ref here for check");
@@ -405,7 +418,8 @@ public class Player : MonoBehaviour {
 
         Debug.LogError("ERROR! This is not meant to be reached!");
     }
-    //Handles checking if task station is in range
+
+
     public void SetInTaskStationRange(TaskStation target, bool state) {
 
         interactingTaskStation = target;
@@ -414,7 +428,6 @@ public class Player : MonoBehaviour {
     public bool GetInTaskStationRange() { //(???
         return inTaskStationRange;
     }
-    //Checks if player starts interaction with task station in range!
     private void CheckTaskStatioInteraction() {
         if (!inTaskStationRange || !interactingTaskStation || isInteractingWithTaskStation)
             return;
@@ -681,7 +694,37 @@ public class Player : MonoBehaviour {
 
 
     private void OnDrawGizmos() {
-        if (showPickupTrigger) {
+
+
+        if (showGroundedCheck) {
+            Vector3 startingPosition = transform.position;
+            Vector3 endPosition = transform.position;
+            //startingPosition.y += 1;
+
+            Vector3 size;
+            float offset;
+            if (heldCreature) {
+                size = pickupBoxColliderSize;
+                offset = pickupBoxColliderCenter.y;
+            }
+            else {
+                size = normalBoxColliderSize;
+                offset = normalBoxColliderCenter.y;
+            }
+
+            startingPosition.y += offset;
+            endPosition.y += offset - 0.1f;
+
+            Color startColor = Color.blue;
+            startColor.a = 0.5f;
+            Color endColor = Color.red;
+            endColor.a = 0.5f;
+            Gizmos.color = startColor;
+            Gizmos.DrawCube(startingPosition, size);
+            Gizmos.color = endColor;
+            Gizmos.DrawCube(endPosition, size);
+        }
+        if (showPickupCheck) {
             Vector3 boxcastOrigin = transform.position;
             boxcastOrigin += transform.rotation * pickupCheckOffset;
             Vector3 boxSize = new Vector3(pickupCheckBoxSize, pickupCheckBoxSize, pickupCheckBoxSize);

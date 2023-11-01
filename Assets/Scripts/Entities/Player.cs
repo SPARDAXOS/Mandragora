@@ -586,7 +586,15 @@ public class Player : MonoBehaviour {
         if (!heldCreature)
             return;
 
-        //heldCreature.transform.position = Vector3.Lerp(heldCreature.transform.position, pickupPoint.transform.position, 1.0f);
+        if (isInteractingWithTaskStation) {
+            if (interactingTaskStation.IsUsingCustomHeldSpot()) {
+                Transform heldSpot = interactingTaskStation.GetCustomHeldSpot();
+                heldCreature.transform.position = heldSpot.transform.position;
+                heldCreature.transform.rotation = heldSpot.transform.rotation;
+                return;
+            }
+        }
+        Debug.Log("Player side");
         heldCreature.transform.position = pickupPoint.transform.position;
     }
 
@@ -607,6 +615,9 @@ public class Player : MonoBehaviour {
     }
     public bool IsThrowing() {
         return isThrowingTrigger;
+    }
+    public GameObject GetPickupPoint() {
+        return pickupPoint;
     }
 
 

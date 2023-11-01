@@ -105,20 +105,6 @@ MonoBehaviour:
   creatureType: 1
   stats: {fileID: 11400000, guid: 7e6a4c96a7c5dba43a046f9994e0f3b6, type: 2}
   randomizeDissatisfactionRate: {x: 0.5, y: 2}
-  onionSatisfiedMaterial: {fileID: 2100000, guid: ef57f6ff11b8a524191c54fd83712730, type: 2}
-  onionDissatisfiedMaterial: {fileID: 2100000, guid: e094616139b217a439859ef241dd5a01, type: 2}
-  mushroomSatisfiedMaterials:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  mushroomDissatisfiedMaterials:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
   dissatisfaction: 0
   scaleWhenDissatisfied: 2
   doDissatisfaction: 0
@@ -130,7 +116,12 @@ MonoBehaviour:
   isMoving: 0
   taskList: 
   onionMaterials: []
-  mushroomMeshRenderer: {fileID: 0}
+  mushroomMaterials:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!1001 &1405697963936289669
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -465,7 +456,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7183691018464292142, guid: f047cb383fa50f84087360510582557f, type: 3}
       propertyPath: moveWithTransform
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7183691018464292142, guid: f047cb383fa50f84087360510582557f, type: 3}
       propertyPath: ShapeModule.radius.value

@@ -257,7 +257,11 @@ public class Creature : MonoBehaviour
     }
     void UpdateScale()
     {
-        transform.localScale = (initialScale * (1f + dissatisfaction * dissatisfaction * (scaleWhenDissatisfied - 1f))) * Vector3.one;
+        transform.localScale = 
+            (initialScale + initialScale *
+            (dissatisfaction * dissatisfaction * 
+            (scaleWhenDissatisfied - 1f))) 
+            * Vector3.one;
     }
     void GetDissatisfactionMultiplier()
     {

@@ -51,6 +51,7 @@ public class GameInstance : MonoBehaviour {
 
     public bool gameStarted = false;
     public bool gamePaused = false;
+    
 
 
     private GameObject currentLevel;
@@ -62,7 +63,7 @@ public class GameInstance : MonoBehaviour {
     private GameObject eventSystem = null;
     private GameObject mainCamera = null;
     private GameObject soundManager = null;
-    private GameObject tutorialSequencer = null;
+    private GameObject tutorialsSequencer = null;
     private GameObject mainMenu = null;
     private GameObject settingsMenu = null;
     private GameObject pauseMenu = null;
@@ -77,7 +78,7 @@ public class GameInstance : MonoBehaviour {
     private Camera cameraScript = null;
     private MainCamera mainCameraScript = null;
     private SoundManager soundManagerScript = null;
-    private TutorialSequencer tutorialSequencerScript = null;
+    private TutorialsSequencer tutorialsSequencerScript = null;
     private MainMenu mainMenuScript = null;
     private SettingsMenu settingsMenuScript = null;
     private PauseMenu pauseMenuScript = null;
@@ -155,9 +156,9 @@ public class GameInstance : MonoBehaviour {
         if (!entitiesResources["TutorialSequencer"])
             Abort("Failed to find TutorialSequencer resource");
         else {
-            tutorialSequencer = Instantiate(entitiesResources["TutorialSequencer"]);
-            tutorialSequencerScript = tutorialSequencer.GetComponent<TutorialSequencer>();
-            tutorialSequencerScript.Initialize(this, soundManagerScript);
+            tutorialsSequencer = Instantiate(entitiesResources["TutorialSequencer"]);
+            tutorialsSequencerScript = tutorialsSequencer.GetComponent<TutorialsSequencer>();
+            tutorialsSequencerScript.Initialize(this, soundManagerScript);
         }
 
         if (!entitiesResources["Countdown"])
@@ -278,6 +279,7 @@ public class GameInstance : MonoBehaviour {
             Abort("Failed to find Level1 resource");
         else {
             currentLevel = Instantiate(levelsResources["Level1"]);
+            currentLevel.SetActive(false);
             currentLevelScript = currentLevel.GetComponent<Level>();
             currentLevelScript.Initialize(this, soundManagerScript);
         }
@@ -289,8 +291,8 @@ public class GameInstance : MonoBehaviour {
         player2Script.Tick();
         currentLevelScript.Tick();
 
-        if (tutorialSequencerScript.IsTutorialRunning())
-            tutorialSequencerScript.Tick();
+        if (tutorialsSequencerScript.IsTutorialRunning())
+            tutorialsSequencerScript.Tick();
     }
     private void UpdateFixedPlayingState() {
         player1Script.FixedTick();
@@ -335,6 +337,7 @@ public class GameInstance : MonoBehaviour {
         currentGameState = GameState.MAIN_MENU;
         soundManagerScript.PlayTrack("MainMenu", true);
         mainMenu.SetActive(true);
+        mainMenuScript.PlayFadeInAnimation();
     }
     private void SetupSettingsMenuState() {
         SetCursorState(true);
@@ -377,9 +380,10 @@ public class GameInstance : MonoBehaviour {
         player2Script.SetupStartingState();
 
         currentGameState = GameState.PLAYING;
-
+        currentLevel.SetActive(true);
         //It gets kinda messy! - Check from tutorial into start!
         currentLevelScript.EnableEffects();
+        //WTF IF THIS IS CALLED BY SETGAMESTATE! Add debug message there
         //StartGame();
     }
 
@@ -427,7 +431,7 @@ public class GameInstance : MonoBehaviour {
 
 
         if (playTutorials)
-            tutorialSequencerScript.StartTutorial(currentLevelScript);
+            tutorialsSequencerScript.StartTutorials(currentLevelScript);
         else
             StartLevelCountdown();
     }
@@ -452,6 +456,11 @@ public class GameInstance : MonoBehaviour {
 
         DisablePlayerCharacters();
         currentLevelScript.GameOver();
+
+        tutorialsSequencerScript.StopTutorials();
+
+        mainMenuScript.SetFadeInAtStartUpState(true);
+        currentLevel.SetActive(false);
 
         gameStarted = false;
         SetGameState(GameState.MAIN_MENU);

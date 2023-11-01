@@ -55,17 +55,14 @@ public class MainCamera : MonoBehaviour
         if (shakeMultiplier <= 0) return Vector3.zero;
         return UnityEngine.Random.insideUnitSphere * cameraShake.amplitude * shakeMultiplier * shakeMultiplier;
     }
-    public void ShakeFor(float duration) 
-    {
-        shakeMultiplier = 1f;
-    }
+    
 
     // REAL CODE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    /*public void ShakeFor(CameraShake cameraShake) 
+    public void ShakeFor(CameraShake cameraShake) 
     {
         this.cameraShake = cameraShake;
         shakeMultiplier = 1f;
-    }*/
+    }
 
 public void AddTarget(GameObject target) 
     {
@@ -81,8 +78,6 @@ public void AddTarget(GameObject target)
         targetDistance *= zoomToFitFactor;
         targetDistance += (1 - zoomToFitFactor) * restingCameraDistance;
 
-
-
         if (targetDistance < restingCameraDistance) 
             targetDistance = restingCameraDistance;
     }
@@ -95,8 +90,8 @@ public void AddTarget(GameObject target)
         position += ShakeOffset();
         targetPos = position;
 
-        /*if(shakeMultiplier > 0f)
-            shakeMultiplier -= Time.fixedDeltaTime / cameraShake.duration;*/
+        if(shakeMultiplier > 0f)
+            shakeMultiplier -= Time.fixedDeltaTime / cameraShake.duration;
     }
     Vector3 GetPlayerCenter() 
     {

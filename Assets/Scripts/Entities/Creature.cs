@@ -20,7 +20,6 @@ public class Creature : MonoBehaviour
     [SerializeField] private CreatureStats stats;
     [SerializeField] private Vector2 randomizeDissatisfactionRate = new Vector2(0.5f, 2f);
     [SerializeField] private Material satisfiedMaterial, dissatisfiedMaterial;
-    [SerializeField] private GameObject changeMaterialOn;
     [Range (0, 1f)]
     [SerializeField] private float dissatisfaction = 0;
     [SerializeField] private float scaleWhenDissatisfied = 3;
@@ -59,7 +58,7 @@ public class Creature : MonoBehaviour
     private Rigidbody rigidbodyComp = null;
     private Collider colliderComp = null;
     private Animator animatorComp = null;
-    private SkinnedMeshRenderer meshRendererComp = null;
+    private SkinnedMeshRenderer[] meshRenderers = null;
     private Player player = null;
     private ParticleSystem stinkPS = null;
     private ParticleSystem cryPS = null;
@@ -143,7 +142,24 @@ public class Creature : MonoBehaviour
         sickPS = transform.Find("SickPS").GetComponent<ParticleSystem>();
         heldPS = transform.Find("HeldPS").GetComponent<ParticleSystem>();
         heldPS.Stop();
-        meshRendererComp = changeMaterialOn.GetComponent<SkinnedMeshRenderer>();
+
+        //SetupMeshRenderers();
+    }
+
+    void SetupMeshRenderers()
+    {
+        Transform meshObjectParent = transform.Find("Mesh");
+        int numChildren = meshObjectParent.childCount;
+
+        meshRenderers = new SkinnedMeshRenderer[numChildren];
+
+        for (int i = 0; i < numChildren; i++)
+        {
+            SkinnedMeshRenderer meshRenderer = meshObjectParent.GetChild(i).GetComponent<SkinnedMeshRenderer>();
+
+            if (meshRenderer)
+                meshRenderers[i] = meshRenderer;
+        }
     }
 
     public void ClearAllTasks() {
@@ -219,7 +235,7 @@ public class Creature : MonoBehaviour
         else if (dissatisfaction >= 1f)
             levelScript.RegisterCreatureDesatisfied();
 
-        UpdateMaterials();
+        //UpdateMaterials();
         UpdateScale();
     }
     public void StartDissatisfaction()
@@ -234,7 +250,10 @@ public class Creature : MonoBehaviour
     }
     void UpdateMaterials()
     {
-        meshRendererComp.material.Lerp(satisfiedMaterial, dissatisfiedMaterial, dissatisfaction);
+        foreach (var meshRenderer in meshRenderers)
+        {
+            meshRenderer.material.Lerp(satisfiedMaterial, dissatisfiedMaterial, dissatisfaction);
+        }
     }
     void UpdateScale()
     {

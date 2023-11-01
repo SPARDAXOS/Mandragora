@@ -315,7 +315,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CreaturePrefab: {fileID: 6999313860858921807, guid: 41f4ed135d66d76409942cc5a6c18654, type: 3}
-  creaturesCount: 7
+  creaturesCount: 10
   spawnPointCalculationRetries: 10
   spawnHeightOffset: 7
   currentSatisfiedCreatures: 0

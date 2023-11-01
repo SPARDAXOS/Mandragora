@@ -5,19 +5,19 @@ public class MainMenu : MonoBehaviour {
     private bool initialize = false;
     private GameInstance gameInstance = null;
     private SoundManager soundManager = null;
-    private Camera mainCamera = null;
+    private Camera cameraScript = null;
 
     private Canvas canvasComp = null;
     private Animation animationComp = null;
 
     private bool fadeInAtStartup = false;
 
-    public void Initialize(GameInstance reference, SoundManager soundManager, Camera mainCamera) {
+    public void Initialize(GameInstance reference, SoundManager soundManager, Camera camera) {
         if (initialize)
             return;
 
         this.soundManager = soundManager;
-        this.mainCamera = mainCamera;
+        cameraScript = camera;
         gameInstance = reference;
         fadeInAtStartup = true;
         SetupReferences();
@@ -30,9 +30,8 @@ public class MainMenu : MonoBehaviour {
     }
     private void SetupCameraOverlay() {
         canvasComp.renderMode = RenderMode.ScreenSpaceCamera;
-        canvasComp.worldCamera = mainCamera;
-        canvasComp.planeDistance = 1.0f; //Not sure!
-        Debug.Log(mainCamera);
+        canvasComp.worldCamera = cameraScript;
+        canvasComp.planeDistance = 1.0f;
     }
     public void PlayFadeInAnimation() {
         if (!animationComp.isPlaying && fadeInAtStartup) {

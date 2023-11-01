@@ -28,6 +28,8 @@ public class Creature : MonoBehaviour
     [SerializeField] private bool doEscapeHeld = false;
     [SerializeField] private bool drawAIGizmos;
     [SerializeField] private List<TaskStation.TaskType> taskList;
+    [Range(1, 4)][SerializeField] private int maxAmountOfTasks = 2;
+    [Range(0, 3)][SerializeField] private int minAmountOfTasks = 2;
 
 
     private bool initialized = false;
@@ -64,6 +66,7 @@ public class Creature : MonoBehaviour
     private ParticleSystem runDustPS = null;
     private ParticleSystem stressedPS = null;
     private ParticleSystem sickPS = null;
+    private ParticleSystem heldPS = null;
     private Level levelScript;
 
     public void Initialize(Level level)
@@ -72,6 +75,9 @@ public class Creature : MonoBehaviour
             return;
 
         levelScript = level;
+
+        if (minAmountOfTasks > maxAmountOfTasks)
+            Debug.LogError("minAmountOfTasks should not be higher than maxAmountOfTasks");
 
         SetupReferences();
 
@@ -131,8 +137,8 @@ public class Creature : MonoBehaviour
         runDustPS = transform.Find("RunDustPS").GetComponent<ParticleSystem>();
         stressedPS = transform.Find("StressedPS").GetComponent<ParticleSystem>();
         sickPS = transform.Find("SickPS").GetComponent<ParticleSystem>();
-
-
+        heldPS = transform.Find("HeldPS").GetComponent<ParticleSystem>();
+        heldPS.Stop();
         meshRendererComp = changeMaterialOn.GetComponent<SkinnedMeshRenderer>();
     }
 
@@ -175,8 +181,8 @@ public class Creature : MonoBehaviour
         List<TaskStation.TaskType> availableTasks = new List<TaskStation.TaskType>();
         availableTasks.AddRange((IEnumerable<TaskStation.TaskType>)allTasksArray);
 
-        int amountOfTasks = UnityEngine.Random.Range(1, allTasksArray.Length);
-
+        int amountOfTasks = UnityEngine.Random.Range(minAmountOfTasks, maxAmountOfTasks + 1);
+        Debug.Log("Ammo " + amountOfTasks);
         taskList.Clear();
         while (taskList.Count != amountOfTasks)
         {
@@ -549,9 +555,14 @@ public class Creature : MonoBehaviour
         colliderComp.enabled = false;
         speed = 0f;
         isHeld = true;
-        
+
         if (runDustPS.isPlaying)
             runDustPS.Stop();
+
+        if (!heldPS.isEmitting)
+            heldPS.Play();
+
+        Debug.Log("OnPick : " + heldPS.isPlaying);
     }
     public void PutDown()
     {
@@ -559,6 +570,9 @@ public class Creature : MonoBehaviour
         colliderComp.enabled = true;
         isHeld = false;
         player = null;
+
+        if (heldPS.isEmitting)
+            heldPS.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
     }
     public bool GetHeldState()
     {

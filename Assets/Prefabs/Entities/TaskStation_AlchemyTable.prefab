@@ -56,6 +56,13 @@ MonoBehaviour:
   player1PossibleQTEKeys: 7700000061000000730000006400000065000000
   player2PossibleQTEKeys: 1101000014010000130100001201000001010000
   QTECount: 5
+  persistentParticles: 1
+  sfxInterruptable: 0
+  targetPlayer: {fileID: 0}
+  playersInRange: 
+  interactionOngoing: 0
+  lastInputedKey: 
+  currentTargetQTE: 0
 --- !u!65 &7547347357484397901
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -625,7 +632,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: K
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5e01569bb8f94ae4a8cf1c26daea8c3e, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -689,7 +696,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
+  m_hasFontAssetChanged: 1
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!1 &8324704730348009452

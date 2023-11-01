@@ -41,6 +41,7 @@ public class TaskStation : MonoBehaviour {
     [Space(10)]
     [Header("Settings")]
     [SerializeField] private bool persistentParticles = true;
+    [SerializeField] private bool interactParticles = true;
     [SerializeField] private bool sfxInterruptable = false;
 
 
@@ -71,8 +72,8 @@ public class TaskStation : MonoBehaviour {
     private GameObject normalBarFrame = null;
     private GameObject QTEBarFrame = null;
 
-    private ParticleSystem sparklePS = null;
     private ParticleSystem bathBubblePS = null;
+    private ParticleSystem foodCrumbsPS = null;
 
     private TextMeshProUGUI QTEIndicatorText = null;
     private Image normalBar = null;
@@ -163,14 +164,20 @@ public class TaskStation : MonoBehaviour {
         QTEBarFrame.SetActive(false);
 
         //Sparkle PS
-        var SparklePSTransform = transform.Find("SparklePS");
-        Utility.Validate(SparklePSTransform, "Failed to get reference to SparklePS - " + gameObject.name, Utility.ValidationType.ERROR);
-        sparklePS = SparklePSTransform.GetComponent<ParticleSystem>();
+        //var SparklePSTransform = transform.Find("SparklePS");
+        //Utility.Validate(SparklePSTransform, "Failed to get reference to SparklePS - " + gameObject.name, Utility.ValidationType.ERROR);
+        //sparklePS = SparklePSTransform.GetComponent<ParticleSystem>();
 
         //BathBubble PS
         var BathBubblePSTransform = transform.Find("BathBubblePS");
         Utility.Validate(BathBubblePSTransform, "Failed to get reference to BathBubblePS - " + gameObject.name, Utility.ValidationType.ERROR);
         bathBubblePS = BathBubblePSTransform.GetComponent<ParticleSystem>();
+
+        //FoodCrumbs PS
+        var FoodCrumbsTransform = transform.Find("FoodCrumbsPS");
+        Utility.Validate(FoodCrumbsTransform, "Failed to get reference to FoodCrumbsPS - " + gameObject.name, Utility.ValidationType.ERROR);
+        foodCrumbsPS = FoodCrumbsTransform.GetComponent<ParticleSystem>();
+
 
     }
 
@@ -211,6 +218,8 @@ public class TaskStation : MonoBehaviour {
     private void UpdateMashInteraction() {
         if (targetPlayer.IsInteractingTrigger()) {
             PlaySFX();
+            if(!persistentParticles && interactParticles)
+                EnableParticleSystem();
             normalBar.fillAmount += mashIncreaseRate * Time.deltaTime;
             if (normalBar.fillAmount >= 1.0f) {
                 normalBar.fillAmount = 1.0f;
@@ -221,6 +230,8 @@ public class TaskStation : MonoBehaviour {
     private void UpdateHoldInteraction() {
         if (targetPlayer.IsInteractingHeld()) {
             PlaySFX();
+            if (!persistentParticles && interactParticles)
+                EnableParticleSystem();
             normalBar.fillAmount += holdIncreaseRate * Time.deltaTime;
             if (normalBar.fillAmount >= 1.0f) {
                 normalBar.fillAmount = 1.0f;
@@ -233,6 +244,8 @@ public class TaskStation : MonoBehaviour {
             currentQTECount++;
             normalBar.fillAmount += 1.0f / QTECount;
             PlaySFX();
+            if (!persistentParticles && interactParticles)
+                EnableParticleSystem();
             if (currentQTECount == QTECount) {
                 normalBar.fillAmount = 1.0f;
                 currentQTECount = 0;
@@ -246,6 +259,8 @@ public class TaskStation : MonoBehaviour {
     private void UpdateTimedClickInteraction() {
         if (QTEBarTrigger && targetPlayer.IsInteractingTrigger()) {
             PlaySFX();
+            if (!persistentParticles && interactParticles)
+                EnableParticleSystem();
             CompleteInteraction();
         }
     }
@@ -283,7 +298,6 @@ public class TaskStation : MonoBehaviour {
     private void CompleteInteraction() {
         targetPlayer.GetHeldCreature().CompleteTask(taskType);
         DisableInteractionState();
-        sparklePS.Play();
     }
 
 
@@ -336,6 +350,9 @@ public class TaskStation : MonoBehaviour {
         if (taskType == TaskType.BATHING)
             bathBubblePS.Play();
 
+        if (taskType == TaskType.FEEDING)
+            foodCrumbsPS.Play();
+
         //Feeding
         //Healing
         //Sleeping
@@ -344,6 +361,9 @@ public class TaskStation : MonoBehaviour {
     private void DisableParticleSystem() {
         if (taskType == TaskType.BATHING)
             bathBubblePS.Stop();
+
+        if (taskType == TaskType.FEEDING)
+            foodCrumbsPS.Stop();
 
         //Feeding
         //Healing

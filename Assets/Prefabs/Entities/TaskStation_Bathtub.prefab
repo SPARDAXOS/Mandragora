@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6496003265933644122}
   - component: {fileID: 7327453599668854676}
   - component: {fileID: 7547347357484397901}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: TaskStation_Bathtub
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31,10 +31,10 @@ Transform:
   m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 2582991559680349089}
   - {fileID: 7117392323214612938}
   - {fileID: 5406603370885538292}
   - {fileID: 1172009509116656617}
-  - {fileID: 2582991559680349089}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7327453599668854676
@@ -958,6 +958,10 @@ PrefabInstance:
     - target: {fileID: 890715573373201312, guid: 62b7e65bfd9b1ac4090313be6babed9f, type: 3}
       propertyPath: m_Name
       value: Bathtub
+      objectReference: {fileID: 0}
+    - target: {fileID: 890715573373201312, guid: 62b7e65bfd9b1ac4090313be6babed9f, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2324279829900677714, guid: 62b7e65bfd9b1ac4090313be6babed9f, type: 3}
       propertyPath: m_Enabled

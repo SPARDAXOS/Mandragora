@@ -313,7 +313,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 294fcc3db2baf1d408a2a5b10c100a2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CreaturePrefab: {fileID: 6999313860858921807, guid: 41f4ed135d66d76409942cc5a6c18654, type: 3}
+  CreaturePrefab: {fileID: 6999313860858921807, guid: 1d7caa809b0cbe24cbff23a7be0b731f, type: 3}
   creaturesCount: 10
   spawnPointCalculationRetries: 10
   spawnHeightOffset: 7

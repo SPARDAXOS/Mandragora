@@ -76,8 +76,12 @@ public class Creature : MonoBehaviour
 
         levelScript = level;
 
-        if (minAmountOfTasks > maxAmountOfTasks)
-            Debug.LogError("minAmountOfTasks should not be higher than maxAmountOfTasks");
+        if (minAmountOfTasks > maxAmountOfTasks) {
+            Debug.LogWarning("minAmountOfTasks should not be higher than maxAmountOfTasks - Value will be swapped!");
+            int temp = minAmountOfTasks;
+            minAmountOfTasks = maxAmountOfTasks;
+            maxAmountOfTasks = temp;
+        }
 
         SetupReferences();
 
@@ -182,7 +186,7 @@ public class Creature : MonoBehaviour
         availableTasks.AddRange((IEnumerable<TaskStation.TaskType>)allTasksArray);
 
         int amountOfTasks = UnityEngine.Random.Range(minAmountOfTasks, maxAmountOfTasks + 1);
-        Debug.Log("Ammo " + amountOfTasks);
+
         taskList.Clear();
         while (taskList.Count != amountOfTasks)
         {

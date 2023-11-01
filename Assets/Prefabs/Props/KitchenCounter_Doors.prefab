@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 3884616473024357871}
   - component: {fileID: 1020121999540959206}
   - component: {fileID: 3483975898975279718}
+  - component: {fileID: 4191350044237767323}
+  - component: {fileID: 1010496066482195834}
   m_Layer: 0
   m_Name: KitchenCounter_Doors
   m_TagString: Untagged
@@ -83,3 +85,40 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &4191350044237767323
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1853965794740806380}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 228.88303, y: 152.37811, z: 204.7976}
+  m_Center: {x: -3.537548, y: -9.830322, z: 0}
+--- !u!208 &1010496066482195834
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1853965794740806380}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 114.44201, y: 76.189, z: 102.399}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: -3.538, y: -9.830001, z: 0}
+  m_TimeToStationary: 0.5

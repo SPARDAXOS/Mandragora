@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 2088796486222923839}
   - component: {fileID: 4721934229298036768}
   - component: {fileID: 2106804885083441993}
+  - component: {fileID: 7503339875469378029}
+  - component: {fileID: 5674174780600275943}
   m_Layer: 0
   m_Name: KitchenCounter_Corner
   m_TagString: Untagged
@@ -83,3 +85,40 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &7503339875469378029
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9213490377192810478}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 319.80493, y: 151.6557, z: 307.1964}
+  m_Center: {x: 6.453476, y: -9.218899, z: 0}
+--- !u!208 &5674174780600275943
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9213490377192810478}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 159.90201, y: 75.828, z: 153.598}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 6.453, y: -9.219001, z: 0}
+  m_TimeToStationary: 0.5

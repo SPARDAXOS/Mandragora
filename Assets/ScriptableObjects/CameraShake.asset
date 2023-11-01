@@ -12,4 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40c9931e9d7ffde4ab444adf0404c188, type: 3}
   m_Name: CameraShake
   m_EditorClassIdentifier: 
-  amplitude: 1
+  amplitude: 3
+  duration: 0.5

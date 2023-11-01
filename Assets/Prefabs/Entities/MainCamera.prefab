@@ -171,7 +171,5 @@ MonoBehaviour:
   maxAngleBetweenTargets: 25
   zoomToFitFactor: 0.3
   lerpSpeed: 4.5
-  cameraShake:
-    amplitude: 2
-    frequency: 2
-    isShaking: 0
+  cameraShake: {fileID: 11400000, guid: 558a12d06c5f7044ea7a74cfb45855fb, type: 2}
+  shakeEnabled: 0

@@ -51,6 +51,7 @@ public class GameInstance : MonoBehaviour {
 
     public bool gameStarted = false;
     public bool gamePaused = false;
+    
 
 
     private GameObject currentLevel;
@@ -62,7 +63,7 @@ public class GameInstance : MonoBehaviour {
     private GameObject eventSystem = null;
     private GameObject mainCamera = null;
     private GameObject soundManager = null;
-    private GameObject tutorialSequencer = null;
+    private GameObject tutorialsSequencer = null;
     private GameObject mainMenu = null;
     private GameObject settingsMenu = null;
     private GameObject pauseMenu = null;
@@ -70,12 +71,14 @@ public class GameInstance : MonoBehaviour {
     private GameObject loseMenu = null;
     private GameObject creditsMenu = null;
     private GameObject countdown = null;
+    private GameObject fadeOut = null;
 
     private Player player1Script = null;
     private Player player2Script = null;
+    private Camera cameraScript = null;
     private MainCamera mainCameraScript = null;
     private SoundManager soundManagerScript = null;
-    private TutorialSequencer tutorialSequencerScript = null;
+    private TutorialsSequencer tutorialsSequencerScript = null;
     private MainMenu mainMenuScript = null;
     private SettingsMenu settingsMenuScript = null;
     private PauseMenu pauseMenuScript = null;
@@ -83,6 +86,7 @@ public class GameInstance : MonoBehaviour {
     private WinMenu winMenuScript = null;
     private CreditsMenu creditsMenuScript = null;
     private Countdown countdownScript = null;
+    private FadeOut fadeOutScript = null;
 
 
 
@@ -152,9 +156,9 @@ public class GameInstance : MonoBehaviour {
         if (!entitiesResources["TutorialSequencer"])
             Abort("Failed to find TutorialSequencer resource");
         else {
-            tutorialSequencer = Instantiate(entitiesResources["TutorialSequencer"]);
-            tutorialSequencerScript = tutorialSequencer.GetComponent<TutorialSequencer>();
-            tutorialSequencerScript.Initialize(this, soundManagerScript);
+            tutorialsSequencer = Instantiate(entitiesResources["TutorialSequencer"]);
+            tutorialsSequencerScript = tutorialsSequencer.GetComponent<TutorialsSequencer>();
+            tutorialsSequencerScript.Initialize(this, soundManagerScript);
         }
 
         if (!entitiesResources["Countdown"])
@@ -165,13 +169,53 @@ public class GameInstance : MonoBehaviour {
             countdownScript.Initialize();
         }
 
+        if (!entitiesResources["FadeOut"])
+            Abort("Failed to find FadeOut resource");
+        else {
+            fadeOut = Instantiate(entitiesResources["FadeOut"]);
+            fadeOutScript = fadeOut.GetComponent<FadeOut>();
+            fadeOutScript.Initialize();
+        }
 
+
+
+        if (!entitiesResources["MainCamera"])
+            Abort("Failed to find MainCamera resource");
+        else {
+            mainCamera = Instantiate(entitiesResources["MainCamera"]);
+            cameraScript = mainCamera.GetComponent<Camera>();
+            mainCameraScript = mainCamera.GetComponent<MainCamera>();
+            mainCameraScript.Initialize();
+            soundManagerScript.SetMainCamera(mainCameraScript);
+        }
+
+        if (!entitiesResources["Player"])
+            Abort("Failed to find Player resource");
+        else {
+            player1 = Instantiate(entitiesResources["Player"]);
+            player1.name = "Player_1";
+            player1Script = player1.GetComponent<Player>();
+            player1Script.Initialize(Player.PlayerType.PLAYER_1, player1ControlScheme, this, soundManagerScript, mainCameraScript);
+            player1.SetActive(false);
+
+            player2 = Instantiate(entitiesResources["Player"]);
+            player2.name = "Player_2";
+            player2Script = player2.GetComponent<Player>();
+            player2Script.Initialize(Player.PlayerType.PLAYER_2, player2ControlScheme, this, soundManagerScript, mainCameraScript);
+            player2.SetActive(false);
+
+            mainCameraScript.AddTarget(player1);
+            mainCameraScript.AddTarget(player2);
+        }
+
+
+        //Menus
         if (!entitiesResources["MainMenu"])
             Abort("Failed to find MainMenu resource");
         else {
             mainMenu = Instantiate(entitiesResources["MainMenu"]);
             mainMenuScript = mainMenu.GetComponent<MainMenu>();
-            mainMenuScript.Initialize(this, soundManagerScript);
+            mainMenuScript.Initialize(this, soundManagerScript, cameraScript);
             mainMenu.SetActive(false);
         }
 
@@ -221,35 +265,6 @@ public class GameInstance : MonoBehaviour {
         }
 
 
-        if (!entitiesResources["MainCamera"])
-            Abort("Failed to find MainCamera resource");
-        else {
-            mainCamera = Instantiate(entitiesResources["MainCamera"]);
-            mainCameraScript = mainCamera.GetComponent<MainCamera>();
-            mainCameraScript.Initialize();
-            soundManagerScript.SetMainCamera(mainCameraScript);
-        }
-
-        if (!entitiesResources["Player"])
-            Abort("Failed to find Player resource");
-        else {
-            player1 = Instantiate(entitiesResources["Player"]);
-            player1.name = "Player_1";
-            player1Script = player1.GetComponent<Player>();
-            player1Script.Initialize(Player.PlayerType.PLAYER_1, player1ControlScheme, this, soundManagerScript, mainCameraScript);
-            player1.SetActive(false);
-
-            player2 = Instantiate(entitiesResources["Player"]);
-            player2.name = "Player_2";
-            player2Script = player2.GetComponent<Player>();
-            player2Script.Initialize(Player.PlayerType.PLAYER_2, player2ControlScheme, this, soundManagerScript, mainCameraScript);
-            player2.SetActive(false);
-
-            mainCameraScript.AddTarget(player1);
-            mainCameraScript.AddTarget(player2);
-        }
-
-
 
 
         if (!entitiesResources["EventSystem"])
@@ -264,6 +279,7 @@ public class GameInstance : MonoBehaviour {
             Abort("Failed to find Level1 resource");
         else {
             currentLevel = Instantiate(levelsResources["Level1"]);
+            currentLevel.SetActive(false);
             currentLevelScript = currentLevel.GetComponent<Level>();
             currentLevelScript.Initialize(this, soundManagerScript);
         }
@@ -275,8 +291,8 @@ public class GameInstance : MonoBehaviour {
         player2Script.Tick();
         currentLevelScript.Tick();
 
-        if (tutorialSequencerScript.IsTutorialRunning())
-            tutorialSequencerScript.Tick();
+        if (tutorialsSequencerScript.IsTutorialRunning())
+            tutorialsSequencerScript.Tick();
     }
     private void UpdateFixedPlayingState() {
         player1Script.FixedTick();
@@ -321,6 +337,7 @@ public class GameInstance : MonoBehaviour {
         currentGameState = GameState.MAIN_MENU;
         soundManagerScript.PlayTrack("MainMenu", true);
         mainMenu.SetActive(true);
+        mainMenuScript.PlayFadeInAnimation();
     }
     private void SetupSettingsMenuState() {
         SetCursorState(true);
@@ -357,8 +374,17 @@ public class GameInstance : MonoBehaviour {
         HideAllMenus();
 
         EnablePlayerCharacters();
+        player1.transform.position = currentLevelScript.GetPlayer1SpawnPosition();
+        player2.transform.position = currentLevelScript.GetPlayer2SpawnPosition();
+        player1Script.SetupStartingState();
+        player2Script.SetupStartingState();
+
         currentGameState = GameState.PLAYING;
-        StartGame();
+        currentLevel.SetActive(true);
+        //It gets kinda messy! - Check from tutorial into start!
+        currentLevelScript.EnableEffects();
+        //WTF IF THIS IS CALLED BY SETGAMESTATE! Add debug message there
+        //StartGame();
     }
 
 
@@ -394,23 +420,20 @@ public class GameInstance : MonoBehaviour {
     }
 
 
-    private void Test() {
-        Debug.Log("Callback works!");
+    public void StartLevelStartFade() {
+        fadeOutScript.StartFadeOut(SetupPlayingState, StartGame);
+    }
+    public void StartLevelCountdown() {
+        countdownScript.StartCountdown(currentLevelScript.StartLevel);
     }
     public void StartGame() {
         gameStarted = true;
 
-        player1.transform.position = currentLevelScript.GetPlayer1SpawnPosition();
-        player2.transform.position = currentLevelScript.GetPlayer2SpawnPosition();
-        player1Script.SetupStartingState();
-        player2Script.SetupStartingState();
-
-        countdownScript.StartCountdown(Test);
 
         if (playTutorials)
-            tutorialSequencerScript.StartTutorial(currentLevelScript);
+            tutorialsSequencerScript.StartTutorials(currentLevelScript);
         else
-            currentLevelScript.StartLevel();
+            StartLevelCountdown();
     }
     public void EndGame(GameResults results) {
 
@@ -433,6 +456,11 @@ public class GameInstance : MonoBehaviour {
 
         DisablePlayerCharacters();
         currentLevelScript.GameOver();
+
+        tutorialsSequencerScript.StopTutorials();
+
+        mainMenuScript.SetFadeInAtStartUpState(true);
+        currentLevel.SetActive(false);
 
         gameStarted = false;
         SetGameState(GameState.MAIN_MENU);

@@ -201,7 +201,7 @@ public class Creature : MonoBehaviour
             {
                 taskList.RemoveAt(i);
                 SetParticleSystemState(completedTask, false);
-
+                Debug.Log("CompleteTask");
                 transform.position += 1.5f * Vector3.up;
                 ApplyImpulse(-player.transform.forward + Vector3.up, 5f);
                 player.DropHeldCreature();

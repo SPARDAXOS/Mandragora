@@ -40,9 +40,12 @@ public class TaskStation : MonoBehaviour {
 
     [Space(10)]
     [Header("Settings")]
+    [SerializeField] private bool customHeldSpot = false;
     [SerializeField] private bool persistentParticles = true;
     [SerializeField] private bool interactParticles = true;
     [SerializeField] private bool sfxInterruptable = false;
+
+    private Transform customHeldSpotTransform = null;
 
 
 
@@ -74,6 +77,7 @@ public class TaskStation : MonoBehaviour {
 
     private ParticleSystem bathBubblePS = null;
     private ParticleSystem foodCrumbsPS = null;
+    private ParticleSystem sleepingPS = null;
 
     private TextMeshProUGUI QTEIndicatorText = null;
     private Image normalBar = null;
@@ -168,6 +172,11 @@ public class TaskStation : MonoBehaviour {
         //Utility.Validate(SparklePSTransform, "Failed to get reference to SparklePS - " + gameObject.name, Utility.ValidationType.ERROR);
         //sparklePS = SparklePSTransform.GetComponent<ParticleSystem>();
 
+        customHeldSpotTransform = transform.Find("HeldSpot");
+        Utility.Validate(customHeldSpotTransform, "Failed to get reference to HeldSpot - " + gameObject.name, Utility.ValidationType.ERROR);
+
+
+
         //BathBubble PS
         var BathBubblePSTransform = transform.Find("BathBubblePS");
         Utility.Validate(BathBubblePSTransform, "Failed to get reference to BathBubblePS - " + gameObject.name, Utility.ValidationType.ERROR);
@@ -178,6 +187,12 @@ public class TaskStation : MonoBehaviour {
         Utility.Validate(FoodCrumbsTransform, "Failed to get reference to FoodCrumbsPS - " + gameObject.name, Utility.ValidationType.ERROR);
         foodCrumbsPS = FoodCrumbsTransform.GetComponent<ParticleSystem>();
 
+        //Sleepy
+        var SleepPSTransform = transform.Find("SleepPS");
+        Utility.Validate(SleepPSTransform, "Failed to get reference to SleepPS - " + gameObject.name, Utility.ValidationType.ERROR);
+        sleepingPS = SleepPSTransform.GetComponent<ParticleSystem>();
+
+        
 
     }
 
@@ -296,7 +311,12 @@ public class TaskStation : MonoBehaviour {
     }
 
     private void CompleteInteraction() {
-        targetPlayer.GetHeldCreature().CompleteTask(taskType);
+        var heldCreature = targetPlayer.GetHeldCreature();
+        if (customHeldSpot) {
+            heldCreature.transform.rotation = Quaternion.identity;
+        }
+
+        heldCreature.CompleteTask(taskType);
         DisableInteractionState();
     }
 
@@ -304,6 +324,14 @@ public class TaskStation : MonoBehaviour {
     public bool IsInteractionOngoing() {
         return interactionOngoing;
     }
+    public bool IsUsingCustomHeldSpot() {
+        return customHeldSpot;
+    }
+    public Transform GetCustomHeldSpot() {
+        return customHeldSpotTransform;
+    }
+
+
     public bool Interact(Player user) {
         if (interactionOngoing)
             return false;
@@ -353,10 +381,10 @@ public class TaskStation : MonoBehaviour {
         if (taskType == TaskType.FEEDING)
             foodCrumbsPS.Play();
 
-        //Feeding
         //Healing
-        //Sleeping
 
+        if (taskType == TaskType.SLEEPING)
+            sleepingPS.Play();
     }
     private void DisableParticleSystem() {
         if (taskType == TaskType.BATHING)
@@ -365,9 +393,10 @@ public class TaskStation : MonoBehaviour {
         if (taskType == TaskType.FEEDING)
             foodCrumbsPS.Stop();
 
-        //Feeding
         //Healing
-        //Sleeping
+
+        if (taskType == TaskType.SLEEPING)
+            sleepingPS.Stop();
     }
 
     private void EnableInteractionGUI() {

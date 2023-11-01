@@ -1,13 +1,17 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using UnityEditor;
 using UnityEngine;
+
+
 
 [RequireComponent(typeof(Rigidbody))]
 public class Creature : MonoBehaviour
 {
+    public enum CreatureType {
+        NONE = 0,
+        ONION,
+        MUSHROOM
+    }
     public enum CreatureState
     {
         NONE = 0,
@@ -17,18 +21,20 @@ public class Creature : MonoBehaviour
         FALL
     }
 
+    [SerializeField] private CreatureType creatureType = CreatureType.NONE;
     [SerializeField] private CreatureStats stats;
     [SerializeField] private Vector2 randomizeDissatisfactionRate = new Vector2(0.5f, 2f);
-    [SerializeField] private Material satisfiedMaterial, dissatisfiedMaterial;
-    [Range (0, 1f)]
-    [SerializeField] private float dissatisfaction = 0;
+
+
+    [Space(10)]
+    [Range (0, 1f)] [SerializeField] private float dissatisfaction = 0;
     [SerializeField] private float scaleWhenDissatisfied = 3;
     [SerializeField] private bool doDissatisfaction;
     [SerializeField] private bool doEscapeHeld = false;
     [SerializeField] private bool drawAIGizmos;
-    [SerializeField] private List<TaskStation.TaskType> taskList;
     [Range(1, 4)][SerializeField] private int maxAmountOfTasks = 2;
     [Range(0, 3)][SerializeField] private int minAmountOfTasks = 2;
+
 
 
     private bool initialized = false;
@@ -52,13 +58,20 @@ public class Creature : MonoBehaviour
     public bool isMoving = false;
     private Vector3 velocity = Vector3.zero;
 
+    public List<TaskStation.TaskType> taskList;
+
     private float restTimeElapsed = 0;
     private float restDuration = 0;
 
     private Rigidbody rigidbodyComp = null;
     private Collider colliderComp = null;
     private Animator animatorComp = null;
-    private SkinnedMeshRenderer[] meshRenderers = null;
+
+    //In case of Onion ;(
+    public Material[] onionMaterials = null;
+    //In case of Mushroom ;(
+    public Material[] mushroomMaterials = new Material[5];
+
     private Player player = null;
     private ParticleSystem stinkPS = null;
     private ParticleSystem cryPS = null;
@@ -73,6 +86,11 @@ public class Creature : MonoBehaviour
         if (initialized) 
             return;
 
+        if (creatureType == CreatureType.NONE) {
+            Debug.LogError("Creature " + gameObject.name + " has CreatureType set to NONE!");
+            return;
+        }
+
         levelScript = level;
 
         if (minAmountOfTasks > maxAmountOfTasks) {
@@ -82,6 +100,8 @@ public class Creature : MonoBehaviour
             maxAmountOfTasks = temp;
         }
 
+
+        
         SetupReferences();
 
         initialScale = transform.localScale.x;
@@ -143,22 +163,22 @@ public class Creature : MonoBehaviour
         heldPS = transform.Find("HeldPS").GetComponent<ParticleSystem>();
         heldPS.Stop();
 
-        //SetupMeshRenderers();
+        SetupMeshRenderers();
     }
 
-    void SetupMeshRenderers()
-    {
-        Transform meshObjectParent = transform.Find("Mesh");
-        int numChildren = meshObjectParent.childCount;
-
-        meshRenderers = new SkinnedMeshRenderer[numChildren];
-
-        for (int i = 0; i < numChildren; i++)
-        {
-            SkinnedMeshRenderer meshRenderer = meshObjectParent.GetChild(i).GetComponent<SkinnedMeshRenderer>();
-
-            if (meshRenderer)
-                meshRenderers[i] = meshRenderer;
+    void SetupMeshRenderers() {
+        var mesh = transform.Find("Mesh");
+        switch (creatureType) {
+            case CreatureType.ONION: {
+                var skinnedMeshRenderers = mesh.GetComponentsInChildren<SkinnedMeshRenderer>();
+                    onionMaterials = new Material[skinnedMeshRenderers.Length];
+                    for (int i = 0; i < onionMaterials.Length; i++)
+                        onionMaterials[i] = skinnedMeshRenderers[i].material;
+                }
+                break;
+            case CreatureType.MUSHROOM:
+                mushroomMaterials = mesh.GetComponent<SkinnedMeshRenderer>().materials;
+                break;
         }
     }
 
@@ -235,7 +255,7 @@ public class Creature : MonoBehaviour
         else if (dissatisfaction >= 1f)
             levelScript.RegisterCreatureDesatisfied();
 
-        //UpdateMaterials();
+        UpdateMaterials();
         UpdateScale();
     }
     public void StartDissatisfaction()
@@ -248,16 +268,26 @@ public class Creature : MonoBehaviour
         dissatisfaction = 0f;
         doDissatisfaction = false;
     }
-    void UpdateMaterials()
-    {
-        foreach (var meshRenderer in meshRenderers)
-        {
-            meshRenderer.material.Lerp(satisfiedMaterial, dissatisfiedMaterial, dissatisfaction);
+    void UpdateMaterials() {
+        switch (creatureType) {
+            case CreatureType.ONION: {
+                foreach (var material in onionMaterials)
+                        material.SetFloat("_Dissatisfaction", dissatisfaction);
+                }
+                break;
+            case CreatureType.MUSHROOM: {
+                    mushroomMaterials[0].SetFloat("_Dissatisfaction", dissatisfaction);
+                    mushroomMaterials[1].SetFloat("_Dissatisfaction", dissatisfaction);
+                    mushroomMaterials[2].SetFloat("_Dissatisfaction", dissatisfaction);
+                    mushroomMaterials[3].SetFloat("_Dissatisfaction", dissatisfaction);
+                    mushroomMaterials[4].SetFloat("_Dissatisfaction", dissatisfaction);
+                }
+                break;
         }
     }
     void UpdateScale()
     {
-        transform.localScale = (initialScale * (1f + dissatisfaction * dissatisfaction * (scaleWhenDissatisfied - 1f))) * Vector3.one;
+        transform.localScale = (initialScale + initialScale * (dissatisfaction * dissatisfaction * (scaleWhenDissatisfied - 1f))) * Vector3.one;
     }
     void GetDissatisfactionMultiplier()
     {

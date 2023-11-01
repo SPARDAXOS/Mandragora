@@ -51,7 +51,6 @@ public class MainCamera : MonoBehaviour
     }
     private Vector3 ShakeOffset() 
     {
-        return Vector3.zero;
         if (shakeMultiplier <= 0) return Vector3.zero;
         return UnityEngine.Random.insideUnitSphere * cameraShake.amplitude * shakeMultiplier * shakeMultiplier;
     }

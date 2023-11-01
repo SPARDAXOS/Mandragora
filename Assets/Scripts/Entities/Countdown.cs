@@ -9,7 +9,7 @@ public class Countdown : MonoBehaviour {
 
 
     private Action targetCallback = null;
-    private Animation countdownAnimationComp = null;
+    private Animation animationComp = null;
 
 
     public void Initialize() {
@@ -21,7 +21,7 @@ public class Countdown : MonoBehaviour {
         initialized = true;
     }
     private void SetupReferences() {
-        countdownAnimationComp = GetComponent<Animation>();
+        animationComp = GetComponent<Animation>();
     }
 
 
@@ -33,11 +33,19 @@ public class Countdown : MonoBehaviour {
 
 
         targetCallback = callback;
-        countdownAnimationComp.Play("Countdown");
+        animationComp.Play("Countdown");
         gameObject.SetActive(true);
     }
     public bool IsPlaying() {
-        return countdownAnimationComp.isPlaying;
+        return animationComp.isPlaying;
+    }
+    public void Stop() {
+        if (!animationComp.isPlaying)
+            return;
+
+        animationComp.Stop();
+        gameObject.SetActive(false);
+        targetCallback = null;
     }
     public void CountdownFinished() {
         if (targetCallback != null)

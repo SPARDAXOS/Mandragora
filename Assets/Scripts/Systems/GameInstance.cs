@@ -434,7 +434,7 @@ public class GameInstance : MonoBehaviour {
     public void StartGame() {
         gameStarted = true;
 
-
+        Debug.Log("Start!");
         if (playTutorials)
             tutorialsSequencerScript.StartTutorials(currentLevelScript);
         else
@@ -463,6 +463,12 @@ public class GameInstance : MonoBehaviour {
         currentLevelScript.GameOver();
 
         tutorialsSequencerScript.StopTutorials();
+
+        if (countdownScript.IsPlaying())
+            countdownScript.Stop();
+
+        if (fadeOutScript.IsPlaying())
+            fadeOutScript.Stop();
 
         mainMenuScript.SetFadeInAtStartUpState(true);
         currentLevel.SetActive(false);

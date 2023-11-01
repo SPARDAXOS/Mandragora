@@ -366,6 +366,7 @@ public class Player : MonoBehaviour {
             }
             else {
                 if (isDashing) {
+                    Debug.LogWarning("I dashed into " + hit.collider.name);
                     StopDashing();
                     Vector3 targetDirection = hit.point - transform.position;
                     //targetDirection.Normalize();

@@ -7,7 +7,7 @@ public class FadeOut : MonoBehaviour {
 
     private Action onFadeCallback = null;
     private Action onFinishedCallback = null;
-    private Animation fadeOutAnimationComp = null;
+    private Animation animationComp = null;
 
 
     public void Initialize() {
@@ -19,7 +19,7 @@ public class FadeOut : MonoBehaviour {
         initialized = true;
     }
     private void SetupReferences() {
-        fadeOutAnimationComp = GetComponent<Animation>();
+        animationComp = GetComponent<Animation>();
     }
 
 
@@ -31,12 +31,22 @@ public class FadeOut : MonoBehaviour {
 
         onFadeCallback = onFade;
         onFinishedCallback = onFinished;
-        fadeOutAnimationComp.Play("FadeOut");
+        animationComp.Play("FadeOut");
         gameObject.SetActive(true);
     }
     public bool IsPlaying() {
-        return fadeOutAnimationComp.isPlaying;
+        return animationComp.isPlaying;
     }
+    public void Stop() {
+        if (!animationComp.isPlaying)
+            return;
+
+        animationComp.Stop();
+        gameObject.SetActive(false);
+        onFadeCallback = null;
+        onFinishedCallback = null;
+    }
+
     public void FadeOutCallback() {
         if (onFadeCallback != null)
             onFadeCallback.Invoke();

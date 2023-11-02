@@ -226,7 +226,7 @@ public class Level : MonoBehaviour {
 
         RandomizeCreatureSpawns();
         currentSatisfiedCreatures = 0;
-        soundManager.PlayTrack("Gameplay", true);
+        //soundManager.PlayTrack("Gameplay", true);
     }
     public void GameOver() {
 

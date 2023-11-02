@@ -84,7 +84,7 @@ MonoBehaviour:
     maxPitch: 0.8
     minPitch: 1.2
   - key: Step
-    clip: {fileID: 8300000, guid: d38d840d8ceead84d8b712adc836295e, type: 3}
-    volume: 1
+    clip: {fileID: 8300000, guid: 6551a66022c6ca74d8f43ffd09f65cee, type: 3}
+    volume: 0.5
     maxPitch: 1.5
     minPitch: 2

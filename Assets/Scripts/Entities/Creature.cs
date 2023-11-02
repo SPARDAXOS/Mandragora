@@ -64,7 +64,7 @@ public class Creature : MonoBehaviour
     private float restDuration = 0;
 
     private Rigidbody rigidbodyComp = null;
-    private Collider colliderComp = null;
+    private SphereCollider colliderComp = null;
     private Animator animatorComp = null;
 
     //In case of Onion ;(
@@ -153,7 +153,7 @@ public class Creature : MonoBehaviour
     void SetupReferences()
     {
         rigidbodyComp   = GetComponent<Rigidbody>();
-        colliderComp = GetComponent<Collider>();
+        colliderComp = GetComponent<SphereCollider>();
         animatorComp = transform.Find("Mesh").GetComponent<Animator>();
         stinkPS = transform.Find("StinkPS").GetComponent<ParticleSystem>();
         cryPS = transform.Find("CryPS").GetComponent<ParticleSystem>();
@@ -529,14 +529,12 @@ public class Creature : MonoBehaviour
     bool CastToTarget(Vector3 target, bool assignTarget = true)
     {
         float scale = transform.localScale.x;
-        if (!Physics.CheckSphere(target, scale))
-            return false;
 
-        Vector3 origin = transform.position;
+        Vector3 origin = transform.position + colliderComp.center * transform.localScale.x;
         Vector3 direction = target - transform.position;
-        colliderComp.enabled = false;
-        bool output = Physics.SphereCast(new Ray(origin, direction), scale * 0.9f, stats.viewRange);
-        colliderComp.enabled = true;
+        direction.y = 0f;
+        float radius = colliderComp.radius * transform.localScale.x;
+        bool output = Physics.SphereCast(new Ray(origin, direction), radius * 0.9f, stats.viewRange);
         if (!output && assignTarget) targetPosition = target;
         return output;
     }
@@ -663,6 +661,10 @@ public class Creature : MonoBehaviour
             Gizmos.DrawWireSphere(transform.position, stats.viewRange);
             Gizmos.color = Color.green;
             Gizmos.DrawWireSphere(targetPosition, 0.5f);
+            Gizmos.color = Color.red;
+            Vector3 origin = transform.position + colliderComp.center * transform.localScale.x;
+            float radius = colliderComp.radius * transform.localScale.x;
+            Gizmos.DrawWireSphere(origin, radius * 0.9f);
         }
     }
 }

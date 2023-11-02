@@ -62,6 +62,7 @@ MonoBehaviour:
   persistentParticles: 0
   interactParticles: 0
   sfxInterruptable: 0
+  endOnlySFX: 1
   targetPlayer: {fileID: 0}
   playersInRange: 
   interactionOngoing: 0
@@ -86,7 +87,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 2, y: 1, z: 3}
+  m_Size: {x: 2.87, y: 1.13, z: 4.1}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &702745886898384076
 GameObject:

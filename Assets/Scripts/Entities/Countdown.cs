@@ -11,6 +11,8 @@ public class Countdown : MonoBehaviour {
     private Action targetCallback = null;
     private Animation animationComp = null;
 
+    private GameObject GUI = null;
+
 
     public void Initialize() {
         if (initialized)
@@ -22,6 +24,8 @@ public class Countdown : MonoBehaviour {
     }
     private void SetupReferences() {
         animationComp = GetComponent<Animation>();
+        GUI = transform.Find("GUI").gameObject;
+        GUI.gameObject.SetActive(false);
     }
 
 
@@ -35,6 +39,7 @@ public class Countdown : MonoBehaviour {
         targetCallback = callback;
         animationComp.Play("Countdown");
         gameObject.SetActive(true);
+        GUI.gameObject.SetActive(true);
     }
     public bool IsPlaying() {
         return animationComp.isPlaying;
@@ -45,6 +50,7 @@ public class Countdown : MonoBehaviour {
 
         animationComp.Stop();
         gameObject.SetActive(false);
+        GUI.gameObject.SetActive(false);
         targetCallback = null;
     }
     public void CountdownFinished() {
@@ -54,6 +60,8 @@ public class Countdown : MonoBehaviour {
             Debug.LogError("Countdown animation player but target callback was invalid!");
 
         gameObject.SetActive(false);
+        GUI.gameObject.SetActive(false);
         targetCallback = null;
     }
+    
 }

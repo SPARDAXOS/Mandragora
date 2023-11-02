@@ -309,6 +309,7 @@ public class Player : MonoBehaviour {
             rigidbodyComp.velocity = transform.forward * stats.dashSpeed;
             dashTimer = stats.dashLength;
             direction = transform.forward;
+            soundManager.PlaySFX("Dash", transform.position, false, false, gameObject);
         }
     }
     private void CheckThrow() {
@@ -378,6 +379,7 @@ public class Player : MonoBehaviour {
 
         RaycastHit hit;
         if (Physics.BoxCast(origin, halfExtent, transform.forward, out hit, transform.rotation, pathCheckOffset * 2)) {
+            Debug.Log(hit.collider.name);
             if (hit.collider.CompareTag("Player") || hit.collider.CompareTag("Creature")) {
                 isPathBlocked = false;
                 return;
@@ -510,6 +512,10 @@ public class Player : MonoBehaviour {
         //WORKS BUT QUESTIONABLE!
         if (isPathBlocked)
             currentSpeed *= stats.speedRetainedOnHit;
+
+        //Timer this!
+        if (!isPathBlocked && isMoving)
+            soundManager.PlaySFX("Step", transform.position, false, false, gameObject);
 
         Vector3 velocity = direction * currentSpeed * Time.fixedDeltaTime;
         rigidbodyComp.velocity = new Vector3(velocity.x, rigidbodyComp.velocity.y, velocity.z);

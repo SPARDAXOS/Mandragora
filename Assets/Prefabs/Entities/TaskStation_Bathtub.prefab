@@ -87,7 +87,7 @@ MonoBehaviour:
   actionType: 2
   mashIncreaseRate: 8.63
   holdIncreaseRate: 1
-  player1PossibleQTEKeys: 7700000061000000730000006400000065000000
+  player1PossibleQTEKeys: 77000000610000007300000064000000
   player2PossibleQTEKeys: 11010000140100001301000012010000
   QTECount: 6
   customHeldSpot: 1

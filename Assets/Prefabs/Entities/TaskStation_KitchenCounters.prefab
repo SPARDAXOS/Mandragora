@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6496003265933644122}
   - component: {fileID: 7327453599668854676}
   - component: {fileID: 7547347357484397901}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: TaskStation_KitchenCounters
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -116,7 +116,7 @@ Transform:
   m_GameObject: {fileID: 959976293147986095}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -0.426, y: 1.181, z: 0.939}
+  m_LocalPosition: {x: -0.426, y: 1.233, z: 0.437}
   m_LocalScale: {x: 3, y: 3, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1092,11 +1092,19 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5328314747895460693, guid: c0022050826b45045aff4e6a0b2e229d, type: 3}
+      propertyPath: looping
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5328314747895460693, guid: c0022050826b45045aff4e6a0b2e229d, type: 3}
       propertyPath: LightsModule.range
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5328314747895460693, guid: c0022050826b45045aff4e6a0b2e229d, type: 3}
       propertyPath: LightsModule.ratio
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5328314747895460693, guid: c0022050826b45045aff4e6a0b2e229d, type: 3}
+      propertyPath: ColorModule.enabled
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5328314747895460693, guid: c0022050826b45045aff4e6a0b2e229d, type: 3}
@@ -1113,11 +1121,35 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5328314747895460693, guid: c0022050826b45045aff4e6a0b2e229d, type: 3}
       propertyPath: InitialModule.startSize.minScalar
-      value: 1.5
+      value: 1.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 5328314747895460693, guid: c0022050826b45045aff4e6a0b2e229d, type: 3}
+      propertyPath: EmissionModule.rateOverTime.scalar
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 5328314747895460693, guid: c0022050826b45045aff4e6a0b2e229d, type: 3}
+      propertyPath: InitialModule.startLifetime.scalar
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5328314747895460693, guid: c0022050826b45045aff4e6a0b2e229d, type: 3}
       propertyPath: LightsModule.intensityCurve.scalar
       value: 78.36
+      objectReference: {fileID: 0}
+    - target: {fileID: 5328314747895460693, guid: c0022050826b45045aff4e6a0b2e229d, type: 3}
+      propertyPath: ColorModule.gradient.maxGradient.key1.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5328314747895460693, guid: c0022050826b45045aff4e6a0b2e229d, type: 3}
+      propertyPath: ColorModule.gradient.maxGradient.key1.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5328314747895460693, guid: c0022050826b45045aff4e6a0b2e229d, type: 3}
+      propertyPath: ColorModule.gradient.maxGradient.key1.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5328314747895460693, guid: c0022050826b45045aff4e6a0b2e229d, type: 3}
+      propertyPath: ColorModule.gradient.maxGradient.m_ColorSpace
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

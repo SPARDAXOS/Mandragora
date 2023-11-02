@@ -104,8 +104,10 @@ public class TaskStation : MonoBehaviour {
         this.soundManager = soundManager;
         mainCamera = camera;
         SetupReferences();
-        if (persistentParticles)
+        if (persistentParticles && endOnlyVFX) {
+            Debug.Log("Here");
             EnableParticleSystem();
+        }
 
         initialized = true;
     }
@@ -239,8 +241,10 @@ public class TaskStation : MonoBehaviour {
         if (targetPlayer.IsInteractingTrigger()) {
             if (!endOnlySFX)
                 PlaySFX();
-            if(!persistentParticles && interactParticles)
+            if (!persistentParticles && interactParticles) {
+                Debug.Log("Here");
                 EnableParticleSystem();
+            }
             normalBar.fillAmount += mashIncreaseRate * Time.deltaTime;
             if (normalBar.fillAmount >= 1.0f) {
                 normalBar.fillAmount = 1.0f;
@@ -252,8 +256,10 @@ public class TaskStation : MonoBehaviour {
         if (targetPlayer.IsInteractingHeld()) {
             if (!endOnlySFX)
                 PlaySFX();
-            if (!persistentParticles && interactParticles)
+            if (!persistentParticles && interactParticles) {
+                Debug.Log("Here");
                 EnableParticleSystem();
+            }
             normalBar.fillAmount += holdIncreaseRate * Time.deltaTime;
             if (normalBar.fillAmount >= 1.0f) {
                 normalBar.fillAmount = 1.0f;
@@ -267,8 +273,10 @@ public class TaskStation : MonoBehaviour {
             normalBar.fillAmount += 1.0f / QTECount;
             if (!endOnlySFX)
                 PlaySFX();
-            if (!persistentParticles && interactParticles)
+            if (!persistentParticles && interactParticles) {
+                Debug.Log("Here");
                 EnableParticleSystem();
+            }
             if (currentQTECount == QTECount) {
                 normalBar.fillAmount = 1.0f;
                 currentQTECount = 0;
@@ -283,8 +291,11 @@ public class TaskStation : MonoBehaviour {
         if (QTEBarTrigger && targetPlayer.IsInteractingTrigger()) {
             if (!endOnlySFX)
                 PlaySFX();
-            if (!persistentParticles && interactParticles)
-                EnableParticleSystem();
+            //if (!persistentParticles && interactParticles) {
+            //    Debug.Log("Here");
+            //    EnableParticleSystem();
+            //}
+            Debug.Log("Got in");
             CompleteInteraction();
         }
     }
@@ -326,8 +337,10 @@ public class TaskStation : MonoBehaviour {
         }
         if (endOnlySFX)
             PlaySFX();
-        if (endOnlyVFX)
+        if (endOnlyVFX) {
+            Debug.Log("Here");
             EnableParticleSystem();
+        }
 
         heldCreature.CompleteTask(taskType);
         DisableInteractionState();
@@ -366,7 +379,7 @@ public class TaskStation : MonoBehaviour {
         playerType = targetPlayer.GetPlayerType();
         EnableInteractionGUI();
 
-        if (!persistentParticles || endOnlyVFX)
+        if (!persistentParticles)
             EnableParticleSystem();
 
         targetPlayer.SetInteractingWithTaskStationState(this, true);
@@ -388,6 +401,8 @@ public class TaskStation : MonoBehaviour {
 
 
     private void EnableParticleSystem() {
+        Debug.Log("Called");
+
         if (taskType == TaskType.BATHING)
             bathBubblePS.Play();
 

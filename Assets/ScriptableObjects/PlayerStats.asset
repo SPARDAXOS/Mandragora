@@ -34,6 +34,6 @@ MonoBehaviour:
   dashCooldown: 0.6
   retainedSpeed: 0.8
   dashCreatureDropForce: 20
-  stunDuration: 3.5
-  throwForce: 12
+  stunDuration: 4
+  throwForce: 16
   throwHeightAngle: 35

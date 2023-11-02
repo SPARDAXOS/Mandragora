@@ -195,8 +195,8 @@ public class Level : MonoBehaviour {
 
 
     public Creature StartTutorial() {
-        if (tutorialCreature)
-            return tutorialCreature;
+        //if (tutorialCreature)
+            //return tutorialCreature;
 
         currentSatisfiedCreatures = 0;
 
@@ -230,7 +230,7 @@ public class Level : MonoBehaviour {
     }
     public void GameOver() {
 
-        DisableEffects();
+        //DisableEffects();
 
         foreach (var creature in creatures)
             creature.SetActive(false);

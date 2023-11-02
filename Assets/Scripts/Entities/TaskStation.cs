@@ -45,6 +45,7 @@ public class TaskStation : MonoBehaviour {
     [SerializeField] private bool interactParticles = true;
     [SerializeField] private bool sfxInterruptable = false;
     [SerializeField] private bool endOnlySFX = false;
+    [SerializeField] private bool endOnlyVFX = false;
 
     private Transform customHeldSpotTransform = null;
 
@@ -79,6 +80,7 @@ public class TaskStation : MonoBehaviour {
     private ParticleSystem bathBubblePS = null;
     private ParticleSystem foodCrumbsPS = null;
     private ParticleSystem sleepingPS = null;
+    private ParticleSystem alchemyPS = null;
 
     private TextMeshProUGUI QTEIndicatorText = null;
     private Image normalBar = null;
@@ -193,8 +195,10 @@ public class TaskStation : MonoBehaviour {
         Utility.Validate(SleepPSTransform, "Failed to get reference to SleepPS - " + gameObject.name, Utility.ValidationType.ERROR);
         sleepingPS = SleepPSTransform.GetComponent<ParticleSystem>();
 
-        
-
+        //Alchemy
+        var AlchemyPSTransform = transform.Find("AlchemyPS");
+        Utility.Validate(AlchemyPSTransform, "Failed to get reference to AlchemyPS - " + gameObject.name, Utility.ValidationType.ERROR);
+        alchemyPS = AlchemyPSTransform.GetComponent<ParticleSystem>();
     }
 
     private void UpdateInteraction() {
@@ -322,6 +326,8 @@ public class TaskStation : MonoBehaviour {
         }
         if (endOnlySFX)
             PlaySFX();
+        if (endOnlyVFX)
+            EnableParticleSystem();
 
         heldCreature.CompleteTask(taskType);
         DisableInteractionState();
@@ -387,8 +393,9 @@ public class TaskStation : MonoBehaviour {
 
         if (taskType == TaskType.FEEDING)
             foodCrumbsPS.Play();
-
-        //Healing
+        
+        if (taskType == TaskType.HEALING)
+            alchemyPS.Play();
 
         if (taskType == TaskType.SLEEPING)
             sleepingPS.Play();
@@ -400,7 +407,8 @@ public class TaskStation : MonoBehaviour {
         if (taskType == TaskType.FEEDING)
             foodCrumbsPS.Stop();
 
-        //Healing
+        if (taskType == TaskType.HEALING)
+            alchemyPS.Stop();
 
         if (taskType == TaskType.SLEEPING)
             sleepingPS.Stop();

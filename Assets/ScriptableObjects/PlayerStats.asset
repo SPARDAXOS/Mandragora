@@ -20,7 +20,7 @@ MonoBehaviour:
   speedRetainedOnHit: 0.8
   customGravity: 1
   gravityScale: 10
-  customGravityBounciness: 0.762
+  customGravityBounciness: 0
   normalGravityBounciness: 0.7
   knockbackForce: 15
   knockbackHeightAngle: 40

@@ -697,6 +697,8 @@ public class Player : MonoBehaviour {
 
             if (!stunnedPS.isPlaying)
                 stunnedPS.Play();
+
+            soundManager.PlaySFX("Stunned", transform.position);            
             isStunned = true;
         }
     }

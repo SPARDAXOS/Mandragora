@@ -383,6 +383,7 @@ public class GameInstance : MonoBehaviour {
         currentLevel.SetActive(true);
         //It gets kinda messy! - Check from tutorial into start!
         currentLevelScript.EnableEffects();
+        soundManagerScript.PlayTrack("Gameplay", true);
         //WTF IF THIS IS CALLED BY SETGAMESTATE! Add debug message there
         //StartGame();
     }

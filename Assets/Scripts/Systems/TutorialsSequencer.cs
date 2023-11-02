@@ -453,6 +453,7 @@ public class TutorialsSequencer : MonoBehaviour {
             player1ThrowCheck = false;
             player2ThrowCheck = false;
 
+            soundManager.PlayTrack("Gameplay", true);
             gameInstance.StartLevelCountdown();
             return;
         }

@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ddcbb7cc55f40be479262003ebcb12e1, type: 3}
   m_Name: MushroomStats
   m_EditorClassIdentifier: 
-  maxSpeed: 7
-  accelerationTime: 1
+  maxSpeed: 6
+  accelerationTime: 1.5
   decelerationTime: 2
   turnRate: 180
-  viewRange: 10
-  maxRestDuration: 1
-  restProbability: 0.1
+  viewRange: 5
+  maxRestDuration: 0
+  restProbability: 0
   escapeHeldProbability: 0
   timeUntilDissatisfied: 120

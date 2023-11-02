@@ -88,7 +88,7 @@ Material:
     m_Floats:
     - _BUILTIN_QueueControl: 0
     - _BUILTIN_QueueOffset: 0
-    - _Dissatisfaction: 1
+    - _Dissatisfaction: 0
     - _Smoothness: 0
     m_Colors: []
   m_BuildTextureStacks: []

@@ -25,6 +25,10 @@ public class Player : MonoBehaviour {
     [Header("Navigation")]
     [SerializeField] private float pathCheckOffset = 0.1f;
 
+    [Header("Skins")]
+    [SerializeField] private Material player1Skin;
+    [SerializeField] private Material player2Skin;
+
     [Header("CameraShakes")]
     [SerializeField] private CameraShake bounceCameraShake;
     [SerializeField] private CameraShake dashBounceCameraShake;
@@ -100,6 +104,7 @@ public class Player : MonoBehaviour {
         this.soundManager = soundManager;
         this.mainCamera = mainCamera;
         SetupReferences();
+        SetupPlayerSkin();
         initialized = true;
     }
     private void SetupReferences() {
@@ -198,6 +203,19 @@ public class Player : MonoBehaviour {
             UpdateMovement();
     }
 
+
+    private void SetupPlayerSkin() {
+        if (playerType == PlayerType.NONE) {
+            Debug.LogError("Unable to setup player skin due to player type being NONE");
+            return;
+        }
+
+
+        if (playerType == PlayerType.PLAYER_1)
+            transform.Find("Mesh").Find("Body").GetComponent<SkinnedMeshRenderer>().material = player1Skin;
+        else if (playerType == PlayerType.PLAYER_2)
+            transform.Find("Mesh").Find("Body").GetComponent<SkinnedMeshRenderer>().material = player2Skin;
+    }
     public void EnableInput() {
 
         activeControlScheme.movement.Enable();

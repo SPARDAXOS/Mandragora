@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entries:
   - name: Player
-    resource: {fileID: 1524629042715173762, guid: 9556cb895d0d5d5409ab0280af5a3ef2, type: 3}
+    resource: {fileID: 1524629042715173762, guid: 43ebcd2239428084ca189c62c56babf6, type: 3}
   - name: MainCamera
     resource: {fileID: 9123308379923989643, guid: b9cc5c1f6e5b3fc43b7ed928c8879d9a, type: 3}
   - name: EventSystem

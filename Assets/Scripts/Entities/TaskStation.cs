@@ -26,7 +26,7 @@ public class TaskStation : MonoBehaviour {
 
     [Space(10)]
     [Header("Mash")]
-    [Range(1.0f, 10.0f)][SerializeField] private float mashIncreaseRate = 5.0f;
+    [Range(1.0f, 20.0f)][SerializeField] private float mashIncreaseRate = 5.0f;
 
     [Space(10)]
     [Header("Hold")]
@@ -366,7 +366,7 @@ public class TaskStation : MonoBehaviour {
         playerType = targetPlayer.GetPlayerType();
         EnableInteractionGUI();
 
-        if (!persistentParticles)
+        if (!persistentParticles || endOnlyVFX)
             EnableParticleSystem();
 
         targetPlayer.SetInteractingWithTaskStationState(this, true);

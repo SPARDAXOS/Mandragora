@@ -80,6 +80,7 @@ public class SettingsMenu : MonoBehaviour {
     private GameSettings gameSettings = null;
     private GameInstance gameInstance = null;
     private SoundManager soundManager = null;
+    private Camera cameraScript = null;
 
     private Slider MasterSlider;
     private Slider SFXSlider;
@@ -98,9 +99,10 @@ public class SettingsMenu : MonoBehaviour {
     private TMP_Dropdown shadowQualityDropdown = null;
     private TMP_Dropdown shadowResolutionDropdown = null;
 
+    private Canvas canvasComp = null;
 
 
-    public void Initialize(GameInstance gameInstance, SoundManager soundManager, GameSettings gameSettings) {
+    public void Initialize(GameInstance gameInstance, SoundManager soundManager, GameSettings gameSettings, Camera camera) {
         if (initialize)
             return;
 
@@ -109,8 +111,11 @@ public class SettingsMenu : MonoBehaviour {
         this.gameSettings = gameSettings;
         this.gameInstance = gameInstance;
         this.soundManager = soundManager;
+        cameraScript = camera;
 
         SetupReference();
+        SetupCameraOverlay();
+
         SetupResolutionOptions();
         SetupWindowModeOptions();
         SetupVsyncOptions();
@@ -141,7 +146,14 @@ public class SettingsMenu : MonoBehaviour {
         UpdateGUI();
         initialize = true;
     }
+    private void SetupCameraOverlay() {
+        canvasComp.renderMode = RenderMode.ScreenSpaceCamera;
+        canvasComp.worldCamera = cameraScript;
+        canvasComp.planeDistance = 1.0f;
+    }
     private void SetupReference() {
+
+        canvasComp = GetComponent<Canvas>();
 
         var Display = transform.Find("Display");
         var Audio = transform.Find("Audio");

@@ -70,8 +70,8 @@ MonoBehaviour:
     m_Interactions: 
     m_SingletonActionBindings:
     - m_Name: 
-      m_Id: b799cea1-9abf-4c4f-8a3a-33fe2084ef21
-      m_Path: <Keyboard>/numpad1
+      m_Id: bca98042-c58d-402f-b317-f6ebcf67b07b
+      m_Path: <Keyboard>/enter
       m_Interactions: 
       m_Processors: 
       m_Groups: 
@@ -87,8 +87,8 @@ MonoBehaviour:
     m_Interactions: 
     m_SingletonActionBindings:
     - m_Name: 
-      m_Id: bc3a3bd1-8bc4-4e63-83fa-d6b247b95bdb
-      m_Path: <Keyboard>/numpad0
+      m_Id: 99b8ac4f-90bc-41df-82a0-2c5775b8987b
+      m_Path: <Keyboard>/rightShift
       m_Interactions: 
       m_Processors: 
       m_Groups: 
@@ -104,8 +104,8 @@ MonoBehaviour:
     m_Interactions: 
     m_SingletonActionBindings:
     - m_Name: 
-      m_Id: 4d5739c5-4626-4db0-b958-d17b0c594b7a
-      m_Path: <Keyboard>/numpad2
+      m_Id: 95f0fd05-21e4-4197-b476-4f3626de0572
+      m_Path: <Keyboard>/rightCtrl
       m_Interactions: 
       m_Processors: 
       m_Groups: 
@@ -122,7 +122,7 @@ MonoBehaviour:
     m_SingletonActionBindings:
     - m_Name: 
       m_Id: d3f73d7b-9bd5-4306-b438-dab4a03ee094
-      m_Path: <Keyboard>/enter
+      m_Path: <Keyboard>/backspace
       m_Interactions: 
       m_Processors: 
       m_Groups: 

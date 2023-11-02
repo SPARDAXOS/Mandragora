@@ -4,13 +4,29 @@ public class CreditsMenu : MonoBehaviour {
     private bool initialize = false;
     private GameInstance gameInstance = null;
     private SoundManager soundManager = null;
+    private Camera cameraScript = null;
 
-    public void Initialize(GameInstance reference, SoundManager soundManager) {
+    private Canvas canvasComp = null;
+
+    public void Initialize(GameInstance gameInstance, SoundManager soundManager, Camera camera) {
         if (initialize)
             return;
+
+        this.gameInstance = gameInstance;
         this.soundManager = soundManager;
-        gameInstance = reference;
+        cameraScript = camera;
+
+        SetupReferences();
+        SetupCameraOverlay();
         initialize = true;
+    }
+    private void SetupReferences() {
+        canvasComp = GetComponent<Canvas>();
+    }
+    private void SetupCameraOverlay() {
+        canvasComp.renderMode = RenderMode.ScreenSpaceCamera;
+        canvasComp.worldCamera = cameraScript;
+        canvasComp.planeDistance = 1.0f;
     }
 
     public void ReturnButton() {

@@ -25,8 +25,17 @@ public class Player : MonoBehaviour {
     [Header("Navigation")]
     [SerializeField] private float pathCheckOffset = 0.1f;
 
+    [Header("Skins")]
+    [SerializeField] private Material player1Skin;
+    [SerializeField] private Material player2Skin;
+
+    [Header("CameraShakes")]
+    [SerializeField] private CameraShake bounceCameraShake;
+    [SerializeField] private CameraShake dashBounceCameraShake;
+
     [Header("Debugging")]
-    [SerializeField] private bool showPickupTrigger = true;
+    [SerializeField] private bool showGroundedCheck = true;
+    [SerializeField] private bool showPickupCheck = true;
     [SerializeField] private bool showPathCheck = true;
 
 
@@ -72,6 +81,9 @@ public class Player : MonoBehaviour {
     private MainCamera mainCamera = null;
 
     private ParticleSystem runDustPS = null;
+    private ParticleSystem stunnedPS = null;
+    private ParticleSystem impactPS = null;
+    private ParticleSystem knockbackTrailPS = null;
 
 
     private Rigidbody rigidbodyComp = null;
@@ -92,6 +104,7 @@ public class Player : MonoBehaviour {
         this.soundManager = soundManager;
         this.mainCamera = mainCamera;
         SetupReferences();
+        SetupPlayerSkin();
         initialized = true;
     }
     private void SetupReferences() {
@@ -99,6 +112,16 @@ public class Player : MonoBehaviour {
 
         runDustPS = transform.Find("RunDustPS").GetComponent<ParticleSystem>();
         Utility.Validate(runDustPS, "Failed to find RunDustPS.", Utility.ValidationType.WARNING);
+
+        stunnedPS = transform.Find("StunnedPS").GetComponent<ParticleSystem>();
+        Utility.Validate(stunnedPS, "Failed to find StunnedPS.", Utility.ValidationType.WARNING);
+
+        impactPS = transform.Find("ImpactPS").GetComponent<ParticleSystem>();
+        Utility.Validate(impactPS, "Failed to find ImpactPS.", Utility.ValidationType.WARNING);
+
+        knockbackTrailPS = transform.Find("KnockbackTrailPS").GetComponent<ParticleSystem>();
+        Utility.Validate(knockbackTrailPS, "Failed to find KnockbackTrailPS.", Utility.ValidationType.WARNING);
+        
 
         rigidbodyComp = GetComponent<Rigidbody>();
         if (!rigidbodyComp)
@@ -170,13 +193,29 @@ public class Player : MonoBehaviour {
 
 
         if (isKnockedback) {
-            if (isGrounded && rigidbodyComp.velocity.y < 0.0f)
+            if (isGrounded && rigidbodyComp.velocity.y < 0.0f) {
+                if (knockbackTrailPS.isPlaying)
+                    knockbackTrailPS.Stop();
                 isKnockedback = false;
+            }
         }
         else if (!isDashing)
             UpdateMovement();
     }
 
+
+    private void SetupPlayerSkin() {
+        if (playerType == PlayerType.NONE) {
+            Debug.LogError("Unable to setup player skin due to player type being NONE");
+            return;
+        }
+
+
+        if (playerType == PlayerType.PLAYER_1)
+            transform.Find("Mesh").Find("Body").GetComponent<SkinnedMeshRenderer>().material = player1Skin;
+        else if (playerType == PlayerType.PLAYER_2)
+            transform.Find("Mesh").Find("Body").GetComponent<SkinnedMeshRenderer>().material = player2Skin;
+    }
     public void EnableInput() {
 
         activeControlScheme.movement.Enable();
@@ -301,8 +340,21 @@ public class Player : MonoBehaviour {
 
     private void CheckGrounded() {
         Vector3 startingPosition = transform.position;
-        startingPosition.y += 1;
-        bool results = Physics.BoxCast(startingPosition, Vector3.one / 2, -transform.up, transform.rotation, 1.0f);
+
+        Vector3 size;
+        float offset = 0.1f;
+        if (heldCreature) {
+            startingPosition += pickupBoxColliderCenter;
+            size = pickupBoxColliderSize;
+        }
+        else {
+            startingPosition += normalBoxColliderCenter;
+            size = normalBoxColliderSize;
+        }
+
+
+        startingPosition.y += offset;
+        bool results = Physics.BoxCast(startingPosition, size / 2, -transform.up, transform.rotation, offset * 2);
         if (!isGrounded && results)
             soundManager.PlaySFX("Landing", transform.position);
         isGrounded = results;
@@ -332,6 +384,7 @@ public class Player : MonoBehaviour {
             }
             else {
                 if (isDashing) {
+                    Debug.LogWarning("I dashed into " + hit.collider.name);
                     StopDashing();
                     Vector3 targetDirection = hit.point - transform.position;
                     //targetDirection.Normalize();
@@ -344,8 +397,10 @@ public class Player : MonoBehaviour {
                     bounceDirection.y = Mathf.Sin(Mathf.Deg2Rad * stats.objectBounceOffAngle);
                     bounceDirection.z *= Mathf.Cos(Mathf.Deg2Rad * stats.objectBounceOffAngle);
                     ApplyKnockback(bounceDirection, stats.objectBouceOffForce);
-                    mainCamera.ShakeFor(10.0f);
-                    soundManager.PlaySFX("BounceOffObject", transform.position);                                                  
+                    mainCamera.ShakeFor(bounceCameraShake);
+                    soundManager.PlaySFX("BounceOffObject", transform.position);
+                    if (!impactPS.isPlaying)
+                        impactPS.Play();
                 }
                 isPathBlocked = true;
             }
@@ -363,7 +418,6 @@ public class Player : MonoBehaviour {
     }
 
 
-    //Handles toggling interaction start and finish
     public void SetInteractingWithTaskStationState(TaskStation target, bool state) {
         if (!target) {
             Debug.LogError("Null taskstation sent to SetInteractingWithTaskStationState - Should always send valid ref here for check");
@@ -383,7 +437,8 @@ public class Player : MonoBehaviour {
 
         Debug.LogError("ERROR! This is not meant to be reached!");
     }
-    //Handles checking if task station is in range
+
+
     public void SetInTaskStationRange(TaskStation target, bool state) {
 
         interactingTaskStation = target;
@@ -392,7 +447,6 @@ public class Player : MonoBehaviour {
     public bool GetInTaskStationRange() { //(???
         return inTaskStationRange;
     }
-    //Checks if player starts interaction with task station in range!
     private void CheckTaskStatioInteraction() {
         if (!inTaskStationRange || !interactingTaskStation || isInteractingWithTaskStation)
             return;
@@ -422,7 +476,7 @@ public class Player : MonoBehaviour {
             Decelerate();
     }
     private void CheckMovementPS() {
-        if (isMoving && !runDustPS.isPlaying)
+        if (isMoving && !runDustPS.isPlaying && isGrounded) //Test this
             runDustPS.Play();
         else if (!isMoving && runDustPS.isPlaying)
             runDustPS.Stop();
@@ -504,7 +558,8 @@ public class Player : MonoBehaviour {
                 stunTimer = 0.0f;
                 isStunned = false;
                 EnableInteractionInput();
-                //Disable VFX
+                if (stunnedPS.isPlaying)
+                    stunnedPS.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             }
         }
         else
@@ -549,7 +604,15 @@ public class Player : MonoBehaviour {
         if (!heldCreature)
             return;
 
-        //heldCreature.transform.position = Vector3.Lerp(heldCreature.transform.position, pickupPoint.transform.position, 1.0f);
+        if (isInteractingWithTaskStation) {
+            if (interactingTaskStation.IsUsingCustomHeldSpot()) {
+                Transform heldSpot = interactingTaskStation.GetCustomHeldSpot();
+                heldCreature.transform.position = heldSpot.transform.position;
+                heldCreature.transform.rotation = heldSpot.transform.rotation;
+                return;
+            }
+        }
+        Debug.Log("Player side");
         heldCreature.transform.position = pickupPoint.transform.position;
     }
 
@@ -570,6 +633,9 @@ public class Player : MonoBehaviour {
     }
     public bool IsThrowing() {
         return isThrowingTrigger;
+    }
+    public GameObject GetPickupPoint() {
+        return pickupPoint;
     }
 
 
@@ -607,6 +673,8 @@ public class Player : MonoBehaviour {
         rigidbodyComp.velocity = Vector3.zero;
         rigidbodyComp.velocity += direction * force;
         isKnockedback = true;
+        //if (!knockbackTrailPS.isPlaying)
+            knockbackTrailPS.Play();
     }
     public void ApplyStun(float duration, bool stack = false) {
         if (stack)
@@ -618,7 +686,8 @@ public class Player : MonoBehaviour {
         if (stunTimer > 0.0f) {
             DisableInteractionInput();
 
-            //Start VFX
+            if (!stunnedPS.isPlaying)
+                stunnedPS.Play();
             isStunned = true;
         }
     }
@@ -645,6 +714,8 @@ public class Player : MonoBehaviour {
             if (script) {
                 soundManager.PlaySFX("PlayerBounce", transform.position);
                 CheckKnockback(script, collision.GetContact(0).point);
+                if (!impactPS.isPlaying)
+                    impactPS.Play();
             }
         }
     }
@@ -653,7 +724,37 @@ public class Player : MonoBehaviour {
 
 
     private void OnDrawGizmos() {
-        if (showPickupTrigger) {
+
+
+        if (showGroundedCheck) {
+            Vector3 startingPosition = transform.position;
+            Vector3 endPosition = transform.position;
+            //startingPosition.y += 1;
+
+            Vector3 size;
+            float offset;
+            if (heldCreature) {
+                size = pickupBoxColliderSize;
+                offset = pickupBoxColliderCenter.y;
+            }
+            else {
+                size = normalBoxColliderSize;
+                offset = normalBoxColliderCenter.y;
+            }
+
+            startingPosition.y += offset;
+            endPosition.y += offset - 0.1f;
+
+            Color startColor = Color.blue;
+            startColor.a = 0.5f;
+            Color endColor = Color.red;
+            endColor.a = 0.5f;
+            Gizmos.color = startColor;
+            Gizmos.DrawCube(startingPosition, size);
+            Gizmos.color = endColor;
+            Gizmos.DrawCube(endPosition, size);
+        }
+        if (showPickupCheck) {
             Vector3 boxcastOrigin = transform.position;
             boxcastOrigin += transform.rotation * pickupCheckOffset;
             Vector3 boxSize = new Vector3(pickupCheckBoxSize, pickupCheckBoxSize, pickupCheckBoxSize);

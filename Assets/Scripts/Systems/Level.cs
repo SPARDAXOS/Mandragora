@@ -7,8 +7,9 @@ using UnityEngine.AI;
 public class Level : MonoBehaviour {
 
     [Header("CreatureState")]
-    [SerializeField] private GameObject CreaturePrefab;
-    [Range(1, 24)][SerializeField] private uint creaturesCount = 7;
+    [SerializeField] private GameObject OnionPrefab;
+    [SerializeField] private GameObject MushroomPrefab;
+    [Range(1, 24)][SerializeField] private uint creaturesCount = 12;
 
     [Header("Spawner")]
     [Range(1, 15)] [SerializeField] private uint spawnPointCalculationRetries = 10;
@@ -31,6 +32,8 @@ public class Level : MonoBehaviour {
     private Vector3 player1SpawnPosition = Vector3.zero;
     private Vector3 player2SpawnPosition = Vector3.zero;
 
+    private GameObject effects = null;
+
     private List<Creature> creatures = new List<Creature>();
     private TaskStation[] taskStations;
     private CreatureDeliveryStation creatureDeliveryStationScript = null;
@@ -47,6 +50,7 @@ public class Level : MonoBehaviour {
         this.soundManager = soundManager;
         gameInstance = instance;
         SetupReferences();
+        DisableEffects();
         CreateCreaturesPool();
         initialize = true;
     }
@@ -89,6 +93,10 @@ public class Level : MonoBehaviour {
         var player1SpawnPositionTransform = transform.Find("Player1SpawnPoint");
         var player2SpawnPositionTransform = transform.Find("Player2SpawnPoint");
 
+        effects = transform.Find("Effects").gameObject;
+        Utility.Validate(effects, gameObject.name + " does not contain a Effects!", Utility.ValidationType.WARNING);
+
+
         if (Utility.Validate(player1SpawnPositionTransform, gameObject.name + " does not contain a player 1 spawn point!", Utility.ValidationType.WARNING))
             player1SpawnPosition = player1SpawnPositionTransform.position;
         if (Utility.Validate(player2SpawnPositionTransform, gameObject.name + " does not contain a player 2 spawn point!", Utility.ValidationType.WARNING))
@@ -113,13 +121,34 @@ public class Level : MonoBehaviour {
     private void CreateCreaturesPool() {
         if (creaturesCount == 0)
             return;
+
+        int rand = 0;
         for (uint i = 0; i < creaturesCount; i++) {
-            GameObject go = Instantiate(CreaturePrefab);
+            GameObject go = null;
+            rand = Random.Range(0, 2);
+            if (rand == 0)
+                go = Instantiate(OnionPrefab);
+            else if (rand == 1)
+                go = Instantiate(MushroomPrefab);
+            else {
+                Debug.LogError("Error randomizing creature types - got value " + rand);
+                return;
+            }
+
             Creature script = go.GetComponent<Creature>();
             script.Initialize(this);
             script.SetActive(false);
             creatures.Add(script);
         }
+    }
+
+    public void EnableEffects() {
+        if (effects)
+            effects.SetActive(true);
+    }
+    public void DisableEffects() {
+        if (effects)
+            effects.SetActive(false);
     }
 
 
@@ -186,6 +215,8 @@ public class Level : MonoBehaviour {
 
 
     public void StartLevel() {
+        EnableEffects();
+
         foreach (var entry in creatures) {
             entry.SetActive(true);
             entry.SetupStartState();
@@ -198,6 +229,9 @@ public class Level : MonoBehaviour {
         soundManager.PlayTrack("Gameplay", true);
     }
     public void GameOver() {
+
+        DisableEffects();
+
         foreach (var creature in creatures)
             creature.SetActive(false);
 

@@ -201,6 +201,7 @@ public class TaskStation : MonoBehaviour {
         var AlchemyPSTransform = transform.Find("AlchemyPS");
         Utility.Validate(AlchemyPSTransform, "Failed to get reference to AlchemyPS - " + gameObject.name, Utility.ValidationType.ERROR);
         alchemyPS = AlchemyPSTransform.GetComponent<ParticleSystem>();
+        alchemyPS.Stop();
     }
 
     private void UpdateInteraction() {
@@ -335,6 +336,7 @@ public class TaskStation : MonoBehaviour {
         if (customHeldSpot) {
             heldCreature.transform.rotation = Quaternion.identity;
         }
+
         if (endOnlySFX)
             PlaySFX();
         if (endOnlyVFX) {
@@ -379,7 +381,7 @@ public class TaskStation : MonoBehaviour {
         playerType = targetPlayer.GetPlayerType();
         EnableInteractionGUI();
 
-        if (!persistentParticles)
+        if (!persistentParticles && !endOnlyVFX)
             EnableParticleSystem();
 
         targetPlayer.SetInteractingWithTaskStationState(this, true);
@@ -391,7 +393,7 @@ public class TaskStation : MonoBehaviour {
         playerType = PlayerType.NONE;
         DisableInteractionGUI();
 
-        if (!persistentParticles)
+        if (!persistentParticles && !endOnlyVFX)
             DisableParticleSystem();
 
         targetPlayer.SetInteractingWithTaskStationState(this, false);

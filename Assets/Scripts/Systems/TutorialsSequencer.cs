@@ -55,13 +55,10 @@ public class TutorialsSequencer : MonoBehaviour {
 
     private bool player1MovementCheck = false;
     private bool player2MovementCheck = false;
-
     private bool player1DashCheck = false;
     private bool player2DashCheck = false;
-
     private bool player1PickupCheck = false;
     private bool player2PickupCheck = false;
-
     private bool player1ThrowCheck = false;
     private bool player2ThrowCheck = false;
 
@@ -143,6 +140,17 @@ public class TutorialsSequencer : MonoBehaviour {
         tutorialCreature = targetLevel.StartTutorial();
         tutorialsRunning = true;
         tutorialsPaused = false;
+
+        player1MovementCheck = false;
+        player2MovementCheck = false;
+        player1DashCheck = false;
+        player2DashCheck = false;
+        player1PickupCheck = false;
+        player2PickupCheck = false;
+        player1ThrowCheck = false;
+        player2ThrowCheck = false;
+
+
         timer = 0.0f;
     }
     public void StopTutorials() {
@@ -161,6 +169,15 @@ public class TutorialsSequencer : MonoBehaviour {
 
         tutorialsRunning = false;
         tutorialsPaused = false;
+
+        player1MovementCheck = false;
+        player2MovementCheck = false;
+        player1DashCheck = false;
+        player2DashCheck = false;
+        player1PickupCheck = false;
+        player2PickupCheck = false;
+        player1ThrowCheck = false;
+        player2ThrowCheck = false;
 
         HideAllTutorials();
     }
@@ -426,6 +443,16 @@ public class TutorialsSequencer : MonoBehaviour {
             currentTutorial = Tutorials.NONE;
             tutorialsRunning = false;
             tutorialsPaused = false;
+
+            player1MovementCheck = false;
+            player2MovementCheck = false;
+            player1DashCheck = false;
+            player2DashCheck = false;
+            player1PickupCheck = false;
+            player2PickupCheck = false;
+            player1ThrowCheck = false;
+            player2ThrowCheck = false;
+
             gameInstance.StartLevelCountdown();
             return;
         }

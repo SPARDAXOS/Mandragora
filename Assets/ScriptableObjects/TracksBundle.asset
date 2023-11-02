@@ -19,8 +19,8 @@ MonoBehaviour:
     maxPitch: 1
     minPitch: 1
   - key: Gameplay
-    clip: {fileID: 8300000, guid: 5bda4f35b865f6e4c94faca0b20c73ca, type: 3}
-    volume: 0.5
+    clip: {fileID: 8300000, guid: da9744c23380bf14a937dad434968baf, type: 3}
+    volume: 0.2
     maxPitch: 1
     minPitch: 1
   - key: Tutorial

@@ -142,7 +142,10 @@ public class Player : MonoBehaviour {
     public void SetupStartingState() {
 
         //More proper stop!
+        if (knockbackTrailPS.isPlaying)
+            knockbackTrailPS.Stop();
         isKnockedback = false;
+
         isDashing = false;
         isStunned = false;
 

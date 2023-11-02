@@ -44,7 +44,7 @@ MonoBehaviour:
     maxPitch: 1
     minPitch: 2
   - key: CreatureThrow
-    clip: {fileID: 8300000, guid: b6421ee14ea31024898458e0876d7988, type: 3}
+    clip: {fileID: 8300000, guid: ecb2aed7d7b2e4c44b75b8d794de62a9, type: 3}
     volume: 1
     maxPitch: 1
     minPitch: 1.4
@@ -79,12 +79,12 @@ MonoBehaviour:
     maxPitch: 0.8
     minPitch: 1.2
   - key: Dash
-    clip: {fileID: 8300000, guid: 7ce6f9256882ba649b25536814085189, type: 3}
+    clip: {fileID: 8300000, guid: c124d241013c77c42a4806e118489c51, type: 3}
     volume: 1
     maxPitch: 0.8
     minPitch: 1.2
   - key: Step
     clip: {fileID: 8300000, guid: 6551a66022c6ca74d8f43ffd09f65cee, type: 3}
-    volume: 0.5
-    maxPitch: 1.5
+    volume: 0.3
+    maxPitch: 1.4
     minPitch: 2

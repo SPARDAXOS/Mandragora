@@ -7,8 +7,9 @@ using UnityEngine.AI;
 public class Level : MonoBehaviour {
 
     [Header("CreatureState")]
-    [SerializeField] private GameObject CreaturePrefab;
-    [Range(1, 24)][SerializeField] private uint creaturesCount = 7;
+    [SerializeField] private GameObject OnionPrefab;
+    [SerializeField] private GameObject MushroomPrefab;
+    [Range(1, 24)][SerializeField] private uint creaturesCount = 12;
 
     [Header("Spawner")]
     [Range(1, 15)] [SerializeField] private uint spawnPointCalculationRetries = 10;
@@ -120,8 +121,20 @@ public class Level : MonoBehaviour {
     private void CreateCreaturesPool() {
         if (creaturesCount == 0)
             return;
+
+        int rand = 0;
         for (uint i = 0; i < creaturesCount; i++) {
-            GameObject go = Instantiate(CreaturePrefab);
+            GameObject go = null;
+            rand = Random.Range(0, 2);
+            if (rand == 0)
+                go = Instantiate(OnionPrefab);
+            else if (rand == 1)
+                go = Instantiate(MushroomPrefab);
+            else {
+                Debug.LogError("Error randomizing creature types - got value " + rand);
+                return;
+            }
+
             Creature script = go.GetComponent<Creature>();
             script.Initialize(this);
             script.SetActive(false);

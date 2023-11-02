@@ -44,6 +44,7 @@ public class TaskStation : MonoBehaviour {
     [SerializeField] private bool persistentParticles = true;
     [SerializeField] private bool interactParticles = true;
     [SerializeField] private bool sfxInterruptable = false;
+    [SerializeField] private bool endOnlySFX = false;
 
     private Transform customHeldSpotTransform = null;
 
@@ -232,7 +233,8 @@ public class TaskStation : MonoBehaviour {
 
     private void UpdateMashInteraction() {
         if (targetPlayer.IsInteractingTrigger()) {
-            PlaySFX();
+            if (!endOnlySFX)
+                PlaySFX();
             if(!persistentParticles && interactParticles)
                 EnableParticleSystem();
             normalBar.fillAmount += mashIncreaseRate * Time.deltaTime;
@@ -244,7 +246,8 @@ public class TaskStation : MonoBehaviour {
     }
     private void UpdateHoldInteraction() {
         if (targetPlayer.IsInteractingHeld()) {
-            PlaySFX();
+            if (!endOnlySFX)
+                PlaySFX();
             if (!persistentParticles && interactParticles)
                 EnableParticleSystem();
             normalBar.fillAmount += holdIncreaseRate * Time.deltaTime;
@@ -258,7 +261,8 @@ public class TaskStation : MonoBehaviour {
         if (lastInputedKey == currentTargetQTE.ToString().ToLower()) {
             currentQTECount++;
             normalBar.fillAmount += 1.0f / QTECount;
-            PlaySFX();
+            if (!endOnlySFX)
+                PlaySFX();
             if (!persistentParticles && interactParticles)
                 EnableParticleSystem();
             if (currentQTECount == QTECount) {
@@ -273,7 +277,8 @@ public class TaskStation : MonoBehaviour {
     }
     private void UpdateTimedClickInteraction() {
         if (QTEBarTrigger && targetPlayer.IsInteractingTrigger()) {
-            PlaySFX();
+            if (!endOnlySFX)
+                PlaySFX();
             if (!persistentParticles && interactParticles)
                 EnableParticleSystem();
             CompleteInteraction();
@@ -315,6 +320,8 @@ public class TaskStation : MonoBehaviour {
         if (customHeldSpot) {
             heldCreature.transform.rotation = Quaternion.identity;
         }
+        if (endOnlySFX)
+            PlaySFX();
 
         heldCreature.CompleteTask(taskType);
         DisableInteractionState();

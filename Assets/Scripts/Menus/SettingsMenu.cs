@@ -573,7 +573,7 @@ public class SettingsMenu : MonoBehaviour {
 
         options.Add("Disable");
         options.Add("Enable");
-        options.Add("ForceEnable");
+        options.Add("Force Enable");
 
         anisotropicFilteringOptions[0] = AnisotropicFiltering.DISABLE;
         anisotropicFilteringOptions[1] = AnisotropicFiltering.ENABLE;
@@ -618,7 +618,7 @@ public class SettingsMenu : MonoBehaviour {
         var options = new List<string>();
 
         options.Add("Disable");
-        options.Add("HardOnly");
+        options.Add("Hard Only");
         options.Add("All");
 
         shadowQualityOptions[0] = ShadowQuality.DISABLE;

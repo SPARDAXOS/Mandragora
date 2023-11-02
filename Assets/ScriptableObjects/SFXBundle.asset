@@ -42,7 +42,7 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 41a55ebe061689b4fa30f23c0df34451, type: 3}
     volume: 0.8
     maxPitch: 1
-    minPitch: 1.4
+    minPitch: 2
   - key: CreatureThrow
     clip: {fileID: 8300000, guid: b6421ee14ea31024898458e0876d7988, type: 3}
     volume: 1
@@ -69,7 +69,22 @@ MonoBehaviour:
     maxPitch: 0.8
     minPitch: 1.6
   - key: CreatureHeal
-    clip: {fileID: 8300000, guid: 5ed0f7f560ca5ec4f823d20290623013, type: 3}
+    clip: {fileID: 8300000, guid: 129b49583ccb93c49ade55455544e906, type: 3}
     volume: 1
     maxPitch: 0.8
     minPitch: 1.2
+  - key: CreatureSleep
+    clip: {fileID: 8300000, guid: f080afaf2482a6b469e5b813f2ce701b, type: 3}
+    volume: 1
+    maxPitch: 0.8
+    minPitch: 1.2
+  - key: Dash
+    clip: {fileID: 8300000, guid: 7ce6f9256882ba649b25536814085189, type: 3}
+    volume: 1
+    maxPitch: 0.8
+    minPitch: 1.2
+  - key: Step
+    clip: {fileID: 8300000, guid: d38d840d8ceead84d8b712adc836295e, type: 3}
+    volume: 1
+    maxPitch: 1.5
+    minPitch: 2

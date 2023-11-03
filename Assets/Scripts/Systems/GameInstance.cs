@@ -233,7 +233,7 @@ public class GameInstance : MonoBehaviour {
         else {
             winMenu = Instantiate(entitiesResources["WinMenu"]);
             winMenuScript = winMenu.GetComponent<WinMenu>();
-            winMenuScript.Initialize(this);
+            winMenuScript.Initialize(this, soundManagerScript);
             winMenu.SetActive(false);
         }
 
@@ -242,7 +242,7 @@ public class GameInstance : MonoBehaviour {
         else {
             loseMenu = Instantiate(entitiesResources["LoseMenu"]);
             loseMenuScript = loseMenu.GetComponent<LoseMenu>();
-            loseMenuScript.Initialize(this);
+            loseMenuScript.Initialize(this, soundManagerScript);
             loseMenu.SetActive(false);
         }
 
@@ -260,7 +260,7 @@ public class GameInstance : MonoBehaviour {
         else {
             pauseMenu = Instantiate(entitiesResources["PauseMenu"]);
             pauseMenuScript = pauseMenu.GetComponent<PauseMenu>();
-            pauseMenuScript.Initialize(this);
+            pauseMenuScript.Initialize(this, soundManagerScript);
             pauseMenu.SetActive(false);
         }
 
@@ -447,7 +447,8 @@ public class GameInstance : MonoBehaviour {
     }
     public void EndGame(GameResults results) {
 
-        soundManagerScript.StopTrack(true);
+        soundManagerScript.StopTrack(true);//?
+
         if (results == GameResults.WIN) {
             soundManagerScript.PlaySFX("YouWin", Vector3.zero, true);
             SetGameState(GameState.WIN_MENU);

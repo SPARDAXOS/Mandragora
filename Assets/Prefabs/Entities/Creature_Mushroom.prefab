@@ -782,7 +782,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 7238772451212046934, guid: 43bd00e0d29137c46b1191882aea24c5, type: 3}
       propertyPath: moveWithTransform
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7238772451212046934, guid: 43bd00e0d29137c46b1191882aea24c5, type: 3}
       propertyPath: CollisionModule.enabled
@@ -886,7 +886,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7238772452277931476, guid: 43bd00e0d29137c46b1191882aea24c5, type: 3}
       propertyPath: moveWithTransform
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7238772452277931476, guid: 43bd00e0d29137c46b1191882aea24c5, type: 3}
       propertyPath: CollisionModule.enabled

@@ -93,3 +93,18 @@ MonoBehaviour:
     volume: 1
     maxPitch: 0.8
     minPitch: 1.2
+  - key: CreatureDelivered
+    clip: {fileID: 8300000, guid: 5ed0f7f560ca5ec4f823d20290623013, type: 3}
+    volume: 1
+    maxPitch: 1
+    minPitch: 1
+  - key: Retry
+    clip: {fileID: 8300000, guid: 1d31e56162a3f8c40a12215a7d2c90f1, type: 3}
+    volume: 1
+    maxPitch: 1
+    minPitch: 1
+  - key: Quit
+    clip: {fileID: 8300000, guid: 1e18e4c1204f0a34899ad7f1f2eedf02, type: 3}
+    volume: 1
+    maxPitch: 1
+    minPitch: 1

@@ -83,6 +83,7 @@ public class TaskStation : MonoBehaviour {
     private ParticleSystem alchemyPS = null;
 
     private TextMeshProUGUI QTEIndicatorText = null;
+    private TextMeshProUGUI actionIndicatorText = null;
     private Image normalBar = null;
 
     private Animation QTEBarAnimationComp = null;
@@ -151,12 +152,7 @@ public class TaskStation : MonoBehaviour {
         Utility.Validate(interactionIndicator, "Failed to get reference to InteractionIndicator - " + gameObject.name, Utility.ValidationType.ERROR);
         interactionIndicator.SetActive(false);
 
-        //QTE Indicator
-        QTEIndicator = GUI.transform.Find("QTEIndicator").gameObject;
-        Utility.Validate(QTEIndicator, "Failed to get reference to QTEIndicator - " + gameObject.name, Utility.ValidationType.ERROR);
-        QTEIndicatorText = QTEIndicator.GetComponent<TextMeshProUGUI>();
-        Utility.Validate(QTEIndicatorText, "Failed to get component TextMeshProUGUI in QTEIndicatorText - " + gameObject.name, Utility.ValidationType.ERROR);
-        QTEIndicator.SetActive(false);
+
 
         //Normal Bar
         normalBarFrame = GUI.transform.Find("NormalBarFrame").gameObject;
@@ -165,12 +161,23 @@ public class TaskStation : MonoBehaviour {
         Utility.Validate(normalBar, "Failed to get reference to NormalBarFill - " + gameObject.name, Utility.ValidationType.ERROR);
         normalBarFrame.SetActive(false);
 
+        //QTE Indicator
+        QTEIndicator = normalBarFrame.transform.Find("QTEIndicator").gameObject;
+        Utility.Validate(QTEIndicator, "Failed to get reference to QTEIndicator - " + gameObject.name, Utility.ValidationType.ERROR);
+        QTEIndicatorText = QTEIndicator.GetComponent<TextMeshProUGUI>();
+        Utility.Validate(QTEIndicatorText, "Failed to get component TextMeshProUGUI in QTEIndicatorText - " + gameObject.name, Utility.ValidationType.ERROR);
+        QTEIndicator.SetActive(false);
+
         //QTE Bar
         QTEBarFrame = GUI.transform.Find("QTEBarFrame").gameObject;
         Utility.Validate(QTEBarFrame, "Failed to get reference to QTEBarFrame - " + gameObject.name, Utility.ValidationType.ERROR);
         QTEBarAnimationComp = QTEBarFrame.GetComponent<Animation>();
         Utility.Validate(QTEBarAnimationComp, "Failed to get component Animation in QTEBarAnimationComp - " + gameObject.name, Utility.ValidationType.ERROR);
         QTEBarFrame.SetActive(false);
+
+        //Action Indicator
+        actionIndicatorText = normalBarFrame.transform.Find("ActionIndicator").GetComponent<TextMeshProUGUI>();
+
 
         //Sparkle PS
         //var SparklePSTransform = transform.Find("SparklePS");
@@ -432,14 +439,21 @@ public class TaskStation : MonoBehaviour {
     }
 
     private void EnableInteractionGUI() {
-        if (actionType == ActionType.MASH || actionType == ActionType.HOLD) {
+        if (actionType == ActionType.MASH) {
             normalBarFrame.SetActive(true);
             normalBar.fillAmount = 0.0f;
+            actionIndicatorText.text = "Mash";
+        }
+        else if (actionType == ActionType.HOLD) {
+            normalBarFrame.SetActive(true);
+            normalBar.fillAmount = 0.0f;
+            actionIndicatorText.text = "Hold";
         }
         else if (actionType == ActionType.QTE) {
             normalBarFrame.SetActive(true);
             QTEIndicator.SetActive(true);
             normalBar.fillAmount = 0.0f;
+            actionIndicatorText.text = "";
             currentQTECount = 0;
             lastInputedKey = null;
             UpdateQTE();

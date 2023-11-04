@@ -14,32 +14,32 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entries:
   - key: BounceOffObject
-    clip: {fileID: 8300000, guid: 65a7288032ebde24b8ede0e411d0fc05, type: 3}
+    clip: {fileID: 8300000, guid: 6351b3bbfa2e0f34b831b256f73649c8, type: 3}
     volume: 1.66
     maxPitch: 0.7
     minPitch: 1.3
   - key: PlayerBounce
-    clip: {fileID: 8300000, guid: 79bb7693d84271045972bd817f322c37, type: 3}
+    clip: {fileID: 8300000, guid: c58f8eaebc1ae2243965bea0bdd10803, type: 3}
     volume: 0.5
     maxPitch: 1
     minPitch: 1.8
   - key: NextMenu
-    clip: {fileID: 8300000, guid: 497c9340586605940b0e2b21f4327ef9, type: 3}
+    clip: {fileID: 8300000, guid: 3a68cf7e702ebe64196825129408196c, type: 3}
     volume: 1.66
     maxPitch: 0.7
     minPitch: 1.6
   - key: PotionsUsed
-    clip: {fileID: 8300000, guid: 5ed0f7f560ca5ec4f823d20290623013, type: 3}
+    clip: {fileID: 8300000, guid: 50775f64e729cdf409ae583fd31cd785, type: 3}
     volume: 1.66
     maxPitch: 0.7
     minPitch: 1.3
   - key: NextTutorial
-    clip: {fileID: 8300000, guid: 5b52f605177f99648b18c902fea237b3, type: 3}
+    clip: {fileID: 8300000, guid: e4b27717a25ad7c47826ae28f07963a6, type: 3}
     volume: 1
-    maxPitch: 0.9
-    minPitch: 1.2
+    maxPitch: 1
+    minPitch: 1
   - key: Landing
-    clip: {fileID: 8300000, guid: d4f9786e4f6bc58439832fdf938f225d, type: 3}
+    clip: {fileID: 8300000, guid: 73a0dded5730ecf4ebd2edf1da97b3d6, type: 3}
     volume: 1
     maxPitch: 0.7
     minPitch: 1.5
@@ -49,32 +49,32 @@ MonoBehaviour:
     maxPitch: 1
     minPitch: 1.4
   - key: YouWin
-    clip: {fileID: 8300000, guid: 6aa64e7f841ad1b48b0adbbb3b3a2f77, type: 3}
+    clip: {fileID: 8300000, guid: 3b3e0ae0e3b0a3f418602cd6075b6dee, type: 3}
     volume: 1
     maxPitch: 1
     minPitch: 1
   - key: YouLose
-    clip: {fileID: 8300000, guid: 9ff516be10223fd498b1155448304e58, type: 3}
+    clip: {fileID: 8300000, guid: aae90a7710b87b34ab7b565756ee718f, type: 3}
     volume: 1
     maxPitch: 1
     minPitch: 1
   - key: CreatureEat
-    clip: {fileID: 8300000, guid: 5fbd6c89534b6e04fa576af413b29c72, type: 3}
+    clip: {fileID: 8300000, guid: 6072ed51bbb0fd746bfd0e642a42854d, type: 3}
     volume: 1
     maxPitch: 1
     minPitch: 1.4
   - key: CreatureBath
-    clip: {fileID: 8300000, guid: 5e6e9525b0f3ee047a02462c581323c6, type: 3}
-    volume: 0.4
+    clip: {fileID: 8300000, guid: 8b5e2d7e89b10c342ac384b244bb58e8, type: 3}
+    volume: 0.7
     maxPitch: 0.8
     minPitch: 1.6
   - key: CreatureHeal
-    clip: {fileID: 8300000, guid: 129b49583ccb93c49ade55455544e906, type: 3}
+    clip: {fileID: 8300000, guid: 50775f64e729cdf409ae583fd31cd785, type: 3}
     volume: 1
-    maxPitch: 0.8
-    minPitch: 1.2
+    maxPitch: 1
+    minPitch: 1.6
   - key: CreatureSleep
-    clip: {fileID: 8300000, guid: f080afaf2482a6b469e5b813f2ce701b, type: 3}
+    clip: {fileID: 8300000, guid: fa7b1e3dea80f2f418bad15d21b248ac, type: 3}
     volume: 1
     maxPitch: 0.8
     minPitch: 1.2
@@ -94,7 +94,7 @@ MonoBehaviour:
     maxPitch: 0.8
     minPitch: 1.2
   - key: CreatureDelivered
-    clip: {fileID: 8300000, guid: 5ed0f7f560ca5ec4f823d20290623013, type: 3}
+    clip: {fileID: 8300000, guid: 96c1d7c6170ff214fba6acb8c4b2f446, type: 3}
     volume: 1
     maxPitch: 1
     minPitch: 1
@@ -104,7 +104,17 @@ MonoBehaviour:
     maxPitch: 1
     minPitch: 1
   - key: Quit
-    clip: {fileID: 8300000, guid: 1e18e4c1204f0a34899ad7f1f2eedf02, type: 3}
+    clip: {fileID: 8300000, guid: f01b0239b1fbc7b40a0e6f1edd7f87b9, type: 3}
+    volume: 1
+    maxPitch: 1
+    minPitch: 1
+  - key: Countdown
+    clip: {fileID: 8300000, guid: 630237b951aeeed43b958f3901939a27, type: 3}
+    volume: 1
+    maxPitch: 1
+    minPitch: 1
+  - key: CountdownFinished
+    clip: {fileID: 8300000, guid: a40ba6380ad170f40b703bb5bf94a608, type: 3}
     volume: 1
     maxPitch: 1
     minPitch: 1

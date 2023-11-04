@@ -6,7 +6,6 @@ using static UnityEngine.GraphicsBuffer;
 using static UnityEngine.UI.Image;
 
 public class Player : MonoBehaviour {
-
     public enum PlayerType {
         NONE = 0,
         PLAYER_1,
@@ -17,7 +16,7 @@ public class Player : MonoBehaviour {
 
     [Header("Pickup")]
     [SerializeField] private float pickupCheckBoxSize = 1.0f;
-    [SerializeField] public Vector3 pickupCheckOffset;
+    [SerializeField] private Vector3 pickupCheckOffset;
     [SerializeField] private LayerMask pickupMask;
     [SerializeField] private Vector3 pickupBoxColliderCenter;
     [SerializeField] private Vector3 pickupBoxColliderSize;
@@ -41,40 +40,38 @@ public class Player : MonoBehaviour {
 
     private PlayerType playerType = PlayerType.NONE;
 
-    public bool initialized = false;
+    private bool initialized = false;
     private bool isMoving = false;
     private bool isInteractingHeld = false;
-    public bool isInteractingTrigger = false;
+    private bool isInteractingTrigger = false;
     private bool isDashingTrigger = false;
     private bool isThrowingTrigger = false;
 
-    public bool isKnockedback = false;
-    public bool isGrounded = false;
+    private bool isKnockedback = false;
+    private bool isGrounded = false;
     private bool isDashing = false;
     private bool isStunned = false;
-    public bool isPathBlocked = false;
-    public bool isInteractingWithTaskStation = false;
+    private bool isPathBlocked = false;
+    private bool isInteractingWithTaskStation = false;
 
+    private float currentSpeed = 0.0f;
+    private float dashTimer = 0.0f;
+    private float dashCooldownTimer = 0.0f;
+    private float stunTimer = 0.0f;
 
-    public float currentSpeed = 0.0f;
-    public float dashTimer = 0.0f;
-    public float dashCooldownTimer = 0.0f;
-    public float stunTimer = 0.0f;
-
-    public Vector3 direction;
+    private Vector3 direction;
 
     private Vector3 normalBoxColliderSize;
     private Vector3 normalBoxColliderCenter;
 
-    public bool inTaskStationRange = false;
-    public TaskStation interactingTaskStation = null;
+    private bool inTaskStationRange = false;
+    private TaskStation interactingTaskStation = null;
 
     private GameObject pickupPoint = null;
-    public Creature heldCreature = null;
-
-
+    private Creature heldCreature = null;
 
     private PlayerControlScheme activeControlScheme = null;
+
 
     private GameInstance gameInstance = null;
     private SoundManager soundManager = null;
@@ -85,12 +82,9 @@ public class Player : MonoBehaviour {
     private ParticleSystem impactPS = null;
     private ParticleSystem knockbackTrailPS = null;
 
-
     private Rigidbody rigidbodyComp = null;
     private BoxCollider boxColliderComp = null;
     private Animator animatorComp = null;
-    private MeshRenderer meshRendererComp = null;
-    private Material mainMaterial;
 
     private PhysicMaterial physicsMaterial = null;
 
@@ -382,19 +376,16 @@ public class Player : MonoBehaviour {
 
         RaycastHit hit;
         if (Physics.BoxCast(origin, halfExtent, transform.forward, out hit, transform.rotation, pathCheckOffset * 2)) {
-            Debug.Log(hit.collider.name);
             if (hit.collider.CompareTag("Player") || hit.collider.CompareTag("Creature")) {
                 isPathBlocked = false;
                 return;
             }
             else {
                 if (isDashing) {
-                    Debug.LogWarning("I dashed into " + hit.collider.name);
                     StopDashing();
                     Vector3 targetDirection = hit.point - transform.position;
                     //targetDirection.Normalize();
                     //ApplyDashRetainedSpeed(-targetDirection);
-                    Debug.Log("Dash Stopped cause touching!!");
 
 
                     Vector3 bounceDirection = -transform.forward;
@@ -555,7 +546,6 @@ public class Player : MonoBehaviour {
             if (dashTimer <= 0.0f) {
                 StopDashing();
                 ApplyDashRetainedSpeed(transform.forward);
-                Debug.Log("Dashing finished!");
             }
         }
     }
@@ -597,14 +587,11 @@ public class Player : MonoBehaviour {
                 }
 
                 if (isDashing) {
-                    Debug.LogWarning("Dash interrupted by pickup!");
                     StopDashing();
-                    //Weird!
                     ApplyDashRetainedSpeed(transform.forward);
                 }
                 if (!script.GetHeldState()) {
                     PickupCreature(script);
-                    Debug.Log("Called pickup on " + script.name);
                     return;
                 }
             }
@@ -621,7 +608,7 @@ public class Player : MonoBehaviour {
                 return;
             }
         }
-        Debug.Log("Player side");
+
         heldCreature.transform.position = pickupPoint.transform.position;
     }
 

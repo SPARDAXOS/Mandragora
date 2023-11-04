@@ -148,6 +148,7 @@ public class Creature : MonoBehaviour
 
         RandomizeTasks();
         SetupParticleSystems();
+        UpdateMaterials();
     }
 
     void SetupReferences()
@@ -612,8 +613,6 @@ public class Creature : MonoBehaviour
 
         if (!heldPS.isEmitting)
             heldPS.Play();
-
-        Debug.Log("OnPick : " + heldPS.isPlaying);
     }
     public void PutDown()
     {

@@ -482,7 +482,6 @@ MonoBehaviour:
   creaturesCount: 12
   spawnPointCalculationRetries: 10
   spawnHeightOffset: 16
-  currentSatisfiedCreatures: 0
 --- !u!1 &7177991095981450895
 GameObject:
   m_ObjectHideFlags: 0

@@ -18,7 +18,7 @@ public class LoseMenu : MonoBehaviour {
 
     public void RetryButton() {
         soundManager.PlaySFX("Retry", Vector3.zero, true);
-        gameInstance.StartLevelStartFade();
+        gameInstance.StartLevelFade();
     }
     public void QuitButton() {
         soundManager.PlaySFX("Quit", Vector3.zero, true);

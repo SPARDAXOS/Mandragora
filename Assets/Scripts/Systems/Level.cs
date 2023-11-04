@@ -17,12 +17,12 @@ public class Level : MonoBehaviour {
 
     private bool initialize = false;
 
-    public uint currentSatisfiedCreatures = 0;
+    private uint currentSatisfiedCreatures = 0;
 
-    float leftNavMeshEdge  = 0.0f;
-    float rightNavMeshEdge = 0.0f;
-    float upperNavMeshEdge = 0.0f;
-    float lowerNavMeshEdge = 0.0f;
+    private float leftNavMeshEdge  = 0.0f;
+    private float rightNavMeshEdge = 0.0f;
+    private float upperNavMeshEdge = 0.0f;
+    private float lowerNavMeshEdge = 0.0f;
 
     private GameInstance gameInstance = null;
     private SoundManager soundManager = null;
@@ -195,9 +195,6 @@ public class Level : MonoBehaviour {
 
 
     public Creature StartTutorial() {
-        //if (tutorialCreature)
-            //return tutorialCreature;
-
         currentSatisfiedCreatures = 0;
 
         tutorialCreature = creatures[0];

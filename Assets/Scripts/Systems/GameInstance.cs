@@ -2,9 +2,6 @@ using UnityEngine;
 using Mandragora;
 using UnityEditor;
 using System.Collections.Generic;
-using UnityEngine.UIElements;
-using Unity.VisualScripting;
-using static GameInstance;
 
 namespace Initialization {
     public class Initialization {
@@ -44,13 +41,13 @@ public class GameInstance : MonoBehaviour {
     [SerializeField] private bool playTutorials = false;
 
 
-    public GameState currentGameState = GameState.NONE;
+    private GameState currentGameState = GameState.NONE;
     private Dictionary<string, GameObject> entitiesResources;
     private Dictionary<string, GameObject> levelsResources;
 
 
-    public bool gameStarted = false;
-    public bool gamePaused = false;
+    private bool gameStarted = false;
+    private bool gamePaused = false;
     
 
 
@@ -91,7 +88,6 @@ public class GameInstance : MonoBehaviour {
 
 
     void Update() {
-        //Updated regardless?
         if (soundManagerScript)
             soundManagerScript.Tick();
 
@@ -153,6 +149,7 @@ public class GameInstance : MonoBehaviour {
             soundManagerScript.Initialize();
         }
 
+
         if (!entitiesResources["TutorialSequencer"])
             Abort("Failed to find TutorialSequencer resource");
         else {
@@ -161,13 +158,15 @@ public class GameInstance : MonoBehaviour {
             tutorialsSequencerScript.Initialize(this, soundManagerScript);
         }
 
+
         if (!entitiesResources["Countdown"])
             Abort("Failed to find Countdown resource");
         else {
             countdown = Instantiate(entitiesResources["Countdown"]);
             countdownScript = countdown.GetComponent<Countdown>();
-            countdownScript.Initialize();
+            countdownScript.Initialize(soundManagerScript);
         }
+
 
         if (!entitiesResources["FadeOut"])
             Abort("Failed to find FadeOut resource");
@@ -176,7 +175,6 @@ public class GameInstance : MonoBehaviour {
             fadeOutScript = fadeOut.GetComponent<FadeOut>();
             fadeOutScript.Initialize();
         }
-
 
 
         if (!entitiesResources["MainCamera"])
@@ -188,6 +186,7 @@ public class GameInstance : MonoBehaviour {
             mainCameraScript.Initialize();
             soundManagerScript.SetMainCamera(mainCameraScript);
         }
+
 
         if (!entitiesResources["Player"])
             Abort("Failed to find Player resource");
@@ -219,6 +218,7 @@ public class GameInstance : MonoBehaviour {
             mainMenu.SetActive(false);
         }
 
+
         if (!entitiesResources["SettingsMenu"])
             Abort("Failed to find SettingsMenu resource");
         else {
@@ -227,6 +227,7 @@ public class GameInstance : MonoBehaviour {
             settingsMenuScript.Initialize(this, soundManagerScript, gameSettings, cameraScript);
             settingsMenu.SetActive(false);
         }
+
 
         if (!entitiesResources["WinMenu"])
             Abort("Failed to find WinMenu resource");
@@ -237,6 +238,7 @@ public class GameInstance : MonoBehaviour {
             winMenu.SetActive(false);
         }
 
+
         if (!entitiesResources["LoseMenu"])
             Abort("Failed to find LoseMenu resource");
         else {
@@ -246,6 +248,7 @@ public class GameInstance : MonoBehaviour {
             loseMenu.SetActive(false);
         }
 
+
         if (!entitiesResources["CreditsMenu"])
             Abort("Failed to find CreditsMenu resource");
         else {
@@ -254,6 +257,7 @@ public class GameInstance : MonoBehaviour {
             creditsMenuScript.Initialize(this, soundManagerScript, cameraScript);
             creditsMenu.SetActive(false);
         }
+
 
         if (!entitiesResources["PauseMenu"])
             Abort("Failed to find PauseMenu resource");
@@ -265,14 +269,10 @@ public class GameInstance : MonoBehaviour {
         }
 
 
-
-
         if (!entitiesResources["EventSystem"])
             Abort("Failed to find EventSystem resource");
         else
             eventSystem = Instantiate(entitiesResources["EventSystem"]);
-
-
 
 
         if (!levelsResources["Level1"])
@@ -323,7 +323,7 @@ public class GameInstance : MonoBehaviour {
                 SetupCreditsMenuState();
                 break;
             case GameState.PLAYING:
-                SetupPlayingState();
+                Debug.LogWarning("You cant use SetGameState to start the game. Use StartLevelFade() instead!");
                 break;
             case GameState.PAUSE_MENU:
                 Debug.LogWarning("You cant use SetGameState to pause the game. Use PauseGame() instead!");
@@ -370,7 +370,7 @@ public class GameInstance : MonoBehaviour {
         creditsMenu.SetActive(true);
     }
     private void SetupPlayingState() {
-        SetCursorState(true);
+        SetCursorState(false);
         HideAllMenus();
 
         EnablePlayerCharacters();
@@ -381,15 +381,12 @@ public class GameInstance : MonoBehaviour {
 
         currentGameState = GameState.PLAYING;
         currentLevel.SetActive(true);
-        //It gets kinda messy! - Check from tutorial into start!
-        currentLevelScript.EnableEffects();
 
+        currentLevelScript.EnableEffects();
         if (playTutorials)
             soundManagerScript.PlayTrack("Tutorial", true);
         else if (!playTutorials)
             soundManagerScript.PlayTrack("Gameplay", true);
-        //WTF IF THIS IS CALLED BY SETGAMESTATE! Add debug message there
-        //StartGame();
     }
 
 
@@ -430,7 +427,7 @@ public class GameInstance : MonoBehaviour {
     }
 
 
-    public void StartLevelStartFade() {
+    public void StartLevelFade() {
         fadeOutScript.StartFadeOut(SetupPlayingState, StartGame);
     }
     public void StartLevelCountdown() {
@@ -439,7 +436,6 @@ public class GameInstance : MonoBehaviour {
     public void StartGame() {
         gameStarted = true;
 
-        Debug.Log("Start!");
         if (playTutorials)
             tutorialsSequencerScript.StartTutorials(currentLevelScript);
         else
@@ -447,7 +443,7 @@ public class GameInstance : MonoBehaviour {
     }
     public void EndGame(GameResults results) {
 
-        soundManagerScript.StopTrack(true);//?
+        soundManagerScript.StopTrack(true);
 
         if (results == GameResults.WIN) {
             soundManagerScript.PlaySFX("YouWin", Vector3.zero, true);

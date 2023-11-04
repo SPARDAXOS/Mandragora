@@ -46,7 +46,7 @@ public class MainMenu : MonoBehaviour {
 
     public void StartButton() {
         soundManager.PlaySFX("NextMenu", Vector3.zero, true);
-        gameInstance.StartLevelStartFade();
+        gameInstance.StartLevelFade();
     }
     public void SettingsButton() {
         soundManager.PlaySFX("NextMenu", Vector3.zero, true);

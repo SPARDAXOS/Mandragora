@@ -7,6 +7,7 @@ public class Countdown : MonoBehaviour {
 
     private bool initialized = false;
 
+    private SoundManager soundManager = null;
 
     private Action targetCallback = null;
     private Animation animationComp = null;
@@ -14,10 +15,11 @@ public class Countdown : MonoBehaviour {
     private GameObject GUI = null;
 
 
-    public void Initialize() {
+    public void Initialize(SoundManager soundManager) {
         if (initialized)
             return;
 
+        this.soundManager = soundManager;
         SetupReferences();
         gameObject.SetActive(false);
         initialized = true;
@@ -63,5 +65,10 @@ public class Countdown : MonoBehaviour {
         GUI.gameObject.SetActive(false);
         targetCallback = null;
     }
-    
+    public void PlayCountdownSFX() {
+        soundManager.PlaySFX("Countdown", Vector3.zero, true);
+    }
+    public void PlayCountdownFinishedSFX() {
+        soundManager.PlaySFX("CountdownFinished", Vector3.zero, true);
+    }
 }

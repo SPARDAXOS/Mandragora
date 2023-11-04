@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entries:
   - key: MainMenu
-    clip: {fileID: 8300000, guid: 4306cf479551a624495dcaf67bfcce4d, type: 3}
+    clip: {fileID: 8300000, guid: d3bb31b06e252a74db39ee7b498ed450, type: 3}
     volume: 0.4
     maxPitch: 1
     minPitch: 1
@@ -24,7 +24,7 @@ MonoBehaviour:
     maxPitch: 1
     minPitch: 1
   - key: Tutorial
-    clip: {fileID: 8300000, guid: ff1b565112f81f04e88fd6a97d8623dd, type: 3}
+    clip: {fileID: 8300000, guid: 332d0c4d8b345fc49a3ce4063908248f, type: 3}
     volume: 0.3
     maxPitch: 1
     minPitch: 1

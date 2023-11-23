@@ -38,7 +38,7 @@ public class GameInstance : MonoBehaviour {
     [SerializeField] private GameSettings gameSettings;
     [SerializeField] private PlayerControlScheme player1ControlScheme;
     [SerializeField] private PlayerControlScheme player2ControlScheme;
-    [SerializeField] private bool playTutorials = false;
+
 
 
     private GameState currentGameState = GameState.NONE;
@@ -48,7 +48,7 @@ public class GameInstance : MonoBehaviour {
 
     private bool gameStarted = false;
     private bool gamePaused = false;
-    
+    private bool playTutorials = false;
 
 
     private GameObject currentLevel;
@@ -383,10 +383,12 @@ public class GameInstance : MonoBehaviour {
         currentLevel.SetActive(true);
 
         currentLevelScript.EnableEffects();
-        if (playTutorials)
-            soundManagerScript.PlayTrack("Tutorial", true);
-        else if (!playTutorials)
-            soundManagerScript.PlayTrack("Gameplay", true);
+
+        soundManagerScript.StopTrack();
+        //if (playTutorials)
+        //    soundManagerScript.PlayTrack("Tutorial", true);
+        //else if (!playTutorials)
+        //    soundManagerScript.PlayTrack("Gameplay", true);
     }
 
 
@@ -443,7 +445,7 @@ public class GameInstance : MonoBehaviour {
     }
     public void EndGame(GameResults results) {
 
-        soundManagerScript.StopTrack(true);
+        soundManagerScript.StopTrack(); //Fade will not work cause manager is not updated in LOSE/WIN game states!
 
         if (results == GameResults.WIN) {
             soundManagerScript.PlaySFX("YouWin", Vector3.zero, true);
@@ -493,7 +495,12 @@ public class GameInstance : MonoBehaviour {
         return mainCameraScript;
     }
 
-
+    public bool GetPlayTutorials() {
+        return playTutorials;
+    }
+    public void SetPlayTutorials(bool state) {
+        playTutorials = state;
+    }
     private void SetCursorState(bool state) {
         UnityEngine.Cursor.visible = state;
         if (state)

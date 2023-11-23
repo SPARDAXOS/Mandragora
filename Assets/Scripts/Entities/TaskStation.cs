@@ -40,6 +40,7 @@ public class TaskStation : MonoBehaviour {
 
     [Space(10)]
     [Header("Settings")]
+    [SerializeField] private float disatisfactionDecrease = 0.2f;
     [SerializeField] private bool customHeldSpot = false;
     [SerializeField] private bool persistentParticles = true;
     [SerializeField] private bool interactParticles = true;
@@ -351,7 +352,7 @@ public class TaskStation : MonoBehaviour {
             EnableParticleSystem();
         }
 
-        heldCreature.CompleteTask(taskType);
+        heldCreature.CompleteTask(taskType, disatisfactionDecrease);
         DisableInteractionState();
     }
 

@@ -93,6 +93,7 @@ public class SettingsMenu : MonoBehaviour {
 
     private TMP_Dropdown pixelLightCountDropdown = null;
     private Toggle softParticlesToggle = null;
+    private Toggle tutorialsToggle = null;
     private TMP_Dropdown shadowQualityDropdown = null;
     private TMP_Dropdown shadowResolutionDropdown = null;
 
@@ -169,6 +170,7 @@ public class SettingsMenu : MonoBehaviour {
         shadowResolutionDropdown = Quality.Find("ShadowResolutionDropdown").GetComponent<TMP_Dropdown>();
 
         softParticlesToggle = Quality.Find("SoftParticlesToggle").GetComponent<Toggle>();
+        tutorialsToggle = Quality.Find("TutorialsToggle").GetComponent<Toggle>();
     }
     private void UpdateGUI() {
 
@@ -249,6 +251,10 @@ public class SettingsMenu : MonoBehaviour {
         //Soft Particles
         var softParticles = QualitySettings.softParticles;
         softParticlesToggle.isOn = softParticles;
+
+        //Tutorials
+        var tutorials = gameInstance.GetPlayTutorials();
+        tutorialsToggle.isOn = tutorials;
 
         //Audio - These are giving wierd values in the middle!
         MasterSlider.value = soundManager.GetMasterVolume();
@@ -341,6 +347,14 @@ public class SettingsMenu : MonoBehaviour {
         else if (!QualitySettings.softParticles)
             PlayerPrefs.SetInt("SoftParticles", 0);
 
+        //Tutorials
+        var playTutorials = gameSettings.playTutorials;
+        gameInstance.SetPlayTutorials(playTutorials);
+        if (playTutorials)
+            PlayerPrefs.SetInt("PlayTutorials", 1);
+        else if (!playTutorials)
+            PlayerPrefs.SetInt("PlayTutorials", 0);
+
 
         //Audio
         soundManager.SetMasterVolume(gameSettings.masterVolume);
@@ -404,6 +418,16 @@ public class SettingsMenu : MonoBehaviour {
             QualitySettings.softParticles = true;
         else
             Debug.LogError("Got -1 at soft particles!");
+
+        //Tutorials
+        int playTutorials;
+        playTutorials = PlayerPrefs.GetInt("PlayTutorials", -1);
+        if (playTutorials == 0)
+            gameInstance.SetPlayTutorials(false);
+        else if (playTutorials == 1)
+            gameInstance.SetPlayTutorials(true);
+        else
+            Debug.LogError("Got -1 at Tutorials");
 
         //Audio
         float masterVolume = PlayerPrefs.GetFloat("MasterVolume", 0.0f);
@@ -689,7 +713,16 @@ public class SettingsMenu : MonoBehaviour {
         else if (!QualitySettings.softParticles)
             PlayerPrefs.SetInt("SoftParticles", 0);
     }
-    
+    public void ToggleTutorials() {
+        bool value = tutorialsToggle.isOn;
+        gameInstance.SetPlayTutorials(value);
+
+        if (value)
+            PlayerPrefs.SetInt("PlayTutorials", 1);
+        else if (!value)
+            PlayerPrefs.SetInt("PlayTutorials", 0);
+    }
+
     //Sound
     public void SetMasterSlider() {
         if (initialize)

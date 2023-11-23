@@ -95,7 +95,7 @@ MonoBehaviour:
     minPitch: 1.2
   - key: CreatureDelivered
     clip: {fileID: 8300000, guid: 96c1d7c6170ff214fba6acb8c4b2f446, type: 3}
-    volume: 1
+    volume: 0.5
     maxPitch: 1
     minPitch: 1
   - key: Retry

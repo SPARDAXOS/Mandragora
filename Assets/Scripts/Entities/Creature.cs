@@ -193,7 +193,7 @@ public class Creature : MonoBehaviour
         taskList.Add(type);
         SetParticleSystemState(type, true);
     }
-    public void CompleteTask(TaskStation.TaskType completedTask)
+    public void CompleteTask(TaskStation.TaskType completedTask, float reduction)
     {
         for (int i = 0; i < taskList.Count; i++)
         {
@@ -201,6 +201,10 @@ public class Creature : MonoBehaviour
             if (task == completedTask)
             {
                 taskList.RemoveAt(i);
+                dissatisfaction -= reduction;
+                if (dissatisfaction < 0.0f)
+                    dissatisfaction = 0.0f;
+
                 SetParticleSystemState(completedTask, false);
                 Debug.Log("CompleteTask");
                 transform.position += 1.5f * Vector3.up;
@@ -247,13 +251,13 @@ public class Creature : MonoBehaviour
         dissatisfaction += dissatisfactionMultiplier * timeIncrement * Time.deltaTime;
 
 
-        if (IsSatisfied())
-        {
-            dissatisfaction = 0;
-            doDissatisfaction = false;
-        }
+        //if (IsSatisfied())
+        //{
+        //    dissatisfaction = 0;
+        //    doDissatisfaction = false;
+        //}
 
-        else if (dissatisfaction >= 1f)
+        if (dissatisfaction >= 1f)
             levelScript.RegisterCreatureDesatisfied();
 
         UpdateMaterials();

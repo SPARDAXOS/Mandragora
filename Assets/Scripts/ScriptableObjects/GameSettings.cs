@@ -21,6 +21,7 @@ public class GameSettings : ScriptableObject {
     [SerializeField] public bool softParticles = true;
     [SerializeField] public SettingsMenu.ShadowQuality shadowQuality = SettingsMenu.ShadowQuality.HARD_AND_SOFT;
     [SerializeField] public SettingsMenu.ShadowResolution shadowResolution = SettingsMenu.ShadowResolution.ULTRA;
+    [SerializeField] public bool playTutorials = true;
 
 
     [Header("Sound")]

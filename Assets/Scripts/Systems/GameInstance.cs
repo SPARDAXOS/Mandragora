@@ -384,11 +384,10 @@ public class GameInstance : MonoBehaviour {
 
         currentLevelScript.EnableEffects();
 
-        soundManagerScript.StopTrack();
-        //if (playTutorials)
-        //    soundManagerScript.PlayTrack("Tutorial", true);
-        //else if (!playTutorials)
-        //    soundManagerScript.PlayTrack("Gameplay", true);
+        if (playTutorials)
+            soundManagerScript.PlayTrack("Tutorial", true);
+        else if (!playTutorials)
+            soundManagerScript.PlayTrack("Gameplay", true);
     }
 
 

@@ -315,25 +315,25 @@ public class TaskStation : MonoBehaviour {
 
         if (taskType == TaskType.BATHING) {
             if (!sfxInterruptable)
-                soundManager.PlaySFX("CreatureBath", transform.position, false, false, gameObject);
+                soundManager.PlaySFX("CreatureBath", transform.position, true, true, gameObject);
             else
                 soundManager.PlaySFX("CreatureBath", transform.position);
         }
         else if (taskType == TaskType.FEEDING) {
             if (!sfxInterruptable)
-                soundManager.PlaySFX("CreatureEat", transform.position, false, false, gameObject);
+                soundManager.PlaySFX("CreatureEat", transform.position, true, true, gameObject);
             else
                 soundManager.PlaySFX("CreatureEat", transform.position);
         }
         else if (taskType == TaskType.HEALING) {
             if (!sfxInterruptable)
-                soundManager.PlaySFX("CreatureHeal", transform.position, false, false, gameObject);
+                soundManager.PlaySFX("CreatureHeal", transform.position, true, false, gameObject);
             else
                 soundManager.PlaySFX("CreatureHeal", transform.position);
         }
         else if (taskType == TaskType.SLEEPING) {
             if (!sfxInterruptable)
-                soundManager.PlaySFX("CreatureSleep", transform.position, false, false, gameObject);
+                soundManager.PlaySFX("CreatureSleep", transform.position, true, false, gameObject);
             else
                 soundManager.PlaySFX("CreatureSleep", transform.position);
         }

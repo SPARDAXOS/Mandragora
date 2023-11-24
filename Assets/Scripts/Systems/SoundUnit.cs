@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class SoundUnit : MonoBehaviour {
 
+    public enum SpatialBlendMode { TWO_DIMENSIONAL, THREE_DIMENSIONAL }
+
     private bool initialize = false;
     private AudioSource audioSource = null;
     
@@ -27,6 +29,12 @@ public class SoundUnit : MonoBehaviour {
         audioSource.clip = entry.clip;
         audioSource.Play();
         return true;
+    }
+    public void SetSpatialBlend(SpatialBlendMode mode) {
+        if (mode == SpatialBlendMode.TWO_DIMENSIONAL)
+            audioSource.spatialBlend = 0.0f;
+        else if (mode == SpatialBlendMode.THREE_DIMENSIONAL)
+            audioSource.spatialBlend = 1.0f;
     }
 
     private void RandomizePitch(float min, float max) {

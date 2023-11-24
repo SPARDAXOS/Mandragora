@@ -60,14 +60,14 @@ MonoBehaviour:
     minPitch: 1
   - key: CreatureEat
     clip: {fileID: 8300000, guid: 6072ed51bbb0fd746bfd0e642a42854d, type: 3}
-    volume: 1
-    maxPitch: 1
+    volume: 0.7
+    maxPitch: 0.8
     minPitch: 1.4
   - key: CreatureBath
     clip: {fileID: 8300000, guid: 8b5e2d7e89b10c342ac384b244bb58e8, type: 3}
-    volume: 0.7
-    maxPitch: 0.8
-    minPitch: 1.6
+    volume: 0.25
+    maxPitch: 1
+    minPitch: 2
   - key: CreatureHeal
     clip: {fileID: 8300000, guid: 50775f64e729cdf409ae583fd31cd785, type: 3}
     volume: 1

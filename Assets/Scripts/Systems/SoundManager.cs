@@ -130,11 +130,13 @@ public class SoundManager : MonoBehaviour {
         if (worldwide && mainCamera) {
             if (!newUnit)
                 AddSFXRequest(owner, key, soundUnit);
+            soundUnit.SetSpatialBlend(SoundUnit.SpatialBlendMode.TWO_DIMENSIONAL); //Could have just done this!
             return soundUnit.Play((SoundEntry)TargetSoundEntry, mainCamera.transform.position, volume);
         }
         else if (worldwide && !mainCamera)
             Debug.LogWarning("Unable to play clip " + key + " worldwide due to missing MainCamera reference!");
 
+        soundUnit.SetSpatialBlend(SoundUnit.SpatialBlendMode.THREE_DIMENSIONAL); //Could have just done this!
         if (!newUnit)
             AddSFXRequest(owner, key, soundUnit);
         return soundUnit.Play((SoundEntry)TargetSoundEntry, position, volume);

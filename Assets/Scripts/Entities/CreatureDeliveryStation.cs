@@ -37,7 +37,7 @@ public class CreatureDeliveryStation : MonoBehaviour {
             creature.RegisterSatisfied();
             player.DropHeldCreature();
             if (soundManager)
-                soundManager.PlaySFX("CreatureDelivered", Vector3.zero, true, false, gameObject);
+                soundManager.PlaySFX("CreatureDelivered", Vector3.zero, true);
             else
                 Debug.LogWarning("SoundManager is not set on " + gameObject.name);
 
